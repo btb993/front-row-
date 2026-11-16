@@ -36,6 +36,11 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.5)
+  - "✓ Seen it" under every poster on list pages and in the watchlist;
+    once seen, the button becomes stars so you can rate it right there.
+    ▶ starts watching.
+
 WHAT'S INSIDE (v1.4)
   - Discover tab: Recommended for you, Trending this week (from
     Wikipedia page views), Coming soon (upcoming films and series, plus

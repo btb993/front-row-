@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="1.4">
+<html lang="en" data-ver="1.5">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -434,6 +434,10 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .lacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .lacts button{border-radius:12px;padding:9px 16px;font-weight:700;font-size:15px;cursor:pointer;border:1.5px solid color-mix(in srgb,var(--lk) 45%,transparent);background:color-mix(in srgb,var(--lk) 12%,transparent);color:var(--lk);backdrop-filter:blur(4px)}
 .lacts .lb1{background:var(--la);border-color:var(--la);color:var(--lai)}
+.lstats,.ldesc{text-shadow:var(--lsh)}
+.ls-pride .lacts .lb2,.ls-cartoon .lacts .lb2{background:rgba(0,0,0,.42);border-color:rgba(255,255,255,.55);color:#fff;text-shadow:none}
+.ls-cartoon .lacts .lb2{background:rgba(27,27,58,.85)}
+.ls-pride .lstats{background:rgba(0,0,0,.35);border-radius:10px;padding:3px 10px;display:inline-flex}
 .lacts button:hover{filter:brightness(1.1)}
 @media (max-width:640px){.lhin{grid-template-columns:minmax(0,1fr)}.lhin .fan{display:none}.lhero{padding:22px}}
 /* card wrapper, menu button, list dots */
@@ -543,6 +547,8 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .jog{display:flex;gap:9px;align-items:center;font-size:14.5px;cursor:pointer;background:var(--gold-soft);border-radius:10px;padding:7px 12px}
 .jog input{width:18px;height:18px;accent-color:var(--gold)}
 #view-discover .panel{gap:14px}
+.cquick{display:flex;gap:6px}
+.cquick .btn.gold{flex:1}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:80;box-shadow:var(--shadow);max-width:90vw;display:flex;gap:12px;align-items:center;animation:rise .25s}
 .toast button{border:0;background:none;color:var(--gold);font-weight:700;cursor:pointer;padding:0}
 @media (min-width:761px){.toast{bottom:24px}}
@@ -1173,14 +1179,14 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       </div>
       ${L ? `<div class="banner"><span class="mono">List</span><b>${esc(L.name)}</b><span class="muted">Titles you add from search go on this list too.</span><button class="linkbtn" type="button" data-openlist="${esc(L.id)}" style="margin-left:auto">Open the list page</button><button class="linkbtn" type="button" data-unlist>Show everything</button></div>` : ""}
       ${missing ? `<div class="fillbar"><span>${missing} title${missing === 1 ? " has" : "s have"} no poster yet.</span><button class="btn small gold" type="button" id="fill-btn" ${filling ? "disabled" : ""}>${filling ? `<span class="dots">Finding posters</span>` : "Find posters and details"}</button></div>` : ""}
-      ${list.length ? `<div class="grid">${list.map(it => cardW(it)).join("")}</div>` : emptyHTML()}
+      ${list.length ? `<div class="grid">${list.map(it => cardW(it, { quick: statusF !== "dropped" })).join("")}</div>` : emptyHTML()}
       ${homeTeaser()}`;
   }
   function cardHTML(it, opt = {}){
     let extra = "";
     if (it.priority && it.status === "want") extra += `<span class="ribbon">Must see</span>`;
     if (it.fav && it.status === "watched") extra += `<span class="ribbon fav">♥ Favourite</span>`;
-    if (it.status === "watched" && !opt.rate) extra += `<span class="stub"><span>${it.finished ? esc(fmtDate(it.finished).replace(/ \d{4}$/, "")) : "Seen"}</span><span class="st">${starTxt(it.rating)}</span></span>`;
+    if (it.status === "watched" && !opt.rate && !opt.quick) extra += `<span class="stub"><span>${it.finished ? esc(fmtDate(it.finished).replace(/ \d{4}$/, "")) : "Seen"}</span><span class="st">${starTxt(it.rating)}</span></span>`;
     const sub = it.type === "tv" ? (it.seasons ? `${it.seasons} season${it.seasons > 1 ? "s" : ""}` : "Series") : (fmtRun(it.runtime) || "Film");
     const right = it.status === "watching" && it.type === "tv" ? `<span class="mono" style="font-size:11px">S${num(it.season) || 1}·E${num(it.episode)}</span>` : it.imdb ? `<span class="sc imdb">${Number(it.imdb).toFixed(1)}</span>` : "";
     return `<button class="card" type="button" data-open="${esc(it.id)}">${posterHTML(it, { extra })}<span class="ct">${esc(it.title)}${listDots(it)}</span><span class="cs"><span>${esc([it.year, sub].filter(Boolean).join(" · "))}</span>${right}</span>${it.status === "watching" && it.type === "tv" && tvProgress(it) ? `<span class="mini"><span style="width:${tvProgress(it)}%"></span></span>` : ""}${(view === "library" && statusF === "all") || (view === "list" && lpStatus === "all") ? `<span><span class="pill ${it.status}">${esc(STATUS[it.status])}</span></span>` : ""}</button>`;
@@ -1292,7 +1298,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       ${mem.length ? `<div class="ctrl" style="margin-top:20px">
         <div class="seg" role="group" aria-label="Show">${[["left", "To watch", left.length], ["seen", "Seen", seen.length], ["all", "Everything", mem.length]].map(([k, t, n]) => `<button type="button" data-lps="${k}" aria-pressed="${lpStatus === k}">${t}<span class="n">${n}</span></button>`).join("")}</div>
         <div class="tools" style="margin:0">${minSel("lpmin", lpMin)}<select class="sel" id="lpsort" aria-label="Sort">${[["listed", "Recently added to list"], ["short", "Shortest first"], ["imdb", "IMDb rating"], ["rating", "Your rating"], ["year", "Newest release"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${lpSort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>
-        ${shown.length ? `<div class="grid">${shown.map(it => cardW(it, { remove: l.id })).join("")}</div>` : `<div class="empty"><h3>Nothing here</h3><span class="serif">${lpStatus === "seen" ? "Nothing from this list seen yet." : "You've seen everything on this list."}</span></div>`}`
+        ${shown.length ? `<div class="grid">${shown.map(it => cardW(it, { remove: l.id, quick: true })).join("")}</div>` : `<div class="empty"><h3>Nothing here</h3><span class="serif">${lpStatus === "seen" ? "Nothing from this list seen yet." : "You've seen everything on this list."}</span></div>`}`
       : `<div class="empty"><h3>An empty list</h3><span class="serif">Add from your library, or find something new.</span><button class="btn primary" type="button" data-addto="${esc(l.id)}">+ Add titles</button></div>`}`;
   }
 
@@ -1434,7 +1440,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     return e.clientX && e.clientX - b.left < b.width / 2 ? n - .5 : n;
   }
   function cardW(it, opt = {}){
-    return `<div class="cardw">${cardHTML(it, opt)}<button class="cbtn" type="button" data-listpop="id:${esc(it.id)}" aria-label="Options and lists for ${esc(it.title)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button>${opt.remove ? `<button class="cbtn rm" type="button" data-unlistitem="${esc(it.id)}" data-lid="${esc(opt.remove)}" aria-label="Remove from this list" title="Remove from this list">×</button>` : ""}${opt.rate ? `<div class="crate">${rateHTML(it)}<button class="fav${it.fav ? " on" : ""}" type="button" data-fav="${esc(it.id)}" aria-label="${it.fav ? "Remove from favourites" : "Favourite"}" aria-pressed="${!!it.fav}">♥</button></div>` : ""}</div>`;
+    return `<div class="cardw">${cardHTML(it, opt)}<button class="cbtn" type="button" data-listpop="id:${esc(it.id)}" aria-label="Options and lists for ${esc(it.title)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button>${opt.remove ? `<button class="cbtn rm" type="button" data-unlistitem="${esc(it.id)}" data-lid="${esc(opt.remove)}" aria-label="Remove from this list" title="Remove from this list">×</button>` : ""}${opt.quick && !opt.rate && it.status !== "watched" ? `<div class="cquick"><button class="btn small gold" type="button" data-quickseen="${esc(it.id)}">✓ Seen it</button>${it.status === "want" ? `<button class="btn small icon" type="button" data-quickwatch="${esc(it.id)}" title="Start watching" aria-label="Start watching">▶</button>` : ""}</div>` : ""}${opt.rate || (opt.quick && it.status === "watched") ? `<div class="crate">${rateHTML(it)}<button class="fav${it.fav ? " on" : ""}" type="button" data-fav="${esc(it.id)}" aria-label="${it.fav ? "Remove from favourites" : "Favourite"}" aria-pressed="${!!it.fav}">♥</button></div>` : ""}</div>`;
   }
   function listDots(it){
     const ls = (it.lists || []).map(listById).filter(Boolean);
@@ -2373,6 +2379,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
       upsert({ ...it, rating: n }, n ? `${it.title}: ${starTxt(n)}` : "Rating cleared");
       if (pop) renderPop(); if (res.state === "done") renderResults(); return;
     }
+    if (D.quickseen) { const it = items().find(x => x.id === D.quickseen); if (it) upsert(withStatus(it, "watched"), `✓ ${it.title} is in Seen it. Tap the stars to rate it.`, true); return; }
+    if (D.quickwatch) { const it = items().find(x => x.id === D.quickwatch); if (it) upsert(withStatus(it, "watching"), `Watching ${it.title}`, true); return; }
     if (D.fav) { const it = items().find(x => x.id === D.fav); if (it) upsert({ ...it, fav: !it.fav }, it.fav ? "Removed from favourites" : `♥ ${it.title}`); return; }
     if (t.tagName === "A") return;
     if (D.mclose !== undefined || t.id === "x-btn" || t.id === "cancel-btn") return closeModal();

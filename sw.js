@@ -1,5 +1,5 @@
 // Front Row: lets the app open offline and remembers posters.
-const SHELL = "frontrow-shell-v4", POSTERS = "frontrow-posters-v1";
+const SHELL = "frontrow-shell-v5", POSTERS = "frontrow-posters-v1";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "favicon-64.png"];
 
 self.addEventListener("install", e => {
