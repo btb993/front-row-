@@ -36,6 +36,20 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v2.2)
+- Discover: dozens of ready-made lists for films and TV (popular, top rated, genres, decades,
+  world cinema incl. Serbian and Croatian, studios, networks, awards). They open instantly and
+  are rebuilt every Monday by a GitHub job (data/pool.json, data/lists.json).
+- Recommendations are instant, picked from the whole pool for your taste. Anything you add
+  disappears and the next pick moves up. "Dig deeper" still searches directors and actors.
+- Seen-it blitz works through any ready-made list.
+- Import: IMDb ratings/watchlist exports and Letterboxd exports (ratings and watched dates come
+  along), or paste a list of titles.
+- Streaming countries: Serbia, Croatia, Bosnia, Montenegro, North Macedonia, Slovenia and more.
+- Friends: profiles and friendships shared with Save Point; see friends' watching, watchlist,
+  seen titles, ratings, favourites and lists, taste match and activity. One-time setup:
+  run supabase/social.sql in the Supabase SQL editor. It also adds the invite code frontrow2026.
+
 WHAT'S INSIDE (v2.1)
   - Where to watch: pick your streaming services and country in
     Settings. Every title shows where it streams (and where to rent or
