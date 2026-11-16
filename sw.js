@@ -1,5 +1,5 @@
 // Front Row: lets the app open offline and remembers posters.
-const SHELL = "frontrow-shell-v10", POSTERS = "frontrow-posters-v1";
+const SHELL = "frontrow-shell-v11", POSTERS = "frontrow-posters-v1";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "favicon-64.png"];
 
 self.addEventListener("install", e => {
@@ -29,4 +29,13 @@ self.addEventListener("fetch", e => {
       return r;
     }).catch(() => fetch(req)));
   }
+});
+
+// tapping a "new episodes" notification opens the app on Home
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
+    const win = list.find(c => c.url.includes(self.registration.scope));
+    return win ? win.focus() : self.clients.openWindow(self.registration.scope);
+  }));
 });

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="2.0">
+<html lang="en" data-ver="2.1">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://www.wikidata.org">
 <link rel="preconnect" href="https://adkfuzmontecmhfnrcyb.supabase.co">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Bungee&family=Creepster&family=Monoton&family=Orbitron:wght@700&family=Pacifico&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Bungee&family=Creepster&family=Monoton&family=Orbitron:wght@700&family=Pacifico&family=Limelight&family=VT323&display=swap">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>try{var t=localStorage.getItem("front-row-theme");if(t&&t!=="auto")document.documentElement.dataset.theme=t;}catch(e){}</script>
 <style>
@@ -579,6 +579,7 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .btn.seenb{border-color:var(--gold);color:var(--gold);background:transparent}
 .btn.seenb:hover{background:var(--gold-soft)}
 .hsec{margin-top:6px}
+.hsec+.hsec{margin-top:16px}
 .hsec .sechead{margin-bottom:10px}
 .cwrow .cw1{flex:0 0 330px;display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:10px;border-radius:14px;background:linear-gradient(180deg,var(--house),var(--house2));color:var(--cream);box-shadow:var(--shadow);scroll-snap-align:start}
 .cw1 .poster{--fs:8px;border:0;padding:0;cursor:pointer}
@@ -642,6 +643,112 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .bg{border:1.5px dashed var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;opacity:.6}
 .bg b{font-size:14.5px}.bg span{font-size:12px;color:var(--muted)}
 .bg.on{border-style:solid;border-color:var(--gold);background:var(--gold-soft);opacity:1}
+/* ---------- v2.1: where to watch, new episodes, trailers, blitz ---------- */
+.svc{position:absolute;z-index:4;left:6px;bottom:6px;background:var(--c);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:5px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.wtw{display:flex;flex-direction:column;gap:6px}
+.wrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.wrow.small{font-size:13px}
+.wchip{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--c);color:var(--ink);border-radius:999px;padding:4px 12px;text-decoration:none;font-weight:600;font-size:14px;background:color-mix(in srgb,var(--c) 12%,transparent)}
+.wchip.yours{background:var(--c);color:#fff}
+.wrow.small .wchip{font-size:12.5px;padding:2px 9px}
+.svcpick{display:flex;flex-wrap:wrap;gap:6px}
+.svcpick button{border:1.5px solid var(--c);background:transparent;color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer;font-weight:600;font-size:14px}
+.svcpick button[aria-pressed="true"]{background:var(--c);color:#fff}
+.nerow .ne{flex:0 0 300px;display:grid;grid-template-columns:70px minmax(0,1fr);gap:12px;padding:10px;border-radius:14px;background:var(--panel);border:1px solid var(--line);scroll-snap-align:start}
+.ne .poster{--fs:7px;border:0;padding:0;cursor:pointer}
+.ne>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ne b{font-family:var(--f-display);font-size:19px;font-weight:800;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nek{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ne .muted{font-size:12.5px}
+.ne .btn{margin-top:auto;align-self:flex-start}
+.soon{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.soon .lbl{margin:0 6px 0 0}
+.soon button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 11px;font-size:13.5px;cursor:pointer}
+.soon b{color:var(--accent);font-family:var(--f-mono);font-weight:500;margin-right:3px}
+.nav [data-go="home"]{position:relative}
+.nav .hasnew::after{content:"";position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+#trailer{display:flex;flex-direction:column;gap:8px}
+.tframe{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.hero .links .tbtn{background:#FF4D5A;border-color:#FF4D5A;color:#170B0E;font-weight:700}
+.bwall{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:16px 12px}
+.bw{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bwp{border:0;padding:0;background:none;cursor:pointer;display:block;width:100%;transition:transform .12s}
+.bwp:active{transform:scale(.96)}
+.bw .poster{--fs:11px}
+.bw.on .poster{outline:3px solid var(--good);outline-offset:2px}
+.bwck{position:absolute;z-index:6;inset:auto 6px 6px auto;background:var(--good);color:#fff;font-weight:900;border-radius:50%;width:30px;height:30px;display:grid;place-items:center;font-size:17px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.bwck.want{width:auto;height:auto;border-radius:5px;padding:1px 6px;font-size:10px;font-weight:700;background:var(--blue)}
+.bwt{font-size:13px;font-weight:700;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bwt small{font-weight:400;color:var(--muted)}
+.bw .rate .rs{width:20px;height:20px;font-size:18px}.bw .rate .rs i::before{width:20px;height:20px}
+.swipe{display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 20px;user-select:none}
+.scard{position:relative;width:min(300px,72vw);touch-action:none;cursor:grab;transition:transform .25s cubic-bezier(.3,1.3,.5,1)}
+.scard img,.scard .poster{pointer-events:none;-webkit-user-drag:none;user-select:none}
+.scard .poster{--fs:20px;box-shadow:0 22px 50px rgba(0,0,0,.5);border-radius:14px}
+.stag{position:absolute;z-index:8;top:22px;font-family:var(--f-display);font-weight:900;font-size:34px;padding:2px 12px;border:4px solid currentColor;border-radius:10px;opacity:0;transition:opacity .1s}
+.stag.l{right:16px;color:#FF4D5A;transform:rotate(12deg)}.stag.r{left:16px;color:#3EE68A;transform:rotate(-12deg)}.stag.u{left:50%;top:auto;bottom:30px;transform:translateX(-50%);color:#7FB2FF}
+.scard.gl .stag.l,.scard.gr .stag.r,.scard.gu .stag.u{opacity:1}
+.sinfo{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.sinfo b{font-family:var(--f-display);font-size:26px;font-weight:900;text-transform:uppercase;line-height:1}
+.sbtns{display:flex;gap:18px}
+.sb{width:64px;height:64px;border-radius:50%;border:2px solid var(--line);background:var(--panel);font-size:28px;font-weight:900;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s}
+.sb:hover{transform:scale(1.08)}
+.sb.no{color:#FF4D5A;border-color:#FF4D5A}.sb.yes{color:#3EE68A;border-color:#3EE68A}.sb.want{color:#7FB2FF;border-color:#7FB2FF;width:52px;height:52px;align-self:center;font-size:24px}
+.scard.rated{width:min(200px,50vw);cursor:default}
+.srate{display:flex;flex-direction:column;align-items:center;gap:12px}
+.srate b{font-family:var(--f-display);font-size:24px;font-weight:800;text-align:center}
+.srate .rate .rs{width:46px;height:46px;font-size:42px}.srate .rate .rs i::before{width:46px;height:46px}
+
+/* ---------- bulb colours per theme ---------- */
+.bulbs i{background:radial-gradient(circle at 36% 30%,var(--b1,#FFFFF4) 0 16%,var(--b2,#FFEBB0) 32%,var(--b3,#FFB84D) 62%,var(--b4,#A65B0E) 100%);
+  box-shadow:0 0 0 1.5px #2C170A,0 0 5px 2px var(--bgl1,rgba(255,205,120,.9)),0 0 16px 5px var(--bgl2,rgba(255,150,60,.32))}
+
+/* ---------- theme: Drive-in ---------- */
+:root[data-theme="drivein"]{--bg:#0A0E24;--bg2:#141B40;--panel:#121838;--ink:#EAF2FF;--muted:#9AA6C8;--line:#26305A;--accent:#FF4FA3;--accent-ink:#0A0E24;--accent-soft:#3A1840;--gold:#FFC857;--gold-soft:#3A3218;--good:#3EE6C8;--blue:#7FB2FF;--curtain:#0A0E24;--grain:.04;--house:#0B1030;--house2:#05081A;--cream:#F4F7FF;--dim:#B6C0E0;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 14px 32px rgba(0,0,0,.55);--b1:#F2FFFD;--b2:#C9FFF6;--b3:#3EE6C8;--b4:#0E6E66;--bgl1:rgba(62,230,200,.85);--bgl2:rgba(62,230,200,.28);color-scheme:dark}
+[data-theme="drivein"] body{background-color:#05081A;background-image:radial-gradient(1.3px 1.3px at 12px 24px,#fff,transparent),radial-gradient(1px 1px at 90px 70px,#cfe0ff,transparent),radial-gradient(1.6px 1.6px at 150px 120px,#fff,transparent),radial-gradient(1px 1px at 40px 150px,#fff9d6,transparent),linear-gradient(180deg,#04061A,#0A0E24 45%,#211547);background-size:170px 170px,230px 230px,290px 290px,190px 190px,100% 100%;background-attachment:fixed}
+[data-theme="drivein"] .curtain{display:none}
+[data-theme="drivein"] body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:64px;pointer-events:none;z-index:0;opacity:.85;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='60'%3E%3Cpath d='M10 60v-14c0-4 3-6 7-7l14-3 10-11c2-2 4-3 7-3h34c3 0 6 1 8 4l9 11 13 2c4 1 6 4 6 8v13z' fill='%2303051A'/%3E%3Cpath d='M140 60v-12c0-4 2-6 6-7l10-2 12-12c2-2 5-3 8-3h28c4 0 7 2 9 5l7 10 16 3c3 1 5 3 5 7v11z' fill='%2303051A'/%3E%3C/svg%3E") repeat-x bottom/260px 60px}
+[data-theme="drivein"] .marquee{background:radial-gradient(ellipse 70% 120% at 50% 120%,rgba(62,230,200,.18),transparent 60%),linear-gradient(180deg,#121A48,#090D2A);box-shadow:var(--shadow),inset 0 0 0 1px rgba(62,230,200,.25),inset 0 0 0 7px #070B22,inset 0 0 0 8px rgba(255,79,163,.25),0 0 50px rgba(62,230,200,.12)}
+[data-theme="drivein"] .sign h1{font-family:"Pacifico",cursive;font-weight:400;text-transform:none;color:#FF8CCB;text-shadow:0 0 4px #fff,0 0 12px #FF4FA3,0 0 30px #FF4FA3,0 0 60px rgba(255,79,163,.5);letter-spacing:0;line-height:1}
+[data-theme="drivein"] .sign h1 span{color:#7FFFEA;text-shadow:0 0 4px #fff,0 0 12px #3EE6C8,0 0 30px #3EE6C8}
+[data-theme="drivein"] .tick{background:linear-gradient(180deg,#E9FFFB,#A9EEE3);color:#0A0E24}
+[data-theme="drivein"] .find input{border-color:rgba(62,230,200,.4);background:rgba(62,230,200,.07);box-shadow:inset 0 0 16px rgba(62,230,200,.12)}
+[data-theme="drivein"] .board .c.red{color:#FF8CCB}
+
+/* ---------- theme: Art deco palace ---------- */
+:root[data-theme="deco"]{--bg:#0D0B08;--bg2:#1A150C;--panel:#16120B;--ink:#F3E6C4;--muted:#B7A57A;--line:#3B3020;--accent:#D4AF37;--accent-ink:#0D0B08;--accent-soft:#2E2610;--gold:#E8C766;--gold-soft:#2E2610;--good:#9CCB86;--blue:#9FB8D8;--curtain:#2A1E0A;--house:#120E07;--house2:#070502;--cream:#F6E7BE;--dim:#CDB98A;--grain:.05;
+  --f-display:"Limelight","Big Shoulders Display",serif;--b1:#FFFDF0;--b2:#FFF0C2;--b3:#E8C766;--b4:#8A6A16;--bgl1:rgba(232,199,102,.9);--bgl2:rgba(212,175,55,.3);color-scheme:dark}
+[data-theme="deco"] body{background-image:repeating-conic-gradient(from 0deg at 50% -10%,rgba(212,175,55,.06) 0 4deg,transparent 4deg 10deg),radial-gradient(ellipse 70% 520px at 50% -120px,rgba(212,175,55,.18),transparent 70%)}
+[data-theme="deco"] h1,[data-theme="deco"] h2,[data-theme="deco"] h3,[data-theme="deco"] .kpi .v,[data-theme="deco"] .tick b,[data-theme="deco"] .cwt,[data-theme="deco"] .func b{font-weight:400;letter-spacing:.04em}
+[data-theme="deco"] .curtain{background:repeating-linear-gradient(90deg,rgba(212,175,55,.22) 0 2px,transparent 2px 16px),linear-gradient(180deg,#2A1E0A,#0D0B08)}
+[data-theme="deco"] .marquee{border-radius:6px;background:repeating-conic-gradient(from 180deg at 50% 110%,rgba(212,175,55,.09) 0 5deg,transparent 5deg 10deg),linear-gradient(180deg,#1A140A,#070502);box-shadow:var(--shadow),inset 0 0 0 2px #D4AF37,inset 0 0 0 7px #120E07,inset 0 0 0 8px rgba(212,175,55,.55)}
+[data-theme="deco"] .sign h1{color:#F6E7BE;text-shadow:0 0 1px #fff,0 0 16px rgba(232,199,102,.5);letter-spacing:.06em}
+[data-theme="deco"] .sign h1 span{color:#E8C766;text-shadow:0 0 18px rgba(232,199,102,.7);animation:none}
+[data-theme="deco"] .panel,[data-theme="deco"] .kpi,[data-theme="deco"] .lcard,[data-theme="deco"] .func,[data-theme="deco"] .results,[data-theme="deco"] .modal{border-radius:6px;border-color:rgba(212,175,55,.35)}
+[data-theme="deco"] .poster{border-radius:3px;box-shadow:0 0 0 1px rgba(212,175,55,.4),0 10px 20px rgba(0,0,0,.5)}
+[data-theme="deco"] .tick{background:linear-gradient(180deg,#F6E7BE,#D9BE7A)}
+
+/* ---------- theme: VHS rental store ---------- */
+:root[data-theme="vhs"]{--bg:#0B1F7A;--bg2:#0A1966;--panel:#102A96;--ink:#FFF7D1;--muted:#C7CCF2;--line:#2C47B8;--accent:#FFD400;--accent-ink:#0B1F7A;--accent-soft:#24398F;--gold:#FFD400;--gold-soft:#24398F;--good:#4CFF9A;--blue:#9FD0FF;--curtain:#081763;--house:#071459;--house2:#040B36;--cream:#FFF7D1;--dim:#C7CCF2;--grain:.08;
+  --f-display:"Bungee","Big Shoulders Display",sans-serif;--f-mono:"VT323",ui-monospace,monospace;--b1:#FFF2F2;--b2:#FFB3B3;--b3:#FF3B3B;--b4:#8A0D0D;--bgl1:rgba(255,80,80,.85);--bgl2:rgba(255,59,59,.3);color-scheme:dark}
+[data-theme="vhs"] body{background-image:linear-gradient(100deg,transparent 0 72%,rgba(255,212,0,.07) 72% 76%,transparent 76%)}
+[data-theme="vhs"] body::after{background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:normal;opacity:.35}
+[data-theme="vhs"] h1,[data-theme="vhs"] h2,[data-theme="vhs"] h3,[data-theme="vhs"] .kpi .v,[data-theme="vhs"] .tick b,[data-theme="vhs"] .cwt,[data-theme="vhs"] .func b{font-weight:400}
+[data-theme="vhs"] .mono,[data-theme="vhs"] .lbl{font-size:15px;letter-spacing:.04em}
+[data-theme="vhs"] .curtain{background:repeating-linear-gradient(0deg,#FFD400 0 6px,#081763 6px 22px);opacity:.25}
+[data-theme="vhs"] .marquee{border-radius:8px;background:linear-gradient(100deg,transparent 91%,#FFD400 91% 95%,transparent 95%),linear-gradient(180deg,#1238B0,#0A1F66);box-shadow:var(--shadow),inset 0 0 0 3px #FFD400,inset 0 0 0 8px #071459}
+[data-theme="vhs"] .bulbs i{border-radius:2px;width:8px;height:8px}
+[data-theme="vhs"] .sign h1{color:#FFD400;text-shadow:4px 4px 0 #000,0 0 18px rgba(255,212,0,.35)}
+[data-theme="vhs"] .sign h1 span{color:#FF3B3B;text-shadow:4px 4px 0 #000;animation:none}
+[data-theme="vhs"] .poster{border-radius:3px}
+[data-theme="vhs"] .ribbon{background:#FF3B3B;color:#fff}
+[data-theme="vhs"] .stub{background:#FFF7D1}
+[data-theme="vhs"] .tick{background:#FFD400;color:#0B1F7A}
+[data-theme="vhs"] .btn.primary{box-shadow:3px 3px 0 #000}
+
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:80;box-shadow:var(--shadow);max-width:90vw;display:flex;gap:12px;align-items:center;animation:rise .25s}
 .toast button{border:0;background:none;color:var(--gold);font-weight:700;cursor:pointer;padding:0}
 @media (min-width:761px){.toast{bottom:24px}}
@@ -699,6 +806,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   <main id="view-library" hidden></main>
   <main id="view-seen" hidden></main>
   <main id="view-discover" hidden></main>
+  <main id="view-blitz" hidden></main>
   <main id="view-lists" hidden></main>
   <main id="view-list" hidden></main>
   <main id="view-tonight" hidden></main>
@@ -986,7 +1094,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     });
   }
   const imdbMem = {}; let imdbDirect = true, relayDown = 0;
-  let fnState = lsGet("front-row-fn", "unknown"), fnDown = 0;
+  let fnState = lsGet("front-row-fn", "unknown"), fnDown = 0, helperVer = lsGet("front-row-fnver", 0);
   function fnUrl(){ return `${sync.cfg.url}/functions/v1/imdb`; }
   async function fnCall(params, signal, ms = 9000){
     if (fnState === "missing") throw new Error("missing");
@@ -1301,6 +1409,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   }
 
   // ================= library =================
+  let libSvc = false;
   let view = "home", statusF = "want", typeF = lsGet("front-row-type", "all"), listF = "", sortBy = "added", libQ = "", libMin = "";
   function libFiltered(){
     let list = items().slice();
@@ -1308,6 +1417,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     if (typeF !== "all") list = list.filter(x => (x.type || "movie") === typeF);
     if (listF) list = list.filter(x => (x.lists || []).includes(listF));
     if (libMin) list = list.filter(x => passMin(x, libMin));
+    if (libSvc) list = list.filter(onMine);
     if (libQ) { const q = norm(libQ); list = list.filter(x => norm([x.title, x.creator, (x.cast || []).join(" "), (x.genres || []).join(" ")].join(" ")).includes(q)); }
     const by = {
       added: (a, b) => (b.added || "").localeCompare(a.added || "") || (b.updatedAt || 0) - (a.updatedAt || 0),
@@ -1338,6 +1448,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       <div class="tools">
         <input class="filterq" id="libq" type="search" placeholder="Filter by title, person or genre" value="${esc(libQ)}" aria-label="Filter">
         ${lists().length ? `<select class="sel" id="listsel" aria-label="List"><option value="">All lists</option>${lists().map(l => `<option value="${esc(l.id)}" ${l.id === listF ? "selected" : ""}>${esc(l.name)}</option>`).join("")}</select>` : ""}
+        ${prefs().services.length ? `<button class="chip" type="button" data-lsvc aria-pressed="${libSvc}">On my services</button>` : ""}
         ${minSel("libmin", libMin)}
         <select class="sel" id="sort" aria-label="Sort">${[["added","Recently added"],["priority","Must-see first"],["short","Shortest first"],["imdb","IMDb rating"],["rating","Your rating"],["finished","Recently watched"],["year","Newest release"],["title","Title"]].map(([k, l]) => `<option value="${k}" ${sortBy === k ? "selected" : ""}>${l}</option>`).join("")}</select>
       </div>
@@ -1350,6 +1461,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     let extra = "";
     if (it.priority && it.status === "want") extra += `<span class="ribbon">Must see</span>`;
     if (it.fav && it.status === "watched") extra += `<span class="ribbon fav">♥ Favourite</span>`;
+    if (it.status !== "watched" && it.status !== "dropped") extra += svcBadge(it);
     if (it.status === "watched" && !opt.rate && !opt.quick) extra += `<span class="stub"><span>${it.finished ? esc(/^\d{4}$/.test(it.finished) ? it.finished : fmtDate(it.finished).replace(/ \d{4}$/, "")) : "Seen"}</span><span class="st">${starTxt(it.rating)}</span></span>`;
     const sub = it.type === "tv" ? (it.seasons ? `${it.seasons} season${it.seasons > 1 ? "s" : ""}` : "Series") : (fmtRun(it.runtime) || "Film");
     const right = it.status === "watching" && it.type === "tv" ? `<span class="mono" style="font-size:11px">S${num(it.season) || 1}·E${num(it.episode)}</span>` : it.imdb ? `<span class="sc imdb">${Number(it.imdb).toFixed(1)}</span>` : "";
@@ -1664,7 +1776,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         <div class="kpi"><span class="v">${films}</span><span class="s">films</span></div><div class="kpi"><span class="v">${shows}</span><span class="s">series</span></div>
         <div class="kpi"><span class="v">${fmtH(hours)}</span><span class="s">watched</span></div><div class="kpi"><span class="v">${avg ? avg.toFixed(1) + "★" : "–"}</span><span class="s">average rating</span></div>
         <div class="kpi"><span class="v">${favs}</span><span class="s">favourites ♥</span></div></div>` : ""}
-      <div class="qa" style="margin-top:14px"><button class="btn gold" type="button" data-seenmode>+ Add something you've already seen</button><button class="btn" type="button" data-browse-jog>Jog my memory with popular films</button><button class="btn ghost" type="button" data-go="stats">All statistics →</button></div>
+      <div class="qa" style="margin-top:14px"><button class="btn gold" type="button" data-seenmode>+ Add something you've already seen</button><button class="btn" type="button" data-go="blitz">⚡ Seen-it blitz</button><button class="btn ghost" type="button" data-go="stats">All statistics →</button></div>
       ${unrated.length ? `<div class="panel" style="margin-top:18px"><div class="sechead"><h3>How was it?</h3><span class="muted" style="font-size:14px">${all.filter(x => !x.rating).length} not rated yet · tap a star, the left half gives a half star</span></div><div class="row">${unrated.map(it => `<div class="rc">${posterHTML(it, { tag: "button", attrs: `type="button" class="pb" data-open="${esc(it.id)}"` })}<span class="t">${esc(it.title)}</span>${rateHTML(it)}</div>`).join("")}</div></div>` : ""}
       ${recsHTML()}
       <div style="margin-top:22px">${all.length ? `<div class="sechead"><h3 style="font-size:28px">The collection</h3><span class="mono">${L.length} of ${all.length}</span></div>
@@ -1757,7 +1869,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     recState.busy = false; recPaint();
     if (recState.list?.length && prevTop.size) toast("New recommendations");
   }
-  function recPaint(){ if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "home") renderHome(); }
+  function recPaint(){ if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "blitz") renderBlitz(); else if (view === "home") renderHome(); }
 
   // ================= tonight =================
   const MOODS = {
@@ -1775,6 +1887,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     if (tn.from) c = c.filter(x => (x.lists || []).includes(tn.from));
     if (tn.type !== "all") c = c.filter(x => (x.type || "movie") === tn.type);
     if (tn.min) c = c.filter(x => passMin(x, tn.min));
+    if (tn.svc) c = c.filter(onMine);
     const t = tn.time;
     if (t === "short") c = c.filter(x => x.type === "tv" ? epLen(x) <= 35 : !num(x.runtime) || num(x.runtime) <= 100);
     if (t === "evening") c = c.filter(x => x.type === "tv" || !num(x.runtime) || num(x.runtime) <= 150);
@@ -1814,10 +1927,11 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         <div class="tq"><span class="lbl">Time you have</span><div class="chips">${[["any","Any"],["short","A short one"],["evening","An evening"],["epic","Something epic"]].map(([k, l]) => `<button class="chip" type="button" data-time="${k}" aria-pressed="${tn.time === k}">${l}</button>`).join("")}</div></div>
         <div class="tq"><span class="lbl">Movie or series</span><div class="chips">${[["all","Either"],["movie","Movie"],["tv","Series"]].map(([k, l]) => `<button class="chip" type="button" data-ttype="${k}" aria-pressed="${tn.type === k}">${l}</button>`).join("")}
           ${lists().length ? `<select class="sel" id="t-from" aria-label="From list" style="margin-left:6px"><option value="">From my whole watchlist</option>${lists().map(l => `<option value="${esc(l.id)}" ${tn.from === l.id ? "selected" : ""}>From ${esc(l.name)}</option>`).join("")}</select>` : ""}</div></div>
+        ${prefs().services.length ? `<div class="tq"><span class="lbl">Where</span><div class="chips"><button class="chip" type="button" data-tsvc aria-pressed="${!!tn.svc}">Only what's on my services</button></div></div>` : ""}
         <div class="tq"><span class="lbl">Only the good stuff</span><div class="chips">${[["", "Any rating"], ["7", "IMDb 7+"], ["7.5", "IMDb 7.5+"], ["8", "IMDb 8+"]].map(([k, l]) => `<button class="chip" type="button" data-tmin="${k}" aria-pressed="${tn.min === k}">${l}</button>`).join("")}</div></div>
         <div class="qa"><button class="btn primary" type="button" id="t-pick" ${pool.length ? "" : "disabled"}>${tn.pick ? "Pick again" : "Pick for me"}</button><span class="muted" style="align-self:center;font-size:14px">${pool.length ? `${pool.length} title${pool.length === 1 ? "" : "s"} in the running` : items().length ? "Nothing on your watchlist fits that. Loosen a filter." : "Add a few titles to your watchlist first."}</span></div>
       </div>
-      ${tn.pick ? `<div class="ticket">${posterHTML(tn.pick)}<div><span class="mono">Tonight's feature · ${tn.pick.type === "tv" ? "Series" : "Film"}</span><h3>${esc(tn.pick.title)}</h3>${scoresHTML(tn.pick)}<p>${esc(whyOf(tn.pick))}</p>
+      ${tn.pick ? `<div class="ticket">${posterHTML(tn.pick)}<div><span class="mono">Tonight's feature · ${tn.pick.type === "tv" ? "Series" : "Film"}</span><h3>${esc(tn.pick.title)}</h3>${scoresHTML(tn.pick)}${myOffers(tn.pick).length ? `<div class="wrow" style="margin-top:6px">${myOffers(tn.pick).slice(0, 2).map(o => { const sv = svcOf(o.p); return `<a class="wchip yours" style="--c:${sv[2]}" href="${esc(o.url)}" target="_blank" rel="noopener">▶ Watch on ${esc(o.p)}</a>`; }).join("")}</div>` : ""}<p>${esc(whyOf(tn.pick))}</p>
         <div class="qa"><button class="btn small primary" type="button" data-startwatch="${esc(tn.pick.id)}">${tn.pick.status === "watching" ? "Keep watching" : "Start watching"}</button><button class="btn small" type="button" id="t-again">Another</button><button class="btn small" type="button" data-open="${esc(tn.pick.id)}">Details</button></div></div><span class="admit" aria-hidden="true">ADMIT ONE</span></div>
         ${tn.alts.length ? `<h3 style="margin-top:18px">Or maybe</h3><div class="alts">${tn.alts.map(a => `<button class="alt" type="button" data-tpick="${esc(a.id)}">${posterHTML(a)}<span><b>${esc(a.title)}</b><span class="muted" style="font-size:13.5px">${esc([a.year, ...(a.genres || []).slice(0, 2)].filter(Boolean).join(" · "))}</span></span></button>`).join("")}</div>` : ""}` : ""}`;
   }
@@ -2071,6 +2185,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         <div class="seg" role="group" aria-label="Type">${[["movie", "Movies"], ["tv", "Series"]].map(([k, t]) => `<button type="button" data-dtype="${k}" aria-pressed="${disc.type === k}">${t}</button>`).join("")}</div>
         <div class="chips"><button class="chip" type="button" data-dgenre="" aria-pressed="${!disc.genre}">Every genre</button>${GENRE_RE.map(([g]) => `<button class="chip" type="button" data-dgenre="${esc(g)}" aria-pressed="${disc.genre === g}">${esc(g)}</button>`).join("")}</div>
         <div class="chips">${DECADES.map(([k, t]) => `<button class="chip" type="button" data-ddec="${k}" aria-pressed="${disc.decade === k}">${t}</button>`).join("")}</div>
+        <div class="qa"><button class="btn gold small" type="button" data-go="blitz">⚡ Seen-it blitz: tap or swipe through posters</button></div>
         <div class="ctrl"><label class="jog"><input type="checkbox" id="d-jog" ${disc.jog ? "checked" : ""}> <span><b>Jog my memory:</b> mark what I've already seen, and rate it</span></label>
           <div class="tools" style="margin:0">${minSel("d-min", disc.min)}<select class="sel" id="d-sort" aria-label="Sort">${[["pop", "Most popular"], ["imdb", "IMDb rating"], ["new", "Newest"]].map(([k, t]) => `<option value="${k}" ${disc.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>
         ${disc.busy ? `<p class="status"><span class="dots">Gathering ${esc(disc.genre || "popular")} ${disc.type === "tv" ? "series" : "films"}${disc.decade ? " from the " + esc(DECADES.find(d => d[0] === disc.decade)?.[1] || "") : ""}</span></p>`
@@ -2111,7 +2226,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     if (!L.length) {
       v.innerHTML = `<div class="empty"><h3>The house lights are up</h3><span class="serif">Search above for anything you've been meaning to watch, or browse Discover.</span>
         <div class="chips">${SUGGEST.map(s => `<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join("")}</div>
-        <div class="qa"><button class="btn gold" type="button" data-browse-jog>Mark films I've already seen</button><button class="btn" type="button" data-go="discover">Discover</button></div></div>
+        <div class="qa"><button class="btn gold" type="button" data-go="blitz">⚡ Mark films I've already seen</button><button class="btn" type="button" data-go="discover">Discover</button></div></div>
         ${homeTeaser()}`;
       return;
     }
@@ -2121,9 +2236,12 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const nextM = pick("movie"), nextT = pick("tv"), mine = mineUpcoming().slice(0, 14);
     const yr = new Date().getFullYear(), seenYr = L.filter(x => x.status === "watched" && String(x.finished || "").startsWith(String(yr))).length;
     const eps = L.reduce((s, x) => s + (x.type === "tv" ? epsWatched(x) : 0), 0);
+    const ready = L.filter(x => (x.status === "want" || x.status === "watching") && onMine(x)).sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0) || (b.imdb || 0) - (a.imdb || 0)).slice(0, 18);
     v.innerHTML = `
+      ${newEpsHTML()}
       ${watching.length ? `<section class="hsec"><div class="sechead"><h2>Continue watching</h2>${watching.length > 3 ? `<button class="linkbtn" type="button" data-seeall="watching">All ${watching.length} →</button>` : ""}</div><div class="row cwrow">${watching.map(cwCard).join("")}</div></section>` : ""}
       <section class="hsec"><button class="tcta" type="button" data-go="tonight"><span class="admit2">ADMIT ONE</span><span><b>What's playing tonight?</b><span>Pick by mood, time and rating from your watchlist</span></span><span class="go">→</span></button></section>
+      ${ready.length ? `<section class="hsec"><div class="sechead"><h2>Ready to stream</h2><span class="serif">On your services right now</span></div>${homeRow(ready)}</section>` : ""}
       ${nextM.length ? `<section class="hsec"><div class="sechead"><h2>Movies to watch</h2><button class="linkbtn" type="button" data-seeall="movie">All ${L.filter(x => x.status === "want" && (x.type || "movie") === "movie").length} →</button></div>${homeRow(nextM)}</section>` : ""}
       ${nextT.length ? `<section class="hsec"><div class="sechead"><h2>Shows to start</h2><button class="linkbtn" type="button" data-seeall="tv">All ${L.filter(x => x.status === "want" && x.type === "tv").length} →</button></div>${homeRow(nextT)}</section>` : ""}
       ${mine.length ? `<section class="hsec"><div class="sechead"><h2>Coming soon on your list</h2></div><div class="row">${mine.map(m => `<div class="rc">${posterHTML(m.it, { tag: "button", attrs: `type="button" class="pb" data-open="${esc(m.it.id)}"` })}<span class="due">${esc(untilTxt(m.date))}</span><span class="t">${esc(m.it.title)}</span><span class="f"><span>${esc(m.what)}</span></span></div>`).join("")}</div></section>` : ""}
@@ -2132,6 +2250,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       <section class="hsec hstats"><button class="kpi" type="button" data-go="seen"><span class="v">${seenYr}</span><span class="s">seen in ${yr}</span></button><button class="kpi" type="button" data-go="stats"><span class="v">${eps.toLocaleString()}</span><span class="s">episodes logged</span></button><button class="kpi" type="button" data-go="stats"><span class="v">${fmtH(L.reduce((s, x) => s + itemHours(x), 0))}</span><span class="s">watched</span></button><button class="kpi" type="button" data-go="lists"><span class="v">${lists().length}</span><span class="s">lists</span></button></section>`;
   }
   function openHome(){
+    if (!newEps.at || Date.now() - newEps.at > 30 * 6e4) checkNewEpisodes();
     if (disc.trend === null && navigator.onLine) loadTrending();
     if (navigator.onLine && !recState.busy && items().some(x => Number(x.rating) >= 4 || x.status === "watched") && (!recState.list || Date.now() - recState.at > 3 * 864e5)) setTimeout(buildRecs, 600);
   }
@@ -2274,6 +2393,219 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       <div class="panel" style="margin-top:14px"><div class="sechead"><h3>Genre bingo</h3><span class="mono">${got} of ${bingo.length}</span></div><div class="bingo">${bingo.map(([n, c]) => `<div class="bg${c ? " on" : ""}"><b>${esc(n)}</b><span>${c ? `${c} seen` : "not yet"}</span></div>`).join("")}</div>${got === bingo.length ? `<p class="note" style="margin:0">BINGO! You've seen every genre. 🎉</p>` : ""}</div>`;
   }
 
+  // ================= where to watch =================
+  const SERVICES = [
+    ["nfx", "Netflix", "#E50914", /netflix/i], ["hbm", "HBO Max", "#5A2BFF", /hbo|^max\b/i], ["dnp", "Disney+", "#113CCF", /disney/i],
+    ["amp", "Prime Video", "#00A8E1", /amazon|prime video/i], ["atp", "Apple TV+", "#555", /apple tv/i], ["sks", "SkyShowtime", "#1F2A8A", /skyshowtime/i],
+    ["rtl", "RTL+", "#E6312B", /rtl/i], ["mbi", "MUBI", "#111", /mubi/i], ["pmp", "Paramount+", "#0064FF", /paramount/i],
+    ["crn", "Crunchyroll", "#F47521", /crunchyroll/i], ["ytf", "YouTube (free)", "#FF0000", /youtube/i], ["fre", "Other free services", "#2E7A4C", /pluto|rakuten|free|filmbox|tubi/i]
+  ];
+  const COUNTRIES = [["HU", "Hungary"], ["AT", "Austria"], ["DE", "Germany"], ["GB", "United Kingdom"], ["US", "United States"], ["SK", "Slovakia"], ["RO", "Romania"], ["HR", "Croatia"], ["PL", "Poland"], ["NL", "Netherlands"], ["FR", "France"], ["IT", "Italy"], ["ES", "Spain"], ["CA", "Canada"]];
+  const FLAG = c => String(c || "").toUpperCase().replace(/./g, ch => String.fromCodePoint(127397 + ch.charCodeAt(0)));
+  const prefs = () => lib.prefs || (lib.prefs = { services: [], country: "HU", at: 0 });
+  function setPrefs(p){ lib.prefs = { ...prefs(), ...p, at: Date.now() }; commit(); }
+  const svcOf = name => SERVICES.find(s => s[3].test(name || ""));
+  const isStream = t => /FLATRATE|FREE|ADS/.test(t || "");
+  function myOffers(it){
+    const mine = prefs().services;
+    return (it.offers || []).filter(o => isStream(o.t)).filter(o => { const s = svcOf(o.p); return s && mine.includes(s[0]); });
+  }
+  const onMine = it => myOffers(it).length > 0;
+  function svcBadge(it){
+    const o = myOffers(it)[0]; if (!o) return "";
+    const s = svcOf(o.p);
+    return `<span class="svc" style="--c:${s[2]}" title="On ${esc(o.p)}">${esc(s[1].replace(" (free)", ""))}</span>`;
+  }
+  function offersHTML(d){
+    const c = prefs().country || "HU";
+    if (helperVer < 2) return `<div class="wtw"><span class="lbl">Where to watch</span><p class="note" style="margin:0">${fnState === "ok" ? "Update the IMDb helper (Settings) to see where it's streaming." : "Set up the IMDb helper in Settings to see where it's streaming."} <a href="https://www.justwatch.com/${c.toLowerCase()}/search?q=${encodeURIComponent(d.title || "")}" target="_blank" rel="noopener">Check JustWatch ↗</a></p></div>`;
+    if (!d.offersAt) return `<div class="wtw" id="wtw"><span class="lbl">Where to watch in ${FLAG(c)}</span><p class="status" style="margin:0"><span class="dots">Checking streaming services</span></p></div>`;
+    const offers = d.offers || [], stream = offers.filter(o => isStream(o.t)), buy = offers.filter(o => /RENT|BUY/.test(o.t));
+    const mine = prefs().services;
+    const chip = o => { const s = svcOf(o.p), yours = s && mine.includes(s[0]); return `<a class="wchip${yours ? " yours" : ""}" style="--c:${s ? s[2] : "#666"}" href="${esc(o.url || "#")}" target="_blank" rel="noopener">${yours ? "✓ " : ""}${esc(o.p)}${/FREE|ADS/.test(o.t) ? " · free" : ""}</a>`; };
+    const uniq = list => { const seen = new Set(); return list.filter(o => !seen.has(o.p) && seen.add(o.p)); };
+    return `<div class="wtw" id="wtw"><span class="lbl">Where to watch in ${FLAG(c)}</span>
+      ${stream.length ? `<div class="wrow">${uniq(stream).map(chip).join("")}</div>` : `<p class="note" style="margin:0">Not streaming in ${esc(COUNTRIES.find(x => x[0] === c)?.[1] || c)} right now.</p>`}
+      ${buy.length ? `<div class="wrow small"><span class="muted">Rent or buy:</span>${uniq(buy).slice(0, 6).map(chip).join("")}</div>` : ""}</div>`;
+  }
+  async function fetchOffers(it, signal){
+    const c = prefs().country || "HU";
+    const j = await fnCall({ jw: it.title, year: it.year || "", type: it.type || "movie", imdb: it.imdbId || "", country: c }, signal, 12000);
+    return { offers: (j.offers || []).filter(o => o.p && o.url).slice(0, 30), offersAt: Date.now(), jwCountry: c };
+  }
+  let offersBusy = false;
+  async function refreshOffers(force){
+    if (offersBusy || helperVer < 2 || !navigator.onLine) return; offersBusy = true;
+    const c = prefs().country || "HU";
+    const todo = items().filter(x => (x.status === "want" || x.status === "watching") && (force || !x.offersAt || x.jwCountry !== c || Date.now() - x.offersAt > 5 * 864e5)).slice(0, 60);
+    for (let i = 0; i < todo.length; i += 3) {
+      const got = await Promise.all(todo.slice(i, i + 3).map(it => fetchOffers(it).then(o => [it.id, o]).catch(() => null)));
+      got.filter(Boolean).forEach(([id, o]) => { const cur = items().find(x => x.id === id); if (cur) lib.items = lib.items.map(x => x.id === id ? { ...x, ...o } : x); });
+      saveLocal(); if (i % 9 === 0) render();
+    }
+    offersBusy = false; render();
+  }
+
+  // ================= new episodes =================
+  const LS_EPS = "front-row-eps", LS_NOTE = "front-row-notified";
+  let epStore = lsGet(LS_EPS, {});
+  async function showEps(it, signal){
+    const id = it.tvmaze; if (!id) return null;
+    const st = epStore[id]; if (st && Date.now() - st.at < 20 * 36e5) return st.eps;
+    const r = await tvEpisodes(it, signal); if (!r?.eps) return st?.eps || null;
+    const eps = r.eps.map(e => [e.k, e.air, e.name]);
+    epStore[id] = { at: Date.now(), eps };
+    const ks = Object.keys(epStore).sort((a, b) => epStore[b].at - epStore[a].at); ks.slice(60).forEach(k => delete epStore[k]);
+    lsSet(LS_EPS, epStore); return eps;
+  }
+  function seenKeys(it, eps){
+    if (Array.isArray(it.epsSeen)) return new Set(it.epsSeen);
+    const s = num(it.season) || 1, e = num(it.episode);
+    return new Set(eps.filter(([k]) => { const [a, b] = k.split("-").map(Number); return a < s || (a === s && b <= e); }).map(x => x[0]));
+  }
+  let newEps = { list: [], soon: [], busy: false, at: 0 };
+  async function checkNewEpisodes(){
+    if (newEps.busy || !navigator.onLine) return; newEps.busy = true;
+    const today = todayISO(), from = new Date(Date.now() - 14 * 864e5).toISOString().slice(0, 10), to = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+    const shows = items().filter(x => x.type === "tv" && (x.status === "watching" || (x.status === "watched" && x.showStatus !== "Ended"))).slice(0, 25);
+    const list = [], soon = [];
+    for (const s of shows) {
+      try {
+        if (!s.tvmaze) { const t = await tvInfo(s); const cur = items().find(x => x.id === s.id); if (cur && t) upsert(applyTv(cur, t)); }
+        const it = items().find(x => x.id === s.id); const eps = await showEps(it); if (!eps) continue;
+        const seen = seenKeys(it, eps);
+        eps.filter(([k, air]) => air && air >= from && air <= today && !seen.has(k)).forEach(([k, air, name]) => list.push({ it, k, air, name }));
+        eps.filter(([, air]) => air && air > today && air <= to).forEach(([k, air, name]) => soon.push({ it, k, air, name }));
+      } catch {}
+    }
+    list.sort((a, b) => b.air.localeCompare(a.air)); soon.sort((a, b) => a.air.localeCompare(b.air));
+    newEps = { list, soon, busy: false, at: Date.now() };
+    notifyNew(list);
+    if (view === "home") renderHome();
+    const dot = $(".nav [data-go='home']"); if (dot) dot.classList.toggle("hasnew", list.length > 0);
+  }
+  const epLabel = k => { const [s, e] = k.split("-"); return `S${s} E${e}`; };
+  const dayName = iso => { const d = Math.round((new Date(todayISO() + "T00:00:00") - new Date(iso + "T00:00:00")) / 864e5); return d === 0 ? "today" : d === 1 ? "yesterday" : d < 7 ? DAYNAMES[new Date(iso + "T00:00:00").getDay()] : fmtDate(iso); };
+  function newEpsHTML(){
+    if (!newEps.list.length && !newEps.soon.length) return "";
+    return `<section class="hsec"><div class="sechead"><h2>New episodes</h2><span class="serif">${newEps.list.length ? `${newEps.list.length} waiting for you` : "Nothing new to catch up on"}</span></div>
+      ${newEps.list.length ? `<div class="row nerow">${newEps.list.slice(0, 20).map(n => `<div class="ne">${posterHTML(n.it, { tag: "button", attrs: `type="button" data-open="${esc(n.it.id)}"` })}<div><b>${esc(n.it.title)}</b><span class="nek">${epLabel(n.k)}${n.name ? ` · ${esc(n.name)}` : ""}</span><span class="muted">Out ${esc(dayName(n.air))}</span><button class="btn small good" type="button" data-newep="${esc(n.it.id)}" data-k="${esc(n.k)}">✓ Watched</button></div></div>`).join("")}</div>` : ""}
+      ${newEps.soon.length ? `<div class="soon"><span class="lbl">This week</span>${newEps.soon.slice(0, 8).map(n => `<button type="button" data-open="${esc(n.it.id)}"><b>${esc(DAYNAMES[new Date(n.air + "T00:00:00").getDay()].slice(0, 3))}</b> ${esc(n.it.title)} · ${epLabel(n.k)}</button>`).join("")}</div>` : ""}</section>`;
+  }
+  function markNewEp(id, k){
+    const it = items().find(x => x.id === id); if (!it) return;
+    const st = epStore[it.tvmaze]?.eps || [], seen = seenKeys(it, st); seen.add(k);
+    const order = st.filter(([kk]) => seen.has(kk)), last = order[order.length - 1]?.[0] || k, [s, e] = last.split("-").map(Number);
+    const d = todayISO(), log = (it.log || []).map(l => ({ ...l })), same = log.find(l => l.d === d); if (same) same.n += 1; else log.push({ d, n: 1 });
+    upsert({ ...it, epsSeen: [...seen], watchedEps: seen.size, season: s, episode: e, log, status: it.status === "want" ? "watching" : it.status }, `${it.title}: ${epLabel(k)} watched`, true);
+    newEps.list = newEps.list.filter(n => !(n.it.id === id && n.k === k)); renderHome();
+  }
+  async function notifyNew(list){
+    if (!lsGet("front-row-notify", false) || !("Notification" in window) || Notification.permission !== "granted") return;
+    const done = new Set(lsGet(LS_NOTE, [])), fresh = list.filter(n => !done.has(n.it.id + ":" + n.k));
+    if (!fresh.length) return;
+    const body = fresh.slice(0, 4).map(n => `${n.it.title} ${epLabel(n.k)}`).join(", ") + (fresh.length > 4 ? ` and ${fresh.length - 4} more` : "");
+    try { const reg = await navigator.serviceWorker?.getRegistration(); const opt = { body, icon: "icon-192.png", badge: "favicon-64.png", tag: "front-row-new" }; if (reg) await reg.showNotification("New episodes are out", opt); else new Notification("New episodes are out", opt); } catch {}
+    fresh.forEach(n => done.add(n.it.id + ":" + n.k)); lsSet(LS_NOTE, [...done].slice(-300));
+  }
+
+  // ================= trailers =================
+  async function findTrailer(d, signal){
+    if (d.trailer) return d.trailer;
+    if (helperVer >= 2) { try { const j = await fnCall({ yt: `${d.title} ${d.year || ""} ${d.type === "tv" ? "season 1 " : ""}official trailer` }, signal, 12000); if (j.ids?.[0]) return j.ids[0]; } catch (e) { if (e?.name === "AbortError") throw e; } }
+    if (d.wikidata) { try { const e = (await entities([d.wikidata], signal, "claims"))[d.wikidata]; const v = strsOf(e, "P1651")[0]; if (v) return v; } catch {} }
+    return "";
+  }
+  async function playTrailer(){
+    if (!draft) return;
+    const box = $("#trailer"); if (box) { box.innerHTML = `<p class="status" style="margin:0;padding:20px;text-align:center"><span class="dots">Finding the trailer</span></p>`; box.hidden = false; }
+    const id = await findTrailer(draft).catch(() => "");
+    if (!draft) return;
+    if (!id) { if (box) box.hidden = true; window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${draft.title} ${draft.year || ""} trailer`)}`, "_blank", "noopener"); toast("Opened the trailer search on YouTube"); return; }
+    draft.trailer = id; const cur = items().find(x => x.id === draft.id); if (cur && cur.trailer !== id) { lib.items = lib.items.map(x => x.id === cur.id ? { ...x, trailer: id } : x); saveLocal(); }
+    const b2 = $("#trailer"); if (b2) { b2.hidden = false; b2.innerHTML = `<div class="tframe"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="Trailer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div><div class="qa" style="justify-content:space-between"><a class="linkbtn" href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}" target="_blank" rel="noopener">Open on YouTube ↗</a><button class="btn small" type="button" data-trailerclose>Close trailer</button></div>`; b2.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" }); }
+  }
+
+  // ================= seen-it blitz =================
+  const BLITZ_SETS = [["movie::", "Most popular films"], ["movie::2020", "Films of the 2020s"], ["movie::2010", "2010s"], ["movie::2000", "2000s"], ["movie::1990", "1990s"], ["movie::1980", "1980s"], ["movie::old", "Classics"], ["movie:Animation:", "Animated"], ["movie:Horror:", "Horror"], ["movie:Comedy:", "Comedy"], ["movie:LGBTQ+:", "LGBTQ+"], ["tv::", "Popular series"], ["tv::2010", "Series of the 2010s"], ["tv::2020", "Series of the 2020s"]];
+  let bz = { set: "movie::", mode: innerWidth < 700 ? "swipe" : "wall", list: null, busy: false, idx: 0, session: 0, rating: null, err: "" };
+  async function fetchBrowse(type, genre, decade){
+    const key = `b:${type}:${genre}:${decade}`;
+    const hit = cacheGet(key, 5 * 864e5); if (hit) return hit;
+    const tv = type === "tv", types = tv ? "wd:Q5398426 wd:Q1259759 wd:Q581714 wd:Q63952888" : "wd:Q11424 wd:Q202866", dp = tv ? "P580" : "P577";
+    const re = (GENRE_RE.find(g => g[0] === genre) || [])[1];
+    const dec = decade === "old" ? `FILTER(YEAR(?d) < 1970)` : decade ? `FILTER(YEAR(?d) >= ${decade} && YEAR(?d) <= ${Number(decade) + 9})` : "";
+    const minLinks = decade || re ? (tv ? 8 : 12) : (tv ? 25 : 45);
+    const rows = await sparql(`SELECT DISTINCT ?item ?links WHERE {
+      VALUES ?t { ${types} } ?item wdt:P31 ?t; wikibase:sitelinks ?links. FILTER(?links >= ${minLinks})
+      ${dec ? `?item wdt:${dp} ?d. ${dec}` : ""}
+      ${re ? `FILTER EXISTS { ?item wdt:P136 ?g. ?g rdfs:label ?gl. FILTER(LANG(?gl) = "en" && REGEX(?gl, "${re}", "i")) }` : ""}
+    } ORDER BY DESC(?links) LIMIT 72`);
+    const list = await buildFromQids([...new Set(rows.map(qidOf))]);
+    await rateList(list).catch(() => {});
+    cacheSet(key, list); return list;
+  }
+  async function loadBlitz(){
+    const [type, genre, decade] = bz.set.split(":");
+    bz.busy = true; bz.err = ""; bz.list = null; bz.idx = 0; bz.rating = null; renderBlitz();
+    try { bz.list = await fetchBrowse(type, genre, decade); } catch { bz.list = []; bz.err = "Wikidata took too long. Pick another set or try again."; }
+    bz.busy = false; renderBlitz();
+  }
+  const bzKey = r => r.wikidata || r.imdbId || r.title;
+  const bzSkipped = new Set();
+  const bzQueue = () => (bz.list || []).filter(r => !findSame(r) && !bzSkipped.has(bzKey(r)));
+  function renderBlitz(){
+    const v = $("#view-blitz"); if (!v) return;
+    const head = `<div class="sechead"><h2>⚡ Seen-it blitz</h2><span class="serif">${bz.session ? `${bz.session} added this round` : "Tap everything you've seen"}</span></div>
+      <div class="ctrl" style="margin:10px 0"><div class="chips">${BLITZ_SETS.map(([k, t]) => `<button class="chip" type="button" data-bzset="${k}" aria-pressed="${bz.set === k}">${t}</button>`).join("")}</div></div>
+      <div class="ctrl" style="margin-bottom:12px"><div class="seg" role="group" aria-label="Mode"><button type="button" data-bzmode="wall" aria-pressed="${bz.mode === "wall"}">Poster wall</button><button type="button" data-bzmode="swipe" aria-pressed="${bz.mode === "swipe"}">Swipe</button></div><button class="btn small ghost" type="button" data-go="seen">Done → Seen it</button></div>`;
+    if (bz.busy || !bz.list) { v.innerHTML = head + `<p class="status"><span class="dots">Gathering posters</span></p>`; return; }
+    if (bz.err) { v.innerHTML = head + `<p class="status">${esc(bz.err)} <button class="linkbtn" type="button" data-bzretry>Try again</button></p>`; return; }
+    if (bz.mode === "wall") {
+      v.innerHTML = head + `<p class="note" style="margin:0 0 10px">Tap a poster you've seen. Tap the stars underneath to rate it, or leave them empty.</p><div class="bwall">${bz.list.map((r, i) => { const have = findSame(r), seen = have && have.status === "watched"; return `<div class="bw${seen ? " on" : ""}"><button type="button" class="bwp" data-bztap="${i}" aria-pressed="${!!seen}" aria-label="${esc(r.title)}${seen ? ", seen" : ""}">${posterHTML(r, { eager: i < 18, extra: seen ? `<span class="bwck">✓</span>` : have ? `<span class="bwck want">${esc(STATUS[have.status])}</span>` : "" })}</button><span class="bwt">${esc(r.title)}${r.year ? ` <small>${r.year}</small>` : ""}</span>${seen ? rateHTML(have) : ""}</div>`; }).join("")}</div>`;
+      return;
+    }
+    const q = bzQueue();
+    if (bz.rating) {
+      const it = items().find(x => x.id === bz.rating);
+      v.innerHTML = head + `<div class="swipe"><div class="scard rated">${posterHTML(it)}</div><div class="srate"><b>How was ${esc(it?.title || "it")}?</b>${it ? rateHTML(it, "bz") : ""}<button class="btn" type="button" data-bznext>Skip rating</button></div></div>`;
+      return;
+    }
+    if (!q.length) { v.innerHTML = head + `<div class="empty"><h3>That's the whole set</h3><span class="serif">Pick another set above.</span></div>`; return; }
+    const r = q[0], left = q.length;
+    v.innerHTML = head + `<div class="swipe"><div class="scard" id="scard" data-bzkey="${esc(r.wikidata || r.imdbId || r.title)}">${posterHTML(r, { eager: true })}<span class="stag l">NOPE</span><span class="stag r">SEEN</span><span class="stag u">WANT</span></div>
+      <div class="sinfo"><b>${esc(r.title)}</b><span class="muted">${esc([r.year, r.type === "tv" ? "Series" : fmtRun(r.runtime), ...(r.genres || []).slice(0, 2)].filter(Boolean).join(" · "))}</span>${scoresHTML(r)}<span class="mono">${left} left</span></div>
+      <div class="sbtns"><button class="sb no" type="button" data-bzswipe="left" aria-label="Haven't seen it">✕</button><button class="sb want" type="button" data-bzswipe="up" aria-label="Want to watch">+</button><button class="sb yes" type="button" data-bzswipe="right" aria-label="Seen it">✓</button></div>
+      <p class="note" style="text-align:center;margin:0">Swipe right if you've seen it, left if not, up to add it to your watchlist. Keys: ← → ↑</p></div>`;
+    preloadNext(q.slice(1, 4));
+    wireSwipe();
+  }
+  function preloadNext(list){ list.forEach(r => { if (r.poster) { const i = new Image(); i.src = r.poster; } }); }
+  function bzAct(dir){
+    const r = bzQueue()[0]; if (!r) return;
+    if (dir === "left") { bzSkipped.add(bzKey(r)); renderBlitz(); return; }
+    const it = addFrom(r, dir === "right" ? "watched" : "want", {}, true); bz.session++;
+    if (dir === "right" && it) bz.rating = it.id;
+    renderBlitz();
+  }
+  function bzTap(i){
+    const r = bz.list?.[i]; if (!r) return;
+    const have = findSame(r);
+    if (!have) { addFrom(r, "watched", {}, true); bz.session++; }
+    else if (have.status !== "watched") upsert(withStatus(have, "watched"), `✓ ${have.title}`, true);
+    else if (have.added === todayISO()) { removeItem(have.id, `Removed ${have.title}`); bz.session = Math.max(0, bz.session - 1); }
+    renderBlitz();
+  }
+  function wireSwipe(){
+    const c = $("#scard"); if (!c) return;
+    let x0 = 0, y0 = 0, dx = 0, dy = 0, on = false;
+    c.addEventListener("dragstart", e => e.preventDefault());
+    c.addEventListener("pointerdown", e => { e.preventDefault(); on = true; x0 = e.clientX; y0 = e.clientY; c.setPointerCapture(e.pointerId); c.style.transition = "none"; });
+    c.addEventListener("pointermove", e => { if (!on) return; dx = e.clientX - x0; dy = e.clientY - y0; c.style.transform = `translate(${dx}px,${dy}px) rotate(${dx / 18}deg)`; c.classList.toggle("gr", dx > 60); c.classList.toggle("gl", dx < -60); c.classList.toggle("gu", dy < -70 && Math.abs(dx) < 60); });
+    const end = () => { if (!on) return; on = false; c.style.transition = ""; const dir = dx > 90 ? "right" : dx < -90 ? "left" : dy < -100 ? "up" : ""; if (dir) { c.style.transform = `translate(${dir === "right" ? 600 : dir === "left" ? -600 : 0}px,${dir === "up" ? -700 : dy}px) rotate(${dx / 10}deg)`; setTimeout(() => bzAct(dir), 160); } else { c.style.transform = ""; c.classList.remove("gr", "gl", "gu"); } dx = dy = 0; };
+    c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
+  }
+
   // ================= poster picker: alternatives from IMDb, TVmaze, every Wikipedia, Wikidata and Commons =================
   let pp = null;
   const LANG_ORDER = ["en","hu","de","fr","es","it","pt","nl","pl","sv","da","no","fi","cs","ro","ru","uk","ja","ko","zh","tr","he"];
@@ -2383,6 +2715,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const ctl = new AbortController(); moreCtl = ctl;
     if (!draft.plot && draft.wiki) plotOf(draft.wiki, ctl.signal).then(p => { if (draft && p && !ctl.signal.aborted) { draft.plot = p; const el = $("#plot"); if (el) el.textContent = p; const cur = items().find(x => x.id === draft.id); if (cur && !cur.plot) { cur.plot = p; saveLocal(); } } }).catch(() => {});
     if (draft.imdbId && (!rcache[draft.imdbId] || Date.now() - rcache[draft.imdbId].at > 3 * 864e5)) imdbRatings([draft.imdbId], ctl.signal).then(m => { const c = m[draft?.imdbId]; if (!draft || !c?.r) return; if (c.r === draft.imdb && c.v === draft.imdbVotes) return; readFields(); Object.assign(draft, withRating(draft, c)); const cur = items().find(x => x.id === draft.id); if (cur) upsert(withRating(cur, c)); rerenderCard(); }).catch(() => {});
+    if (helperVer >= 2 && draft.title && (!draft.offersAt || draft.jwCountry !== prefs().country || Date.now() - draft.offersAt > 3 * 864e5)) fetchOffers(draft, ctl.signal).then(o => { if (!draft || ctl.signal.aborted) return; Object.assign(draft, o); const cur = items().find(x => x.id === draft.id); if (cur) { lib.items = lib.items.map(x => x.id === cur.id ? { ...x, ...o } : x); saveLocal(); } const el = $("#wtw"); if (el) el.outerHTML = offersHTML(draft); }).catch(() => { if (draft) { draft.offersAt = Date.now(); draft.offers = draft.offers || []; const el = $("#wtw"); if (el) el.outerHTML = offersHTML(draft); } });
     if (draft.type === "tv") tvEpisodes(draft, ctl.signal).then(r => { if (!draft || ctl.signal.aborted) return; draftEps = r || { eps: [] }; if (r?.eps?.length) { seedEpsSeen(draft, r.eps); if (r.id && !draft.tvmaze) draft.tvmaze = r.id; } rerenderCard(); }).catch(() => { if (draft) { draftEps = { eps: [] }; paintEps(); } });
     if (draft.type === "tv" && (!draft.tvAt || Date.now() - draft.tvAt > 3 * 864e5)) tvInfo(draft, ctl.signal).then(t => {
       if (!draft || ctl.signal.aborted || !t) return; readFields(); Object.assign(draft, applyTv(draft, t));
@@ -2404,7 +2737,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const links = [];
     if (d.imdbId) links.push(`<a href="https://www.imdb.com/title/${esc(d.imdbId)}/" target="_blank" rel="noopener">IMDb ↗</a>`);
     if (d.wiki) links.push(`<a href="https://en.wikipedia.org/wiki/${encodeURIComponent(d.wiki.replace(/ /g, "_"))}" target="_blank" rel="noopener">Wikipedia ↗</a>`);
-    if (d.title) { links.push(`<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(`${d.title} ${d.year || ""} trailer`)}" target="_blank" rel="noopener">Trailer ↗</a>`); links.push(`<a href="https://www.justwatch.com/hu/search?q=${encodeURIComponent(d.title)}" target="_blank" rel="noopener">Where to stream ↗</a>`); }
+    if (d.title) links.unshift(`<button type="button" class="tbtn" data-trailer>▶ Trailer</button>`);
     const facts = [tv ? "Series" : "Film", yearText(d), ...factsOf(d), d.network, d.country, tv && d.showStatus === "Running" && d.nextSeason ? `New season ${fmtDate(d.nextSeason)}` : tv && d.showStatus === "Ended" ? "Ended" : ""].filter(Boolean);
     const editing = draftNew && !d.wikidata;
     $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(d.title || "New title")}">
@@ -2419,8 +2752,10 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
           ${links.length ? `<div class="links">${links.join("")}</div>` : ""}
         </div></div></div>
       <div class="mbody">
+        <div id="trailer" hidden></div>
         ${cardHint ? `<div class="banner" style="margin:0">${esc(cardHint)}</div>` : ""}
         ${d.plot || d.wiki ? `<p class="plot" id="plot" style="margin:0">${esc(d.plot || d.blurb || "")}</p>` : d.blurb ? `<p class="plot" style="margin:0">${esc(d.blurb)}</p>` : ""}
+        ${d.title && d.status !== "watched" ? offersHTML(d) : ""}
         <div><span class="lbl">Status</span><div class="statpick" role="group" aria-label="Status">${Object.entries(STATUS).map(([k, l]) => `<button type="button" data-fst="${k}" aria-pressed="${d.status === k}">${l}</button>`).join("")}</div></div>
         ${tv ? epsHTML() : ""}
         ${tv && d.status !== "want" && !draftEps?.eps?.length ? `<div class="fields three"><label class="field">Season you're on<input id="f-season" type="number" inputmode="numeric" min="1" value="${esc(num(d.season) || 1)}"></label><label class="field">Last episode seen<input id="f-episode" type="number" inputmode="numeric" min="0" value="${esc(num(d.episode))}"></label><label class="field">Episodes seen in total<input id="f-weps" type="number" inputmode="numeric" min="0" value="${esc(epsWatched(d))}"></label></div>` : ""}
@@ -2515,7 +2850,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
       if ($("#sync-panel")) panel();
     }
     const set = (s, d = "") => { state = s; detail = d; if (s === "ok") lastOk = new Date(); paint(); };
-    const sig = l => (l.items || []).map(g => g.id + ":" + (g.updatedAt || 0)).sort().join(",") + "|" + Object.keys(l.deleted || {}).sort().join(",") + "|" + (l.listsAt || 0) + "|" + (l.notForMe || []).length;
+    const sig = l => (l.items || []).map(g => g.id + ":" + (g.updatedAt || 0)).sort().join(",") + "|" + Object.keys(l.deleted || {}).sort().join(",") + "|" + (l.listsAt || 0) + "|" + (l.notForMe || []).length + "|" + (l.prefs?.at || 0);
     function merge(a, b){
       const del = { ...(a.deleted || {}) };
       for (const [k, v] of Object.entries(b.deleted || {})) del[k] = Math.max(del[k] || 0, v);
@@ -2523,7 +2858,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
       for (const g of [...(a.items || []), ...(b.items || [])]) { const have = m.get(g.id); if (!have || (g.updatedAt || 0) > (have.updatedAt || 0)) m.set(g.id, g); }
       const listsWin = (b.listsAt || 0) > (a.listsAt || 0) ? b : a;
       const nfm = [...new Set([...(a.notForMe || []), ...(b.notForMe || [])])];
-      return { notForMe: nfm, items: [...m.values()].filter(g => !(del[g.id] && del[g.id] >= (g.updatedAt || 0))), deleted: del, lists: listsWin.lists || [], listsAt: listsWin.listsAt || 0 };
+      const pw = (b.prefs?.at || 0) > (a.prefs?.at || 0) ? b.prefs : a.prefs;
+      return { notForMe: nfm, prefs: pw || { services: [], country: "HU", at: 0 }, items: [...m.values()].filter(g => !(del[g.id] && del[g.id] >= (g.updatedAt || 0))), deleted: del, lists: listsWin.lists || [], listsAt: listsWin.listsAt || 0 };
     }
     const missingTable = e => ["42P01", "PGRST205", "PGRST202"].includes(e?.code) || /watch_library|schema cache|does not exist/i.test(e?.message || "");
     async function connect(){
@@ -2545,7 +2881,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
         if (sig(merged) !== sig(lib)) { lib = { ...lib, ...merged }; saveLocal(); render(); }
         if (!remote || sig(merged) !== sig(remote)) {
           lastPush = new Date().toISOString();
-          const { error: e2 } = await client.from(TABLE).upsert({ user_id: user.id, data: { items: merged.items, deleted: merged.deleted, lists: merged.lists, listsAt: merged.listsAt, notForMe: merged.notForMe || [], app: "front-row" }, updated_at: lastPush });
+          const { error: e2 } = await client.from(TABLE).upsert({ user_id: user.id, data: { items: merged.items, deleted: merged.deleted, lists: merged.lists, listsAt: merged.listsAt, notForMe: merged.notForMe || [], prefs: merged.prefs, app: "front-row" }, updated_at: lastPush });
           if (e2) throw e2;
         }
         set("ok");
@@ -2560,7 +2896,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     function unsubscribe(){ if (chan) { try { client.removeChannel(chan); } catch {} chan = null; } }
     function schedule(){ if (!user) return; clearTimeout(timer); timer = setTimeout(pull, 1200); }
     addEventListener("online", () => pull());
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pull(); });
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { pull(); if (Date.now() - (newEps?.at || 0) > 30 * 6e4) checkNewEpisodes(); } });
 
     let authMode = "in", authMsg = "";
     function panel(){
@@ -2620,9 +2956,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
 
   // ================= settings and backup =================
   function fnBox(){
-    const st = { ok: "✓ Connected. Posters and details come straight from IMDb.", missing: "Not set up yet.", jwt: "The helper is there but turns the app away: switch off “Verify JWT” (step 4).", unknown: "Not checked yet." }[fnState] || "";
+    const st = { ok: helperVer >= 2 ? "✓ Connected. Posters, details, where to watch and trailers all work." : "Connected, but it's an older version: copy the code again, paste it over the old code and deploy, so where to watch and trailers work too.", missing: "Not set up yet.", jwt: "The helper is there but turns the app away: switch off “Verify JWT” (step 4).", unknown: "Not checked yet." }[fnState] || "";
     return `<span class="lbl">IMDb helper (recommended)</span><p class="note" style="margin:0 0 6px"><b>${esc(st)}</b> IMDb doesn't let apps ask it directly, so this tiny function on your own Supabase asks for Front Row. It makes posters, new releases and IMDb links fast and reliable.</p>
-      ${fnState === "ok" ? `<button class="btn small" type="button" data-fncheck>Check again</button>` : `<ol class="steps">
+      ${fnState === "ok" && helperVer >= 2 ? `<button class="btn small" type="button" data-fncheck>Check again</button>` : `<ol class="steps">
         <li><a class="btn small" href="https://supabase.com/dashboard/project/${esc(sync.ref)}/functions" target="_blank" rel="noopener">Open Edge Functions in Supabase ↗</a> (sign in if asked).</li>
         <li>Press <b>Deploy a new function</b>, then <b>Via Editor</b>.</li>
         <li>Name it <code>imdb</code>, delete the sample code, <button class="btn small" type="button" data-fncopy>Copy the helper code</button> paste it in and press <b>Deploy function</b>.</li>
@@ -2631,16 +2967,21 @@ alter publication supabase_realtime add table public.${TABLE};`;
   }
   async function fnCheck(){
     fnState = "unknown"; const box = $("#fn-box"); if (box) box.innerHTML = fnBox().replace("Not checked yet.", "Checking…");
-    try { await fnCall({ ping: 1 }, null, 9000); fnState = "ok"; } catch (e) { if (fnState === "unknown") fnState = /timeout/.test(e?.message) ? "unknown" : "missing"; }
+    try { const j = await fnCall({ ping: 1 }, null, 9000); fnState = "ok"; helperVer = Number(j?.version) || 1; lsSet("front-row-fnver", helperVer); } catch (e) { if (fnState === "unknown") fnState = /timeout/.test(e?.message) ? "unknown" : "missing"; }
     lsSet("front-row-fn", fnState); if ($("#fn-box")) $("#fn-box").innerHTML = fnBox();
-    if (fnState === "ok") { toast("IMDb helper connected"); lib.items = lib.items.map(x => x.poster ? x : { ...x, lookedUp: false }); saveLocal(); fillMissing(); }
+    if (fnState === "ok") { refreshOffers(true); toast(helperVer >= 2 ? "IMDb helper connected" : "Connected, but it's the old version. Copy the code again and deploy (step 3)."); lib.items = lib.items.map(x => x.poster ? x : { ...x, lookedUp: false }); saveLocal(); fillMissing(); }
     else toast(fnState === "jwt" ? "Switch off Verify JWT on the function, then check again" : "Couldn't reach the helper yet");
   }
   function openSettings(){ setTimeout(paintRatingStatus, 0);
     const cur = lsGet(LS_THEME, "auto");
     $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal narrow" role="dialog" aria-modal="true" aria-label="Settings">
       <div class="sechead"><h3 style="font-size:28px">Settings</h3><button class="btn small" type="button" data-mclose>Close</button></div>
-      <div><span class="lbl">Theme</span><div class="themes">${[["auto","Match my device","linear-gradient(90deg,#F2EADD 50%,#100809 50%)"],["velvet","Velvet","#100809"],["matinee","Matinee","#F2EADD"]].map(([k, l, c]) => `<button type="button" data-theme-set="${k}" aria-pressed="${cur === k}"><i style="background:${c}"></i>${l}</button>`).join("")}</div></div>
+      <div><span class="lbl">Theme</span><div class="themes">${[["auto","Match my device","linear-gradient(90deg,#F2EADD 50%,#100809 50%)"],["velvet","Velvet","#100809"],["matinee","Matinee","#F2EADD"],["drivein","Drive-in","radial-gradient(circle at 30% 30%,#3EE6C8 0 18%,#0A0E24 22%)"],["deco","Art deco palace","conic-gradient(#D4AF37 0 25%,#0D0B08 0 50%,#D4AF37 0 75%,#0D0B08 0)"],["vhs","VHS rental store","linear-gradient(135deg,#1238B0 60%,#FFD400 60%)"]].map(([k, l, c]) => `<button type="button" data-theme-set="${k}" aria-pressed="${cur === k}"><i style="background:${c}"></i>${l}</button>`).join("")}</div></div>
+      <div><span class="lbl">My streaming services</span><div class="svcpick">${SERVICES.map(([id, n, c]) => `<button type="button" data-svc="${id}" style="--c:${c}" aria-pressed="${prefs().services.includes(id)}">${esc(n)}</button>`).join("")}</div>
+        <div class="ppq" style="margin-top:8px;align-items:center"><span class="note">Country</span><select class="sel" id="svc-country">${COUNTRIES.map(([k, n]) => `<option value="${k}" ${prefs().country === k ? "selected" : ""}>${FLAG(k)} ${n}</option>`).join("")}</select></div>
+        <p class="note">Titles on your services get a badge, and you can filter the watchlist and Tonight to what you can stream right now. Needs the IMDb helper below.</p></div>
+      <div><span class="lbl">New episode alerts</span><label style="display:flex;gap:9px;align-items:center;cursor:pointer"><input type="checkbox" id="notify-on" ${lsGet("front-row-notify", false) ? "checked" : ""}> Send a notification when a show I watch has a new episode out</label>
+        <p class="note">Checks whenever you open Front Row. On a phone, install the app first (Add to Home Screen) so notifications can appear.</p></div>
       <div id="fn-box">${fnBox()}</div>
       <div><span class="lbl">IMDb ratings</span><p class="note" id="rt-status" style="margin:0 0 8px"></p>
         <div class="chips"><button class="btn small" type="button" id="rt-refresh">Refresh all IMDb ratings now</button></div>
@@ -2688,10 +3029,11 @@ alter publication supabase_realtime add table public.${TABLE};`;
     view = v;
     document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     closePop(); if (v === "discover") openDiscover();
-    document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v)) b.setAttribute("aria-current", "page"); });
+    document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v === "blitz" ? "seen" : v)) b.setAttribute("aria-current", "page"); });
     $("#marquee").classList.toggle("slim", v !== "home"); setTimeout(layBulbs, 0);
     if (v === "home") openHome();
-    ["home","library","seen","discover","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
+    if (v === "blitz" && !bz.list && !bz.busy) loadBlitz();
+    ["home","library","seen","discover","blitz","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
     const hv = v === "list" ? "list-" + curList : v;
     if (location.hash.slice(1) !== hv) history.replaceState(null, "", v === "home" ? location.pathname + location.search : "#" + hv);
     render();
@@ -2723,7 +3065,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("#install-btn").hidden = false; });
   $("#install-btn").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; $("#install-btn").hidden = true; });
   addEventListener("appinstalled", () => { $("#install-btn").hidden = true; toast("Front Row is installed"); });
-  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["home","library","seen","discover","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
+  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["home","library","seen","discover","blitz","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
   addEventListener("hashchange", routeHash);
   addEventListener("scroll", () => { if (pop && !$("#pop-root .sheet")) closePop(); }, { passive: true });
   addEventListener("resize", () => closePop());
@@ -2743,6 +3085,11 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (t.id === "lpsort") { lpSort = t.value; renderListPage(); }
     if (t.id === "f-fyear" && t.value && $("#f-finished")) $("#f-finished").value = "";
     if (t.id === "f-finished" && t.value && $("#f-fyear")) $("#f-fyear").value = "";
+    if (t.id === "svc-country") { setPrefs({ country: t.value }); refreshOffers(true); toast(`Streaming info for ${t.options[t.selectedIndex].text}`); }
+    if (t.id === "notify-on") {
+      if (t.checked && "Notification" in window) Notification.requestPermission().then(p => { lsSet("front-row-notify", p === "granted"); t.checked = p === "granted"; toast(p === "granted" ? "Alerts on. You'll hear about new episodes." : "Notifications are blocked for this site in your browser settings."); if (p === "granted") checkNewEpisodes(); });
+      else { lsSet("front-row-notify", false); if (t.checked) { t.checked = false; toast("This browser can't show notifications."); } }
+    }
     if (t.id === "lpmin") { lpMin = t.value; renderListPage(); }
     if (t.id === "d-min") { disc.min = t.value; renderDiscover(); }
     if (t.id === "d-sort") { disc.sort = t.value; renderDiscover(); }
@@ -2777,6 +3124,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.rate) {
       const box = t.closest("[data-rateid]"), id = box?.dataset.rateid; let n = rateFromClick(t, e);
       if (id === "draft" && draft) { readFields(); draft.rating = Number(draft.rating) === n ? 0 : n; return rerenderCard(); }
+      if (id === "bz") { const it = items().find(x => x.id === bz.rating); if (it) upsert({ ...it, rating: n }, `${it.title}: ${starTxt(n)}`); bz.rating = null; return renderBlitz(); }
       const it = items().find(x => x.id === id); if (!it) return;
       if (Number(it.rating) === n) n = 0;
       upsert({ ...it, rating: n }, n ? `${it.title}: ${starTxt(n)}` : "Rating cleared");
@@ -2835,6 +3183,16 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.snt) { sn.type = D.snt; typeF = D.snt; lsSet(LS_TYPE, D.snt); return renderSeen(); }
     if (D.seenmode !== undefined) { addMode = "watched"; scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }); setTimeout(() => $("#q").focus(), 250); $("#q").placeholder = "What have you already seen?"; if (res.state === "done") renderResults(); toast("Search for anything you've seen. It goes straight into Seen it."); return; }
     if (D.seenoff !== undefined) { addMode = "want"; disc.jog = false; $("#q").placeholder = "Find a movie, show, director or actor…"; return renderResults(); }
+    if (D.bzset) { bz.set = D.bzset; bzSkipped.clear(); return loadBlitz(); }
+    if (D.bzmode) { bz.mode = D.bzmode; bz.rating = null; return renderBlitz(); }
+    if (D.bzretry !== undefined) return loadBlitz();
+    if (D.bztap !== undefined) return bzTap(Number(D.bztap));
+    if (D.bzswipe) { const c = $("#scard"); if (c && !reduceMotion) { const dir = D.bzswipe; c.style.transform = `translate(${dir === "right" ? 600 : dir === "left" ? -600 : 0}px,${dir === "up" ? -700 : 0}px) rotate(${dir === "right" ? 20 : dir === "left" ? -20 : 0}deg)`; setTimeout(() => bzAct(dir), 160); } else bzAct(D.bzswipe); return; }
+    if (D.bznext !== undefined) { bz.rating = null; return renderBlitz(); }
+    if (D.newep) return markNewEp(D.newep, D.k);
+    if (D.svc) { const sv = new Set(prefs().services); sv.has(D.svc) ? sv.delete(D.svc) : sv.add(D.svc); setPrefs({ services: [...sv] }); t.setAttribute("aria-pressed", sv.has(D.svc)); if (helperVer >= 2) refreshOffers(false); return; }
+    if (D.lsvc !== undefined) { libSvc = !libSvc; return renderLibrary(); }
+    if (D.tsvc !== undefined) { tn.svc = !tn.svc; tn.pick = null; return renderTonight(); }
     if (D.rtype) { resType = D.rtype; $("#qtype").value = D.rtype; lsSet("front-row-qtype", D.rtype); return renderResults(); }
     if (D.more !== undefined) return moreResults();
     if (D.dtype) { disc.type = D.dtype; return browse(); }
@@ -2854,6 +3212,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
     // lobby card
     if (!draft) return;
     if (D.ppopen !== undefined) return openPosterPicker();
+    if (D.trailer !== undefined) return playTrailer();
+    if (D.trailerclose !== undefined) { const b = $("#trailer"); if (b) { b.innerHTML = ""; b.hidden = true; } return; }
     if (t.id === "pp-cancel" || t.id === "pp-cancel2") return closePicker();
     if (D.ppick) { if (D.ppick === "none") return applyPoster(""); const c = pp?.list[Number(D.ppick)]; if (c) applyPoster(c.url); return; }
     if (t.id === "pp-upload") return $("#poster-file").click();
@@ -2882,6 +3242,10 @@ alter publication supabase_realtime add table public.${TABLE};`;
   });
   document.addEventListener("keydown", e => {
     if (e.key === "Escape" && pop && !draft && !adder && !le) { closePop(); return; }
+    if (view === "blitz" && bz.mode === "swipe" && !draft && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) {
+      if (bz.rating && /^[1-5]$/.test(e.key)) { const it = items().find(x => x.id === bz.rating); if (it) upsert({ ...it, rating: Number(e.key) }); bz.rating = null; renderBlitz(); return; }
+      const dir = { ArrowRight: "right", ArrowLeft: "left", ArrowUp: "up" }[e.key]; if (dir && !bz.rating) { e.preventDefault(); bzAct(dir); return; }
+    }
     if (e.target.id === "drop" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); $("#poster-file").click(); }
     if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName) && !draft) { e.preventDefault(); $("#q").focus(); }
   });
@@ -2896,6 +3260,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
   addEventListener("load", () => {
     sync.connect();
     if (navigator.onLine) setTimeout(loadTrending, 2500);
+    if (navigator.onLine && fnState === "ok") fnCall({ ping: 1 }, null, 8000).then(j => { helperVer = Number(j?.version) || 1; lsSet("front-row-fnver", helperVer); if (helperVer >= 2) setTimeout(() => refreshOffers(false), 3000); }).catch(() => {});
+    if (navigator.onLine) setTimeout(checkNewEpisodes, 3500);
     if (items().some(x => !x.poster && !x.lookedUp) && navigator.onLine) setTimeout(fillMissing, 1500);
     setTimeout(() => { if (items().some(x => (x.imdbId && (!rcache[x.imdbId] || Date.now() - rcache[x.imdbId].at > 3 * 864e5)) || (!x.imdbId && !x.idTried))) refreshLibRatings(false); }, 4000);
   });

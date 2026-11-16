@@ -5,9 +5,12 @@
 //   GET ?q=harry potter       -> IMDb's search suggestions (titles, years, posters)
 //   GET ?q=tt33362861         -> the same for one IMDb id
 //   GET ?title=tt33362861     -> details from the title page: poster, genres, runtime, plot, rating, people
+//   GET ?jw=Severance&year=2022&type=tv&imdb=tt11280740&country=HU
+//                             -> where to watch it in that country (JustWatch): streaming, free, rent and buy offers
+//   GET ?yt=Severance 2022 official trailer -> YouTube video ids for an in-app trailer
 // Deploy it with "Verify JWT" turned OFF so the app can call it with its public key.
 
-const VERSION = 1;
+const VERSION = 2;
 const ALLOWED = ["https://btb993.github.io"];
 const UA = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
@@ -81,6 +84,50 @@ async function title(id: string) {
   });
 }
 
+const JW_QUERY = `query S($country: Country!, $language: Language!, $first: Int!, $filter: TitleFilter) {
+  popularTitles(country: $country, first: $first, filter: $filter) { edges { node {
+    objectType
+    content(country: $country, language: $language) { title originalReleaseYear externalIds { imdbId } }
+    offers(country: $country, platform: WEB) { monetizationType presentationType standardWebURL package { packageId clearName technicalName } }
+  } } } }`;
+async function justwatch(p: Record<string, string>) {
+  const country = /^[A-Z]{2}$/.test(String(p.country || "")) ? p.country : "HU";
+  const q = String(p.jw || "").slice(0, 100), year = Number(p.year) || 0, imdb = String(p.imdb || ""), type = p.type === "tv" ? "SHOW" : p.type === "movie" ? "MOVIE" : "";
+  return cached(`jw:${country}:${imdb}:${q}:${year}:${type}`, 6 * HOUR, async () => {
+    const r = await fetch("https://apis.justwatch.com/graphql", {
+      method: "POST", headers: { ...UA, "Content-Type": "application/json" },
+      body: JSON.stringify({ query: JW_QUERY, variables: { country, language: "en", first: 6, filter: { searchQuery: q, ...(type ? { objectTypes: [type] } : {}) } } }),
+    });
+    if (!r.ok) return { error: "justwatch " + r.status, offers: [] };
+    const j = await r.json();
+    const nodes = (j?.data?.popularTitles?.edges || []).map((e: any) => e.node);
+    const norm = (s: string) => String(s || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "");
+    const node = (imdb && nodes.find((n: any) => n.content?.externalIds?.imdbId === imdb))
+      || nodes.find((n: any) => norm(n.content?.title) === norm(q) && (!year || Math.abs((n.content?.originalReleaseYear || 0) - year) <= 1))
+      || (imdb ? null : nodes[0]);
+    if (!node) return { country, offers: [] };
+    const seen = new Set<string>(), offers: unknown[] = [];
+    for (const o of node.offers || []) {
+      const key = o.package?.packageId + ":" + o.monetizationType;
+      if (seen.has(key)) continue; seen.add(key);
+      offers.push({ p: o.package?.clearName || "", id: o.package?.packageId, tech: o.package?.technicalName || "", t: o.monetizationType, url: o.standardWebURL || "" });
+    }
+    return { country, title: node.content?.title, year: node.content?.originalReleaseYear, offers };
+  });
+}
+async function youtube(q: string) {
+  const key = q.toLowerCase().replace(/\s+/g, " ").trim().slice(0, 120);
+  if (!key) return { ids: [] };
+  return cached("yt:" + key, 24 * HOUR, async () => {
+    const r = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(key)}&hl=en`, { headers: { ...UA, Cookie: "SOCS=CAI; CONSENT=YES+1" } });
+    if (!r.ok) return { ids: [] };
+    const h = await r.text(), ids: string[] = [];
+    for (const m of h.matchAll(/"videoRenderer":\{"videoId":"([\w-]{11})"/g)) { if (!ids.includes(m[1])) ids.push(m[1]); if (ids.length >= 4) break; }
+    if (!ids.length) for (const m of h.matchAll(/"videoId":"([\w-]{11})"/g)) { if (!ids.includes(m[1])) ids.push(m[1]); if (ids.length >= 4) break; }
+    return { ids };
+  });
+}
+
 Deno.serve(async (req) => {
   const h = cors(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: h });
@@ -91,7 +138,9 @@ Deno.serve(async (req) => {
     if (p.ping) return json({ ok: true, version: VERSION }, h);
     if (p.q) return json(await suggest(String(p.q)), h);
     if (p.title && /^tt\d{5,}$/.test(p.title)) return json(await title(p.title), h);
-    return json({ error: "Ask with ?q=… or ?title=tt…" }, h, 400);
+    if (p.jw) return json(await justwatch(p), h);
+    if (p.yt) return json(await youtube(String(p.yt)), h);
+    return json({ error: "Ask with ?q=…, ?title=tt…, ?jw=… or ?yt=…" }, h, 400);
   } catch (e) {
     return json({ error: String(e) }, h, 500);
   }

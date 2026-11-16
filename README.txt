@@ -36,6 +36,23 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v2.1)
+  - Where to watch: pick your streaming services and country in
+    Settings. Every title shows where it streams (and where to rent or
+    buy), with links straight to the service; titles on your services
+    get a badge, Home has "Ready to stream", and the watchlist and
+    Tonight can filter to "On my services". Needs the IMDb helper v2.
+  - New episodes: Home lists episodes out in the last two weeks that
+    you haven't ticked, with one-tap ✓ Watched, plus what airs this
+    week. Optional notifications (Settings) when you open the app.
+  - Trailers play inside the title's window.
+  - ⚡ Seen-it blitz: a poster wall to tap everything you've seen (rate
+    right under each poster), or swipe mode: right = seen (then rate),
+    left = not seen, up = want to watch. Keys ← → ↑ and 1-5 work too.
+  - Three new themes: Drive-in, Art deco palace and VHS rental store.
+  - IMDb helper version 2 (supabase/imdb/index.ts) adds where-to-watch
+    and trailer lookups. If you set up version 1, copy and deploy again.
+
 WHAT'S INSIDE (v2.0)
   - Fun stats: your viewing personality, days of watching in flights and
     Lord of the Rings marathons, oldest and newest film, longest sit,
