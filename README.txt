@@ -36,6 +36,29 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.1)
+  - Search also uses IMDb, so brand-new titles show up, and you can
+    paste an IMDb link (or a tt number) straight into the search.
+    Results can be filtered to Movies or Series.
+  - TVmaze fills in exact episodes per season, the network or streamer
+    and when the next season starts.
+  - Lists have their own look: Velvet premiere, Pride parade, Film noir,
+    Midnight horror, Date night, Neon '80s, Comfort blanket, Deep space,
+    Video store, Arthouse and Saturday morning. The look is picked from
+    the list's name (you can change it), plus an emoji and description.
+  - Every list has its own page: add titles from your library or the
+    search in one picker, remove with ×, pick one for tonight.
+  - Quick menu (the list icon on every poster and search result): set
+    the status, must see, tick lists or create a new list on the spot.
+  - Seen it: your collection of everything watched, grouped by year,
+    with filters, half-star ratings right on the posters, favourites ♥,
+    a "How was it?" row for unrated titles and "Add something you've
+    already seen" mode.
+  - Recommended for you: built from the directors, creators and actors
+    of what you rated highest, with "Not for me" to hide picks.
+  - More stats: how you rate, decades, genres you rate highest, actors
+    you keep seeing.
+
 WHAT'S INSIDE (v1.0)
   - Search by title, director or actor. Posters, cast, runtime, seasons,
     episodes and IMDb, Rotten Tomatoes and Metacritic scores come from
