@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="1.6">
+<html lang="en" data-ver="1.7">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -552,6 +552,14 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .wdate{display:flex;gap:6px}
 .wdate input,.wdate select{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:8px 10px;font-size:15px;color:var(--ink)}
 .field .chips{margin-top:6px}
+.rcp{position:relative}
+.rcp .cbtn{top:6px;right:6px;width:32px;height:32px}
+.rcp .cbtn.nope{right:auto;left:6px;font-size:15px}
+.rc:hover .cbtn,.rc .cbtn:focus-visible{opacity:1}
+.rc .acts{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.rc .acts .have{grid-column:1/-1}
+.btn.seenb{border-color:var(--gold);color:var(--gold);background:transparent}
+.btn.seenb:hover{background:var(--gold-soft)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:80;box-shadow:var(--shadow);max-width:90vw;display:flex;gap:12px;align-items:center;animation:rise .25s}
 .toast button{border:0;background:none;color:var(--gold);font-weight:700;cursor:pointer;padding:0}
 @media (min-width:761px){.toast{bottom:24px}}
@@ -649,6 +657,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   if (legacy && !lib.items.length) { lib.items = legacy; lib.lists = lsGet("front-row-lists", []); }
   lib.items = lib.items || []; lib.deleted = lib.deleted || {}; lib.lists = lib.lists || []; lib.listsAt = lib.listsAt || 0;
   const items = () => lib.items, lists = () => lib.lists;
+  if (!lib.posterFix) { lib.items = lib.items.map(x => x.poster ? x : { ...x, lookedUp: false }); lib.posterFix = 1; }
   if (!lib.undated) { const now = Date.now(); lib.items = lib.items.map(x => x.status === "watched" && x.finished && x.finished === x.added && !x.dateSet ? { ...x, finished: "", updatedAt: now } : x); lib.undated = 1; try { localStorage.setItem("front-row-library", JSON.stringify(lib)); } catch {} }
   function saveLocal(){ if (!lsSet(LS, lib)) toast("This browser's storage is full. Remove a few uploaded poster images."); }
   function commit(){ saveLocal(); render(); sync.schedule(); }
@@ -885,25 +894,32 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       s.src = url; document.head.append(s);
     });
   }
+  const imdbMem = {}; let imdbDirect = true;
   async function imdbSuggest(q, signal){
     const tt = (String(q).match(/tt\d{5,}/) || [])[0];
     const key = tt || String(q).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
     if (!key) return [];
-    let d;
-    try {
-      const r = await fetch(`https://v3.sg.media-imdb.com/suggestion/x/${encodeURIComponent(key)}.json?includeVideos=0`, { signal });
-      if (!r.ok) throw new Error("imdb " + r.status); d = await r.json();
-    } catch (e) {
-      if (e?.name === "AbortError") throw e;
-      const k2 = key.replace(/ /g, "_");
-      d = await jsonp(`https://v2.sg.media-imdb.com/suggestion/${k2[0]}/${encodeURIComponent(k2)}.json`, "imdb$" + k2);
+    if (imdbMem[key]) return imdbMem[key];
+    const target = `https://v3.sg.media-imdb.com/suggestion/x/${encodeURIComponent(key)}.json?includeVideos=0`;
+    let d = null;
+    if (imdbDirect) {
+      try { const r = await fetch(target, { signal }); if (!r.ok) throw new Error("imdb " + r.status); d = await r.json(); }
+      catch (e) { if (e?.name === "AbortError" && signal?.aborted) throw e; imdbDirect = false; }
     }
-    return (d?.d || []).filter(x => /^tt\d+$/.test(x.id) && IMDB_KIND[x.qid]).map(x => ({
+    if (!d) {
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 12000), onAbort = () => ctl.abort();
+      signal?.addEventListener("abort", onAbort);
+      try { const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(target), { signal: ctl.signal }); if (!r.ok) throw new Error("relay " + r.status); d = await r.json(); }
+      catch (e) { if (signal?.aborted) throw Object.assign(new Error("aborted"), { name: "AbortError" }); throw e; }
+      finally { clearTimeout(tm); signal?.removeEventListener("abort", onAbort); }
+    }
+    const out = (d?.d || []).filter(x => /^tt\d+$/.test(x.id) && IMDB_KIND[x.qid]).map(x => ({
       title: x.l, type: IMDB_KIND[x.qid], year: x.y || null,
       endYear: IMDB_KIND[x.qid] === "tv" && /\d{4}-(\d{4})$/.test(x.yr || "") ? +x.yr.slice(-4) : null,
       cast: String(x.s || "").split(", ").filter(Boolean).slice(0, 3), imdbId: x.id, poster: imdbImg(x.i?.imageUrl),
       genres: [], creator: "", blurb: "", fromImdb: true
     }));
+    imdbMem[key] = out; return out;
   }
   async function wdByImdb(ids, signal){
     ids = [...new Set(ids.filter(Boolean))]; if (!ids.length) return {};
@@ -1076,10 +1092,10 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   function rcHTML(r, i, src){
     const have = findSame(r);
     const f = [r.type === "tv" ? "Series" : "Film", r.year, r.type === "tv" ? (r.seasons ? r.seasons + " seasons" : "") : fmtRun(r.runtime)].filter(Boolean);
-    return `<div class="rc"><button class="pb" type="button" data-preview="${src}:${i}" aria-label="More about ${esc(r.title)}">${posterHTML(r, { extra: r.type === "tv" ? `<span class="tvmark">TV</span>` : "" })}</button>
+    return `<div class="rc"><div class="rcp"><button class="pb" type="button" data-preview="${src}:${i}" aria-label="More about ${esc(r.title)}">${posterHTML(r, { extra: r.type === "tv" ? `<span class="tvmark">TV</span>` : "" })}</button><button class="cbtn" type="button" data-listpop="${src}:${i}" aria-label="Status and lists for ${esc(r.title)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button>${src === "x" ? `<button class="cbtn nope" type="button" data-nope="${esc(r.wikidata)}" aria-label="Not for me" title="Not for me">✕</button>` : ""}</div>
       <span class="t">${esc(r.title)}</span><span class="f">${f.map(esc).map(x => `<span>${x}</span>`).join("")}</span>${scoresHTML(r)}
       ${have && have.status === "watched" ? rateHTML(have) : ""}
-      <div class="acts">${have ? `<button class="have" type="button" data-open="${esc(have.id)}">✓ ${esc(STATUS[have.status])}</button>` : addMode === "watched" ? `<button class="btn small gold" type="button" data-add="${src}:${i}" data-st="watched">✓ Seen it</button>` : `<button class="btn small primary" type="button" data-add="${src}:${i}" data-st="want">+ Watchlist</button>`}<button class="btn small icon" type="button" data-listpop="${src}:${i}" aria-label="More options: status, lists" title="Status and lists"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button></div></div>`;
+      <div class="acts">${have ? `<button class="have" type="button" data-open="${esc(have.id)}">✓ ${esc(STATUS[have.status])}</button>` : `<button class="btn small ${addMode === "watched" ? "" : "primary"}" type="button" data-add="${src}:${i}" data-st="want" title="Add to watchlist">+ Watchlist</button><button class="btn small ${addMode === "watched" ? "gold" : "seenb"}" type="button" data-add="${src}:${i}" data-st="watched" data-quiet="1" title="Already seen it">✓ Seen</button>`}</div></div>`;
   }
   function renderResults(){
     const el = $("#results");
@@ -1204,10 +1220,10 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   let filling = false;
   async function fillMissing(){
     if (filling) return; filling = true; renderLibrary();
-    const todo = items().filter(x => !x.poster && !x.lookedUp).slice(0, 40); let found = 0;
+    const todo = items().filter(x => !x.poster && !x.lookedUp).slice(0, 60); let found = 0;
     for (const it of todo) {
       try { const m = await matchOne(it); const cur = items().find(x => x.id === it.id); if (!cur) continue;
-        if (m) { found++; upsert({ ...fillFrom(cur, m), lookedUp: true }); } else upsert({ ...cur, lookedUp: true });
+        if (m) { found++; const o = fillFrom(cur, m); if (!o.imdbId && m.imdbId) o.imdbId = m.imdbId; if (!o.poster && o.imdbId) { const im = (await imdbSuggest(o.imdbId).catch(() => []))[0]; if (im?.poster) o.poster = im.poster; } upsert({ ...o, lookedUp: true }); } else upsert({ ...cur, lookedUp: true });
         const c2 = items().find(x => x.id === it.id); if (c2?.type === "tv" && !c2.tvAt) { const t = await tvInfo(c2).catch(() => null); const c3 = items().find(x => x.id === it.id); if (c3) upsert(applyTv(c3, t)); } }
       catch { if (!navigator.onLine) break; }
     }
@@ -1517,27 +1533,25 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   function recsHTML(){
     const any = items().some(x => x.status === "watched" || x.status === "watching");
     if (!any) return "";
-    const list = (recState.list || []).filter(r => !findSame(r) && !(lib.notForMe || []).includes(r.wikidata)).slice(0, 18);
+    const list = recShown();
     const head = `<div class="sechead"><h3 style="font-size:28px">Recommended for you</h3><span class="muted" style="font-size:14px">${recState.busy ? `<span class="dots">${esc(recState.prog || "Thinking")}</span>` : `From the people behind what you rated highest`} <button class="linkbtn" type="button" data-recs ${recState.busy ? "disabled" : ""} style="margin-left:8px">${recState.list ? "Refresh" : "Find some"}</button></span></div>`;
     if (!recState.list) return `<div class="panel recp" style="margin-top:18px">${head}<p class="status" style="margin:0">${recState.err ? esc(recState.err) : recState.busy ? "Looking through directors, creators and actors of your favourites…" : "Rate a few things you've seen, then press Find some."}</p></div>`;
     return `<div class="panel recp" style="margin-top:18px">${head}${list.length ? `<div class="row">${list.map((r, i) => recCard(r, i)).join("")}</div>` : `<p class="status" style="margin:0">You've already added everything we found. Rate more titles and refresh.</p>`}</div>`;
   }
   function recCard(r, i){
-    const key = "x:" + i;
-    return `<div class="rc rec">${posterHTML(r, { tag: "button", attrs: `type="button" class="pb" data-preview="${key}" aria-label="More about ${esc(r.title)}"`, extra: r.type === "tv" ? `<span class="tvmark">TV</span>` : "" })}
-      <span class="t">${esc(r.title)}</span><span class="f"><span>${esc([r.year, r.type === "tv" ? "Series" : fmtRun(r.runtime)].filter(Boolean).join(" · "))}</span></span>${scoresHTML(r)}
-      <span class="because">${esc(r.because || "")}</span>
-      <div class="acts"><button class="btn small primary" type="button" data-add="${key}" data-st="want">+ Watchlist</button><button class="btn small icon" type="button" data-listpop="${key}" aria-label="More options"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button><button class="btn small icon" type="button" data-nope="${esc(r.wikidata)}" aria-label="Not for me" title="Not for me">✕</button></div></div>`;
+    return rcHTML(r, i, "x").replace('<div class="acts">', `<span class="because">${esc(r.because || "")}</span><div class="acts">`);
   }
-  const recShown = () => (recState.list || []).filter(r => !findSame(r) && !(lib.notForMe || []).includes(r.wikidata)).slice(0, 18);
+  let recHidden = null;
+  const recShown = () => { if (!recHidden) recHidden = new Set((recState.list || []).filter(r => findSame(r)).map(r => r.wikidata)); return (recState.list || []).filter(r => !recHidden.has(r.wikidata) && !(lib.notForMe || []).includes(r.wikidata)).slice(0, 24); };
   async function buildRecs(){
     if (recState.busy) return;
-    recState.busy = true; recState.err = ""; recState.prog = "Reading your taste"; if (view === "seen") renderSeen();
+    const prevTop = new Set((recState.list || []).slice(0, 14).map(x => x.wikidata));
+    recState.busy = true; recState.err = ""; recState.prog = "Reading your taste"; recPaint();
     try {
       const seenL = items().filter(x => x.status === "watched" || x.status === "watching");
       let seeds = seenL.filter(x => Number(x.rating) >= 4);
       if (seeds.length < 3) seeds = seeds.concat(seenL.filter(x => !x.rating && x.status === "watched" && !seeds.includes(x)));
-      seeds = seeds.sort((a, b) => (Number(b.rating) || 3) - (Number(a.rating) || 3) || (b.finished || "").localeCompare(a.finished || "")).slice(0, 10);
+      seeds = seeds.map(x => [x, (Number(x.rating) || 3) + Math.random() * 1.2]).sort((a, b) => b[1] - a[1]).map(x => x[0]).slice(0, 10);
       const need = seeds.filter(s => !s.creatorIds?.length && !s.castIds?.length);
       if (need.length) {
         const byI = await wdByImdb(need.filter(s => s.imdbId).map(s => s.imdbId)).catch(() => ({}));
@@ -1551,11 +1565,11 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         (s.creatorIds || []).slice(0, 1).forEach(q => addP(q, w * 3, s, "made", (s.creator || "").split(", ")[0]));
         (s.castIds || []).slice(0, 2).forEach((q, i) => addP(q, w * (i ? .7 : 1), s, "cast", (s.cast || [])[i] || ""));
       }
-      const top = [...people.entries()].sort((a, b) => b[1].w - a[1].w).slice(0, 12);
+      const top = [...people.entries()].map(e => [e, e[1].w * (.75 + Math.random() * .5)]).sort((a, b) => b[1] - a[1]).map(x => x[0]).slice(0, 12);
       const taste = {}; seenL.forEach(x => (x.genres || []).forEach(g => { taste[g] = (taste[g] || 0) + (Number(x.rating) || 3) - 2; }));
       const cand = new Map(); let i = 0;
       for (const [qid, p] of top) {
-        recState.prog = `Looking through ${++i} of ${top.length}`; if (view === "seen") { const s = $("#view-seen .recp .dots"); if (s) s.textContent = recState.prog; }
+        recState.prog = `Looking through ${++i} of ${top.length}`; const sp = $(".recp .dots"); if (sp) sp.textContent = recState.prog;
         let works; try { works = await worksOf(qid); } catch { continue; }
         works.forEach((x, rank) => {
           if (!x.wikidata || findSame(x) || (lib.notForMe || []).includes(x.wikidata)) return;
@@ -1567,16 +1581,20 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       const list = [...cand.values()].map(c => {
         const g = (c.genres || []).reduce((s, x) => s + Math.max(0, taste[x] || 0), 0);
         c.score *= 1 + Math.min(1.2, g / 6); if (c.imdb) c.score *= 1 + (c.imdb - 6.5) / 6;
+        c.score *= .7 + Math.random() * .6; if (prevTop.has(c.wikidata)) c.score *= .55;
         const best = c.why.sort((a, b) => b.w - a.w)[0], from = best.from[0];
         c.because = c.why.length > 1 ? `${c.why.length} people behind your favourites made or star in it` : best.role === "made" ? `${c.type === "tv" ? "From the creator" : "Same director"} as ${from.title}${from.rating ? ` (${starTxt(from.rating)})` : ""}` : `${best.name || "An actor"} from ${from.title}`;
         delete c.why; return c;
       }).sort((a, b) => b.score - a.score).slice(0, 40);
       await rateList(list).catch(() => {});
       recState.list = list; recState.at = Date.now(); lsSet(LS_RECS, { list, at: recState.at });
+      recHidden = null;
       if (!list.length) recState.err = "Couldn't find recommendations yet. Rate a few more titles you loved.";
     } catch { recState.err = navigator.onLine ? "Recommendations didn't load. Try again in a moment." : "You're offline."; }
-    recState.busy = false; if (view === "seen") renderSeen();
+    recState.busy = false; recPaint();
+    if (recState.list?.length && prevTop.size) toast("New recommendations");
   }
+  function recPaint(){ if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); }
 
   // ================= tonight =================
   const MOODS = {
@@ -1894,6 +1912,9 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       </div>`;
   }
   function openDiscover(){
+    const unrated = l => l?.length && l.some(x => x.imdbId && !x.imdb);
+    if (unrated(recState.list)) rateList(recState.list).then(ch => { if (ch) { lsSet(LS_RECS, { list: recState.list, at: recState.at }); if (view === "discover") renderDiscover(); } }).catch(() => {});
+    if (unrated(disc.trend)) rateList(disc.trend).then(ch => { if (ch && view === "discover") renderDiscover(); }).catch(() => {});
     if (disc.trend === null) loadTrending();
     if (disc.up === null) loadUpcoming();
     if (!disc.list && !disc.busy) browse();
@@ -2311,6 +2332,11 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (pop) renderPop();
   }
 
+  // keep each sideways row scrolled where it was when the page redraws
+  function rowKeys(){ const m = new Map(); document.querySelectorAll(".row").forEach(r => { const box = r.closest("[id]"), all = box ? [...box.querySelectorAll(".row")] : []; m.set((box?.id || "") + ":" + all.indexOf(r), r); }); return m; }
+  function keepRows(fn){ return function(...a){ const before = []; rowKeys().forEach((r, k) => { if (r.scrollLeft) before.push([k, r.scrollLeft]); }); const out = fn.apply(this, a); if (before.length) { const now = rowKeys(); before.forEach(([k, x]) => { const r = now.get(k); if (r) r.scrollLeft = x; }); } return out; }; }
+  render = keepRows(render); renderResults = keepRows(renderResults); renderSeen = keepRows(renderSeen); renderDiscover = keepRows(renderDiscover); renderLibrary = keepRows(renderLibrary); rerenderCard = keepRows(rerenderCard);
+
   // ================= events =================
   $("#search-form").addEventListener("submit", e => { e.preventDefault(); clearTimeout(typeTimer); runSearch($("#q").value); $("#q").blur(); });
   $("#q").addEventListener("input", e => { clearTimeout(typeTimer); const q = e.target.value.trim(); if (q.length >= 3) typeTimer = setTimeout(() => runSearch(q, false), 550); else if (!q) { res.state = "idle"; renderResults(); } });
@@ -2402,7 +2428,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.clear !== undefined) { searchCtl?.abort(); res = { q: "", items: [], person: null, works: null, state: "idle" }; $("#q").value = ""; addMode = "want"; $("#q").placeholder = "Find a movie, show, director or actor…"; renderResults(); return; }
     if (D.manualQ !== undefined) { const al = autoList(); return openCard({ id: newId(), title: res.q.replace(/https?:\S+/g, "").trim(), type: "movie", status: addMode, lists: al ? [al] : [] }, { isNew: true, editOpen: true }); }
     if (D.preview) { const r = resultAt(D.preview); if (!r) return; closePop(); const have = findSame(r); closeModal(); if (have) return openCard(have); const al = autoList(); return openCard({ id: newId(), ...r, status: addMode, lists: al ? [al] : [] }, { isNew: true }); }
-    if (D.add) { const r = resultAt(D.add); if (t.closest(".modal")) { closeModal(); } return addResult(r, D.st); }
+    if (D.add) { const r = resultAt(D.add); if (t.closest(".modal")) { closeModal(); } if (D.quiet && r && !findSame(r)) { const it = addFrom(r, D.st, {}, true); renderResults(); return; } return addResult(r, D.st); }
     if (D.open) { const it = items().find(x => x.id === D.open); if (it) { closeModal(); openCard(it); } return; }
     if (D.ep) return plusEp(D.ep, t);
     if (D.season) return nextSeason(D.season);

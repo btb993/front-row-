@@ -36,6 +36,17 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.7)
+  - Posters from IMDb work again: IMDb blocks apps from asking it
+    directly, so lookups go through the free allorigins.win relay.
+    Titles without a poster are looked up again once.
+  - Every search, Discover and recommendation card has "+ Watchlist"
+    and "✓ Seen" side by side; the list menu and "Not for me" sit on
+    the poster. Adding as seen stays put, no pop-up.
+  - Sideways rows keep their place when you add something.
+  - Recommendations' Refresh works in Discover too, and each refresh
+    mixes in new picks.
+
 WHAT'S INSIDE (v1.6)
   - Marking something as seen no longer stamps today's date. The date is
     optional: pick an exact date, just a year, or tap "Today" in the
