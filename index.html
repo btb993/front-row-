@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="1.7">
+<html lang="en" data-ver="1.8">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -14,6 +14,11 @@
 <link rel="icon" type="image/png" href="favicon-64.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://m.media-amazon.com">
+<link rel="preconnect" href="https://upload.wikimedia.org">
+<link rel="preconnect" href="https://en.wikipedia.org">
+<link rel="preconnect" href="https://www.wikidata.org">
+<link rel="preconnect" href="https://adkfuzmontecmhfnrcyb.supabase.co">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Bungee&family=Creepster&family=Monoton&family=Orbitron:wght@700&family=Pacifico&display=swap">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -894,7 +899,25 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       s.src = url; document.head.append(s);
     });
   }
-  const imdbMem = {}; let imdbDirect = true;
+  const imdbMem = {}; let imdbDirect = true, relayDown = 0;
+  let fnState = lsGet("front-row-fn", "unknown"), fnDown = 0;
+  function fnUrl(){ return `${sync.cfg.url}/functions/v1/imdb`; }
+  async function fnCall(params, signal, ms = 9000){
+    if (fnState === "missing") throw new Error("missing");
+    if (Date.now() - fnDown < 120000 && !params.ping) throw new Error("helper resting");
+    const u = new URL(fnUrl()); Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, v));
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), ms), on = () => ctl.abort(); signal?.addEventListener("abort", on);
+    try {
+      const r = await fetch(u, { signal: ctl.signal, headers: { apikey: sync.cfg.key, Authorization: `Bearer ${sync.cfg.key}` } });
+      if (r.status === 404) { fnState = "missing"; lsSet("front-row-fn", fnState); throw new Error("missing"); }
+      if (r.status === 401 || r.status === 403) { fnState = "jwt"; lsSet("front-row-fn", fnState); throw new Error("jwt"); }
+      if (!r.ok) throw new Error("fn " + r.status);
+      if (fnState !== "ok") { fnState = "ok"; lsSet("front-row-fn", fnState); }
+      return await r.json();
+    } catch (e) { if (signal?.aborted) throw Object.assign(new Error("aborted"), { name: "AbortError" }); if (!/missing|jwt/.test(e?.message)) fnDown = Date.now(); if (e?.name === "AbortError") throw new Error("timeout"); throw e; }
+    finally { clearTimeout(tm); signal?.removeEventListener("abort", on); }
+  }
+  async function imdbTitle(id, signal){ try { const j = await fnCall({ title: id }, signal, 12000); return j && !j.error ? j : null; } catch (e) { if (e?.name === "AbortError") throw e; return null; } }
   async function imdbSuggest(q, signal){
     const tt = (String(q).match(/tt\d{5,}/) || [])[0];
     const key = tt || String(q).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
@@ -902,15 +925,19 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     if (imdbMem[key]) return imdbMem[key];
     const target = `https://v3.sg.media-imdb.com/suggestion/x/${encodeURIComponent(key)}.json?includeVideos=0`;
     let d = null;
-    if (imdbDirect) {
+    if (fnState !== "missing" && fnState !== "jwt") {
+      try { d = await fnCall({ q: key }, signal); } catch (e) { if (e?.name === "AbortError") throw e; }
+    }
+    if (!d && imdbDirect) {
       try { const r = await fetch(target, { signal }); if (!r.ok) throw new Error("imdb " + r.status); d = await r.json(); }
       catch (e) { if (e?.name === "AbortError" && signal?.aborted) throw e; imdbDirect = false; }
     }
     if (!d) {
-      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 12000), onAbort = () => ctl.abort();
+      if (Date.now() - relayDown < 120000) throw new Error("relay down");
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 7000), onAbort = () => ctl.abort();
       signal?.addEventListener("abort", onAbort);
       try { const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(target), { signal: ctl.signal }); if (!r.ok) throw new Error("relay " + r.status); d = await r.json(); }
-      catch (e) { if (signal?.aborted) throw Object.assign(new Error("aborted"), { name: "AbortError" }); throw e; }
+      catch (e) { if (signal?.aborted) throw Object.assign(new Error("aborted"), { name: "AbortError" }); relayDown = Date.now(); throw new Error("relay failed"); }
       finally { clearTimeout(tm); signal?.removeEventListener("abort", onAbort); }
     }
     const out = (d?.d || []).filter(x => /^tt\d+$/.test(x.id) && IMDB_KIND[x.qid]).map(x => ({
@@ -936,16 +963,29 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   async function searchAll(q, signal){
     const tt = (q.match(/tt\d{5,}/) || [])[0];
     if (tt) {
+      const [im, w, det] = await Promise.all([imdbSuggest(tt, signal).catch(e => { if (e.name === "AbortError") throw e; return []; }), wdByImdb([tt], signal).catch(e => { if (e.name === "AbortError") throw e; return {}; }), imdbTitle(tt, signal)]);
+      let base = im.find(x => x.imdbId === tt) || im[0];
+      if (det && det.title) base = fromDetails(det, base);
+      const hit = w[tt] ? merged(w[tt], base) : base;
+      return { items: hit ? [hit] : [], person: null, link: true };
+    }
+    if (false) {
       const [im, w] = await Promise.all([imdbSuggest(tt, signal).catch(e => { if (e.name === "AbortError") throw e; return []; }), wdByImdb([tt], signal).catch(e => { if (e.name === "AbortError") throw e; return {}; })]);
       const base = im.find(x => x.imdbId === tt) || im[0], hit = w[tt] ? merged(w[tt], base) : base;
       return { items: hit ? [hit] : [], person: null, link: true };
     }
+    return mergeSources(...await bothSources(q, signal));
+  }
+  async function bothSources(q, signal){
     let failed = 0;
     const [wk, im] = await Promise.all([
       searchTitles(q, signal).catch(e => { if (e.name === "AbortError") throw e; failed++; return { items: [], person: null }; }),
       imdbSuggest(q, signal).catch(e => { if (e.name === "AbortError") throw e; failed++; return []; })
     ]);
     if (failed === 2) throw new Error("both sources failed");
+    return [wk, im];
+  }
+  function mergeSources(wk, im){
     const byImdb = new Map(wk.items.filter(x => x.imdbId).map(x => [x.imdbId, x])), used = new Set(), out = [];
     for (const x of im) { const w = byImdb.get(x.imdbId); if (w) { out.push(merged(w, x)); used.add(w); } else out.push(x); }
     for (const w of wk.items) if (!used.has(w) && !out.some(o => (o.imdbId && o.imdbId === w.imdbId) || (norm(o.title) === norm(w.title) && o.type === w.type && o.year === w.year))) out.push(w);
@@ -977,6 +1017,12 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     } catch (e) { if (e?.name === "AbortError") return; }
     res.moreBusy = false; res.noMore = res.step >= 4 && !added;
     renderResults(); toast(added ? `${added} more result${added === 1 ? "" : "s"}` : "That's everything we could find");
+  }
+  function fromDetails(d, base = {}){
+    return { ...base, title: base.title || d.title, type: base.type || d.type, imdbId: d.id, poster: base.poster || d.poster || "", genres: base.genres?.length ? base.genres : (d.genres || []).slice(0, 3),
+      runtime: base.runtime || d.runtime || null, epLength: base.epLength || d.epLength || null, plot: base.plot || d.plot || "", imdb: base.imdb || d.rating || null, imdbVotes: base.imdbVotes || d.votes || null,
+      creator: base.creator || (d.type === "tv" ? d.creators : d.directors)?.slice(0, 2).join(", ") || "", cast: base.cast?.length ? base.cast : (d.actors || []).slice(0, 4),
+      year: base.year || (d.date ? +String(d.date).slice(0, 4) : null), release: base.release || d.date || "", fromImdb: true };
   }
   const stripHTML = s => String(s || "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
   async function tvInfo(it, signal){
@@ -1127,7 +1173,17 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     renderResults();
     if (scroll) $("#results").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
     try {
-      const out = await searchAll(q, sig);
+      let out;
+      if (/tt\d{5,}/.test(q)) out = await searchAll(q, sig);
+      else {
+        const wkP = searchTitles(q, sig).catch(e => { if (e.name === "AbortError") throw e; return null; });
+        const imP = imdbSuggest(q, sig).catch(e => { if (e.name === "AbortError") throw e; return null; });
+        imP.then(im => { if (!sig.aborted && im?.length && res.state === "loading" && res.q === q) { res = { ...res, items: im.slice(), state: "done" }; renderResults(); } }).catch(() => {});
+        wkP.then(wk => { if (!sig.aborted && wk?.items?.length && res.state === "loading" && res.q === q) { res = { ...res, items: wk.items.slice(), state: "done" }; renderResults(); } }).catch(() => {});
+        const [wk, im] = await Promise.all([wkP, imP]);
+        if (!wk && !im) throw new Error("both failed");
+        out = mergeSources(wk || { items: [], person: null }, im || []);
+      }
       if (sig.aborted) return;
       res = { ...res, items: out.items, person: out.person, works: out.person ? null : undefined, state: "done", next: out.next || 0 };
       renderResults();
@@ -1223,7 +1279,8 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const todo = items().filter(x => !x.poster && !x.lookedUp).slice(0, 60); let found = 0;
     for (const it of todo) {
       try { const m = await matchOne(it); const cur = items().find(x => x.id === it.id); if (!cur) continue;
-        if (m) { found++; const o = fillFrom(cur, m); if (!o.imdbId && m.imdbId) o.imdbId = m.imdbId; if (!o.poster && o.imdbId) { const im = (await imdbSuggest(o.imdbId).catch(() => []))[0]; if (im?.poster) o.poster = im.poster; } upsert({ ...o, lookedUp: true }); } else upsert({ ...cur, lookedUp: true });
+        if (m) { found++; const o = fillFrom(cur, m); if (!o.imdbId && m.imdbId) o.imdbId = m.imdbId; if (!o.poster && o.imdbId) { const im = (await imdbSuggest(o.imdbId).catch(() => []))[0]; if (im?.poster) o.poster = im.poster; }
+          if (!o.poster && o.imdbId) { const d = await imdbTitle(o.imdbId); if (d?.poster) o.poster = d.poster; } upsert({ ...o, lookedUp: true }); } else upsert({ ...cur, lookedUp: true });
         const c2 = items().find(x => x.id === it.id); if (c2?.type === "tv" && !c2.tvAt) { const t = await tvInfo(c2).catch(() => null); const c3 = items().find(x => x.id === it.id); if (c3) upsert(applyTv(c3, t)); } }
       catch { if (!navigator.onLine) break; }
     }
@@ -1480,6 +1537,8 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     let it = items().find(x => x.id === id); if (!it) return;
     try {
       if (!it.wikidata && it.imdbId) { const w = (await wdByImdb([it.imdbId]))[it.imdbId]; it = items().find(x => x.id === id); if (it && w) upsert({ ...fillFrom(it, w) }); }
+      it = items().find(x => x.id === id);
+      if (it?.imdbId && (!it.poster || !(it.genres || []).length || (!it.runtime && it.type !== "tv"))) { const d = await imdbTitle(it.imdbId); it = items().find(x => x.id === id); if (it && d?.title) upsert({ ...fromDetails(d, it), id: it.id, fromImdb: it.fromImdb }); }
       it = items().find(x => x.id === id);
       if (it?.type === "tv" && !it.tvAt) { const t = await tvInfo(it); it = items().find(x => x.id === id); if (it) upsert(applyTv(it, t)); }
     } catch {}
@@ -1820,15 +1879,18 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     if (disc.trendBusy) return; disc.trendBusy = true;
     try {
       const counts = new Map();
-      for (const back of [2, 3, 4]) {
+      const days = await Promise.all([2, 3, 4].map(async back => {
         const d = new Date(Date.now() - back * 864e5), y = d.getUTCFullYear(), m = String(d.getUTCMonth() + 1).padStart(2, "0"), dd = String(d.getUTCDate()).padStart(2, "0");
-        const r = await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/${y}/${m}/${dd}`); if (!r.ok) continue;
-        (await r.json()).items?.[0]?.articles?.forEach(a => { if (!/^(Main_Page|Special:|Wikipedia:|Portal:|File:|Help:|Category:|Template:|Deaths_in|List_of|\d{4}_in|Cleopatra|XXX)/.test(a.article)) counts.set(a.article, (counts.get(a.article) || 0) + a.views); });
+        const r = await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/${y}/${m}/${dd}`).catch(() => null); return r?.ok ? r.json() : null;
+      }));
+      for (const day of days) {
+        if (!day) continue;
+        day.items?.[0]?.articles?.forEach(a => { if (!/^(Main_Page|Special:|Wikipedia:|Portal:|File:|Help:|Category:|Template:|Deaths_in|List_of|\d{4}_in|Cleopatra|XXX)/.test(a.article)) counts.set(a.article, (counts.get(a.article) || 0) + a.views); });
       }
       const titles = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 300).map(x => x[0].replace(/_/g, " "));
       const found = [];
-      for (let i = 0; i < titles.length; i += 50) {
-        const j = await wp({ action: "query", titles: titles.slice(i, i + 50).join("|"), prop: "pageprops|pageimages", ppprop: "wikibase_item", piprop: "thumbnail", pithumbsize: 500, pilicense: "any", pilimit: 50, redirects: 1 });
+      const chunks = []; for (let i = 0; i < titles.length; i += 50) chunks.push(titles.slice(i, i + 50));
+      for (const j of await Promise.all(chunks.map(c => wp({ action: "query", titles: c.join("|"), prop: "pageprops|pageimages", ppprop: "wikibase_item", piprop: "thumbnail", pithumbsize: 500, pilicense: "any", pilimit: 50, redirects: 1 }).catch(() => ({}))))) {
         const back = {}; for (const x of [...(j.query?.normalized || []), ...(j.query?.redirects || [])]) back[x.to] = back[x.from] || x.from;
         for (const pg of Object.values(j.query?.pages || {})) if (pg.pageprops?.wikibase_item) found.push({ q: pg.pageprops.wikibase_item, wiki: pg.title, poster: pg.thumbnail?.source || "", rank: titles.indexOf(back[pg.title] || pg.title) });
       }
@@ -1959,6 +2021,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const sig = pp.ctl.signal, type = it.type || "movie";
     const task = async fn => { pp.pending++; ppStatus(); try { await fn(); } catch {} finally { if (pp && !sig.aborted) { pp.pending--; ppStatus(); } } };
     const same = x => (it.imdbId && x.imdbId === it.imdbId) || (norm(x.title) === norm(it.title) && x.type === type && (!it.year || !x.year || Math.abs(x.year - it.year) <= 1));
+    if (it.imdbId) task(async () => { const d = await imdbTitle(it.imdbId, sig); if (d?.poster) addCand(d.poster.replace(/\._V1_.*?\.(jpg|jpeg|png)$/i, "._V1_QL80_UX600_.$1"), "IMDb"); });
     task(async () => {
       let r = await imdbSuggest(it.imdbId || `${it.title} ${it.year || ""}`, sig);
       if (!r.some(same)) r = await imdbSuggest(it.title, sig);
@@ -2000,6 +2063,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       <div class="mbody">
         <div class="sechead" style="padding-right:40px"><h3 style="font-size:32px">Choose a poster</h3><span class="serif">${esc(draft.title)}${draft.year ? ` (${draft.year})` : ""}</span></div>
         <p class="note" id="pp-status" style="margin:0"></p>
+        ${fnState !== "ok" ? `<div class="banner" style="margin:0"><span>For reliable IMDb posters, add the free IMDb helper to your Supabase (about 2 minutes, once).</span><button class="btn small gold" type="button" data-fnsetup style="margin-left:auto">Set it up</button></div>` : ""}
         <div class="ppgrid" id="pp-grid">${pp.list.map((_, i) => ppTile(i)).join("")}</div>
         <form class="ppq" id="pp-form"><input id="pp-q" value="${esc(pp.q)}" aria-label="Search for more posters"><button class="btn small" type="submit">Search for more</button></form>
         <div><span class="lbl">Or use your own</span>
@@ -2263,16 +2327,34 @@ alter publication supabase_realtime add table public.${TABLE};`;
         panel(); $("#au-email").value = email; if ($("#au-invite")) $("#au-invite").value = invite; return; }
       if (authMode === "up" && !r.data.session) { authMsg = "Check your email to confirm the account, then sign in here."; authMode = "in"; panel(); }
     }
-    return { connect, schedule, pull, open, paint, onClick, onSubmit, get user(){ return user; } };
+    return { connect, schedule, pull, open, paint, onClick, onSubmit, cfg, ref, get user(){ return user; } };
   })();
   async function copy(text, ok){ try { await navigator.clipboard.writeText(text); toast(ok); } catch { const ta = document.createElement("textarea"); ta.value = text; document.body.append(ta); ta.select(); try { document.execCommand("copy"); toast(ok); } catch { toast("Couldn't copy. Select the text and copy it yourself."); } ta.remove(); } }
 
   // ================= settings and backup =================
+  function fnBox(){
+    const st = { ok: "✓ Connected. Posters and details come straight from IMDb.", missing: "Not set up yet.", jwt: "The helper is there but turns the app away: switch off “Verify JWT” (step 4).", unknown: "Not checked yet." }[fnState] || "";
+    return `<span class="lbl">IMDb helper (recommended)</span><p class="note" style="margin:0 0 6px"><b>${esc(st)}</b> IMDb doesn't let apps ask it directly, so this tiny function on your own Supabase asks for Front Row. It makes posters, new releases and IMDb links fast and reliable.</p>
+      ${fnState === "ok" ? `<button class="btn small" type="button" data-fncheck>Check again</button>` : `<ol class="steps">
+        <li><a class="btn small" href="https://supabase.com/dashboard/project/${esc(sync.ref)}/functions" target="_blank" rel="noopener">Open Edge Functions in Supabase ↗</a> (sign in if asked).</li>
+        <li>Press <b>Deploy a new function</b>, then <b>Via Editor</b>.</li>
+        <li>Name it <code>imdb</code>, delete the sample code, <button class="btn small" type="button" data-fncopy>Copy the helper code</button> paste it in and press <b>Deploy function</b>.</li>
+        <li>Open the function's <b>Details</b>, switch off <b>Verify JWT</b> (“Enforce JWT verification”) and save.</li>
+        <li><button class="btn small primary" type="button" data-fncheck>Check it works</button></li></ol>`}`;
+  }
+  async function fnCheck(){
+    fnState = "unknown"; const box = $("#fn-box"); if (box) box.innerHTML = fnBox().replace("Not checked yet.", "Checking…");
+    try { await fnCall({ ping: 1 }, null, 9000); fnState = "ok"; } catch (e) { if (fnState === "unknown") fnState = /timeout/.test(e?.message) ? "unknown" : "missing"; }
+    lsSet("front-row-fn", fnState); if ($("#fn-box")) $("#fn-box").innerHTML = fnBox();
+    if (fnState === "ok") { toast("IMDb helper connected"); lib.items = lib.items.map(x => x.poster ? x : { ...x, lookedUp: false }); saveLocal(); fillMissing(); }
+    else toast(fnState === "jwt" ? "Switch off Verify JWT on the function, then check again" : "Couldn't reach the helper yet");
+  }
   function openSettings(){ setTimeout(paintRatingStatus, 0);
     const cur = lsGet(LS_THEME, "auto");
     $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal narrow" role="dialog" aria-modal="true" aria-label="Settings">
       <div class="sechead"><h3 style="font-size:28px">Settings</h3><button class="btn small" type="button" data-mclose>Close</button></div>
       <div><span class="lbl">Theme</span><div class="themes">${[["auto","Match my device","linear-gradient(90deg,#F2EADD 50%,#100809 50%)"],["velvet","Velvet","#100809"],["matinee","Matinee","#F2EADD"]].map(([k, l, c]) => `<button type="button" data-theme-set="${k}" aria-pressed="${cur === k}"><i style="background:${c}"></i>${l}</button>`).join("")}</div></div>
+      <div id="fn-box">${fnBox()}</div>
       <div><span class="lbl">IMDb ratings</span><p class="note" id="rt-status" style="margin:0 0 8px"></p>
         <div class="chips"><button class="btn small" type="button" id="rt-refresh">Refresh all IMDb ratings now</button></div>
         <p class="note">Ratings come from IMDb's daily ratings file and refresh by themselves every few days. As a backup you can add a free OMDb key (omdbapi.com, “API Key”, free tier):</p>
@@ -2419,6 +2501,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.go) { go(D.go); if (D.go === "library" && t.classList.contains("brand")) scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }); return; }
     if (D.themeSet) { applyTheme(D.themeSet); document.querySelectorAll("[data-theme-set]").forEach(b => b.setAttribute("aria-pressed", b.dataset.themeSet === D.themeSet)); return; }
     if (t.id === "s-backup") return downloadBackup();
+    if (D.fnsetup !== undefined) { closeModal(); openSettings(); setTimeout(() => $("#fn-box")?.scrollIntoView({ block: "start" }), 50); return; }
+    if (D.fncheck !== undefined) return fnCheck();
+    if (D.fncopy !== undefined) { try { const code = await fetch("supabase/imdb/index.ts", { cache: "no-store" }).then(r => { if (!r.ok) throw 0; return r.text(); }); await navigator.clipboard.writeText(code); toast("Helper code copied"); } catch { window.open("supabase/imdb/index.ts", "_blank"); toast("Opened the code. Select all and copy it."); } return; }
     if (t.id === "rt-refresh") { refreshLibRatings(true).then(n => { toast(n ? `Updated ${n} IMDb rating${n === 1 ? "" : "s"}` : ratingNote || "IMDb ratings are up to date"); }); return; }
     if (t.id === "omdb-save") { lsSet(LS_OMDB, $("#omdb-key").value.trim()); toast("OMDb key saved"); refreshLibRatings(true).then(() => paintRatingStatus()); return; }
     if (t.id === "s-restore") return openRestore();

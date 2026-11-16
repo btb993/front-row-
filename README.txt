@@ -36,6 +36,17 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.8)
+  - IMDb helper (recommended, one time, about 2 minutes): a tiny function
+    on your Supabase (supabase/imdb/index.ts) that asks IMDb for the app,
+    so posters, brand-new releases and IMDb links load fast and reliably.
+    Settings > IMDb helper walks you through it, like Save Point's
+    playtime function: Edge Functions > Deploy a new function > Via
+    Editor > name it imdb > paste > Deploy > switch off Verify JWT.
+  - Faster: search shows results as soon as the first source answers,
+    the app connects to the poster servers early, trending loads in
+    parallel, and IMDb lookups are remembered.
+
 WHAT'S INSIDE (v1.7)
   - Posters from IMDb work again: IMDb blocks apps from asking it
     directly, so lookups go through the free allorigins.win relay.
