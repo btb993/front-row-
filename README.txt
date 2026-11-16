@@ -36,6 +36,32 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.4)
+  - Discover tab: Recommended for you, Trending this week (from
+    Wikipedia page views), Coming soon (upcoming films and series, plus
+    release dates and new seasons of what's on your watchlist), and
+    Browse by genre and decade, ranked by popularity or IMDb rating.
+  - Jog my memory: tick everything you've already seen straight from
+    the Browse lists and rate it.
+  - Trending this week also shows under your watchlist on the home
+    screen.
+  - Search finds whole series: "harry potter" brings every film in the
+    series, and "Show more results" digs deeper.
+
+WHAT'S INSIDE (v1.3)
+  - IMDb ratings and vote counts for every title, from IMDb's daily
+    ratings file, refreshed every few days (Settings > IMDb ratings).
+    An optional free OMDb key works as a backup.
+  - Filter by minimum IMDb rating and sort by it in search, the
+    watchlist, Seen it, list pages and What's playing tonight.
+
+WHAT'S INSIDE (v1.2)
+  - Choose a poster: every title's window has "Change poster", which
+    gathers alternatives from IMDb, TVmaze, Wikipedia in many languages,
+    Wikidata and Wikimedia Commons. When a poster is missing or doesn't
+    load, the button turns red: "find another". Paste an image link or
+    upload your own too.
+
 WHAT'S INSIDE (v1.1)
   - Search also uses IMDb, so brand-new titles show up, and you can
     paste an IMDb link (or a tt number) straight into the search.

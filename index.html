@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="1.1">
+<html lang="en" data-ver="1.4">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -221,6 +221,7 @@ a{color:var(--accent)}
 .scores{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .sc{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-mono);font-size:11.5px;border-radius:4px;padding:1px 6px;font-weight:500;white-space:nowrap}
 .sc.imdb{background:#F5C518;color:#111}
+.sc small{font-size:10px;opacity:.7;margin-left:4px}
 .sc.rt{background:#FA320A;color:#fff}
 .sc.mc{background:#2C2C2C;color:#fff}
 .row{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity;scrollbar-width:thin}
@@ -521,6 +522,27 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .db i{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--gold),color-mix(in srgb,var(--gold) 50%,var(--accent)));min-height:2px}
 .db .n{font-size:11px;color:var(--muted)} .db .m{font-family:var(--f-mono);font-size:10px;color:var(--muted)}
 
+.hp{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.pchg{border:1px solid rgba(255,241,214,.3);background:rgba(10,4,6,.55);color:var(--cream);border-radius:999px;padding:5px 10px;font-size:12.5px;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-weight:600}
+.pchg:hover{background:rgba(255,241,214,.16)}
+.pchg .b{display:none}
+.hp.noimg .pchg{background:#FF4D5A;border-color:#FF4D5A;color:#170B0E;animation:nudge 2.4s ease-in-out 2}
+.hp.noimg .pchg .a{display:none}.hp.noimg .pchg .b{display:inline}
+@keyframes nudge{40%{transform:none}50%{transform:translateY(-3px)}60%{transform:none}}
+.ppgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:14px 12px;min-height:40px}
+.ppick{position:relative;border:0;padding:0;background:var(--bg2);border-radius:9px;overflow:hidden;aspect-ratio:2/3;cursor:pointer;opacity:0;transition:opacity .35s,transform .15s,box-shadow .15s}
+.ppick.ok{opacity:1}
+.ppick img{width:100%;height:100%;object-fit:cover;display:block}
+.ppick .src{position:absolute;left:6px;bottom:6px;background:rgba(10,4,6,.78);color:#fff;font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:2px 6px;border-radius:4px}
+.ppick:hover{transform:translateY(-3px);box-shadow:0 0 0 2px var(--gold),0 12px 22px rgba(0,0,0,.35)}
+.ppick.cur{box-shadow:0 0 0 3px var(--accent)}
+.ppq{display:flex;gap:8px;flex-wrap:wrap}
+.ppq input{flex:1 1 200px;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:7px 11px;font-size:15px}
+.due{align-self:flex-start;font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:1px 7px}
+.teaser{margin-top:30px;border-top:1px solid var(--line);padding-top:18px}
+.jog{display:flex;gap:9px;align-items:center;font-size:14.5px;cursor:pointer;background:var(--gold-soft);border-radius:10px;padding:7px 12px}
+.jog input{width:18px;height:18px;accent-color:var(--gold)}
+#view-discover .panel{gap:14px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:80;box-shadow:var(--shadow);max-width:90vw;display:flex;gap:12px;align-items:center;animation:rise .25s}
 .toast button{border:0;background:none;color:var(--gold);font-weight:700;cursor:pointer;padding:0}
 @media (min-width:761px){.toast{bottom:24px}}
@@ -537,6 +559,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     <nav class="nav" aria-label="Sections">
       <button type="button" data-go="library" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="10" rx="1.5"/><rect x="14" y="3" width="7" height="10" rx="1.5"/><path d="M3 17h18M3 21h12"/></svg>Watchlist</button>
       <button type="button" data-go="seen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Seen</button>
+      <button type="button" data-go="discover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Discover</button>
       <button type="button" data-go="lists"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Lists</button>
       <button type="button" data-go="tonight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3z"/><path d="M14 6v12" stroke-dasharray="2 2.5"/></svg>Tonight</button>
       <button type="button" data-go="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
@@ -572,6 +595,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 
   <main id="view-library"></main>
   <main id="view-seen" hidden></main>
+  <main id="view-discover" hidden></main>
   <main id="view-lists" hidden></main>
   <main id="view-list" hidden></main>
   <main id="view-tonight" hidden></main>
@@ -662,12 +686,12 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   function posterHTML(it, opt = {}){
     const [a, b] = palOf(it), tag = opt.tag || "div";
     const src = it.poster || "";
-    return `<${tag} class="poster" ${opt.attrs || ""} style="${opt.style || ""}--pa:${a};--pb:${b}">${motif(it, b)}<div class="pt"><span class="ptype">${it.type === "tv" ? "Series" : "Film"}</span><b>${esc(it.title)}</b><span class="py">${esc(yearText(it))}</span></div>${src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onload="this.classList.add('in')" onerror="this.remove()">` : ""}${opt.extra || ""}</${tag}>`;
+    return `<${tag} class="poster" ${opt.attrs || ""} style="${opt.style || ""}--pa:${a};--pb:${b}">${motif(it, b)}<div class="pt"><span class="ptype">${it.type === "tv" ? "Series" : "Film"}</span><b>${esc(it.title)}</b><span class="py">${esc(yearText(it))}</span></div>${src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onload="this.classList.add('in')" onerror="var h=this.closest('.hp');if(h)h.classList.add('noimg');this.remove()">` : ""}${opt.extra || ""}</${tag}>`;
   }
   const stars = n => starTxt(n);
   function scoresHTML(it){
     const s = [];
-    if (it.imdb) s.push(`<span class="sc imdb" title="IMDb user rating">IMDb ${Number(it.imdb).toFixed(1)}</span>`);
+    if (it.imdb) s.push(`<span class="sc imdb" title="IMDb user rating${it.imdbVotes ? `, ${Number(it.imdbVotes).toLocaleString()} votes` : ""}">IMDb ${Number(it.imdb).toFixed(1)}${it.imdbVotes ? `<small>${fmtVotes(it.imdbVotes)}</small>` : ""}</span>`);
     if (it.rt) s.push(`<span class="sc rt" title="Rotten Tomatoes">RT ${it.rt}%</span>`);
     if (it.mc) s.push(`<span class="sc mc" title="Metacritic">MC ${it.mc}</span>`);
     return s.length ? `<span class="scores">${s.join("")}</span>` : "";
@@ -721,6 +745,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     return null;
   }
   const countOf = (e, p) => { let m = 0; for (const c of claims(e, p)) { const n = parseFloat(c.mainsnak?.datavalue?.value?.amount); if (n > m) m = n; } return m ? Math.round(m) : null; };
+  const releaseOf = (e, p) => { const v = claims(e, p).map(c => c.mainsnak?.datavalue?.value).filter(v => v?.time).map(v => ({ t: v.time.slice(1, 11), p: v.precision })).sort((a, b) => a.t.localeCompare(b.t))[0]; return v ? (v.p >= 11 ? v.t : v.p === 10 ? v.t.slice(0, 7) + "-01" : v.t.slice(0, 4) + "-01-01") : ""; };
   const yearsOf = (e, p) => claims(e, p).map(c => +String(c.mainsnak?.datavalue?.value?.time || "").slice(1, 5)).filter(Boolean);
   function scoresOf(e){
     const by = { Q37312: "imdb", Q105584: "rt", Q150248: "mc" }, out = {};
@@ -782,7 +807,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       const ends = yearsOf(e, "P582");
       return {
         title: labelOf(e) || String(wiki || "").replace(/ \((?:\d{4} )?(?:film|TV series|miniseries|American TV series|British TV series)\)$/, ""),
-        type, year: ys.length ? Math.min(...ys) : null, endYear: tv && ends.length ? Math.max(...ends) : null,
+        type, year: ys.length ? Math.min(...ys) : null, release: releaseOf(e, tv ? "P580" : "P577") || (tv ? releaseOf(e, "P577") : ""), endYear: tv && ends.length ? Math.max(...ends) : null,
         creator: cr.map(L).filter(Boolean).slice(0, 2).join(", "), creatorIds: cr.slice(0, 2),
         cast: idsOf(e, "P161").slice(0, 4).map(L).filter(Boolean), castIds: idsOf(e, "P161").slice(0, 4).filter(x => L(x)),
         genres: [...new Set(idsOf(e, "P136").map(L).map(cleanGenre).filter(Boolean))].slice(0, 3),
@@ -794,13 +819,14 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       };
     }).filter(x => x.title && x.type);
   }
-  async function searchTitles(q, signal, limit = 20){
-    const j = await wp({ action: "query", generator: "search", gsrsearch: q, gsrlimit: limit, gsrnamespace: 0, prop: "pageprops|pageimages", ppprop: "wikibase_item", piprop: "thumbnail", pithumbsize: 500, pilicense: "any", pilimit: 50 }, signal);
+  async function searchTitles(q, signal, limit = 20, offset = 0){
+    const j = await wp({ action: "query", generator: "search", gsrsearch: q, gsrlimit: limit, gsroffset: offset, gsrnamespace: 0, prop: "pageprops|pageimages", ppprop: "wikibase_item", piprop: "thumbnail", pithumbsize: 500, pilicense: "any", pilimit: 50 }, signal);
     const pages = Object.values(j.query?.pages || {}).sort((a, b) => a.index - b.index).filter(p => p.pageprops?.wikibase_item);
     const ents = await entities(pages.map(p => p.pageprops.wikibase_item), signal);
     const pe = pages.slice(0, 4).map(p => ents[p.pageprops.wikibase_item]).find(e => e && idsOf(e, "P31").includes("Q5"));
     const list = pages.map(p => ({ e: ents[p.pageprops.wikibase_item], wiki: p.title, poster: p.thumbnail?.source || "" })).filter(x => kindOf(x.e));
-    return { items: await build(list, signal), person: pe ? { id: pe.id, name: labelOf(pe), desc: pe.descriptions?.en?.value || "" } : null };
+    const series = pages.map(p => ents[p.pageprops.wikibase_item]).filter(e => e && idsOf(e, "P31").some(x => ["Q24856","Q196600","Q7725310","Q20937557","Q1667921"].includes(x))).slice(0, 3).map(e => e.id);
+    return { items: await build(list, signal), person: pe ? { id: pe.id, name: labelOf(pe), desc: pe.descriptions?.en?.value || "" } : null, series, next: j.continue?.gsroffset || 0 };
   }
   const worksCache = {};
   async function worksOf(qid, signal){
@@ -897,7 +923,34 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const byImdb = new Map(wk.items.filter(x => x.imdbId).map(x => [x.imdbId, x])), used = new Set(), out = [];
     for (const x of im) { const w = byImdb.get(x.imdbId); if (w) { out.push(merged(w, x)); used.add(w); } else out.push(x); }
     for (const w of wk.items) if (!used.has(w) && !out.some(o => (o.imdbId && o.imdbId === w.imdbId) || (norm(o.title) === norm(w.title) && o.type === w.type && o.year === w.year))) out.push(w);
-    return { items: out, person: wk.person };
+    return { items: out, person: wk.person, series: wk.series || [], next: wk.next || 0 };
+  }
+  async function seriesMembers(qids, signal){
+    if (!qids?.length) return [];
+    const j = await wd({ action: "query", list: "search", srsearch: "haswbstatement:" + qids.flatMap(q => [`P179=${q}`, `P8345=${q}`]).join("|"), srlimit: 50, srnamespace: 0 }, signal);
+    const ids = (j.query?.search || []).map(s => s.title).filter(t => /^Q\d+$/.test(t));
+    if (!ids.length) return [];
+    return (await buildFromQids(ids, signal)).sort((a, b) => (a.type === b.type ? 0 : a.type === "movie" ? -1 : 1) || (a.year || 0) - (b.year || 0));
+  }
+  const sameRes = (a, b) => (a.wikidata && a.wikidata === b.wikidata) || (a.imdbId && a.imdbId === b.imdbId) || (norm(a.title) === norm(b.title) && a.type === b.type && a.year === b.year);
+  function addToResults(list){ let n = 0; for (const x of list) if (!res.items.some(y => sameRes(x, y)) && !(res.works || []).some(y => sameRes(x, y))) { res.items.push(x); n++; } return n; }
+  async function moreResults(){
+    if (res.moreBusy) return; res.moreBusy = true; renderResults();
+    const sig = searchCtl?.signal, q = res.q.replace(/https?:\S+/g, "").trim();
+    const steps = [() => searchTitles(q, sig, 30, res.next || 20), () => searchTitles(`${q} film`, sig, 30), () => searchTitles(`${q} television series`, sig, 30), () => searchTitles(`${q} film`, sig, 30, 30)];
+    let added = 0;
+    try {
+      while (res.step < steps.length && added < 6) {
+        const out = await steps[res.step++](); if (sig?.aborted) return;
+        if (res.step === 1) res.next = out.next;
+        const fresh = out.items.filter(x => !res.items.some(y => sameRes(x, y)));
+        await rateList(fresh, sig).catch(() => {});
+        added += addToResults(fresh);
+        if (out.series?.length) added += addToResults(await seriesMembers(out.series.filter(s => !res.seriesDone.includes(s)), sig).catch(() => []));
+      }
+    } catch (e) { if (e?.name === "AbortError") return; }
+    res.moreBusy = false; res.noMore = res.step >= 4 && !added;
+    renderResults(); toast(added ? `${added} more result${added === 1 ? "" : "s"}` : "That's everything we could find");
   }
   const stripHTML = s => String(s || "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
   async function tvInfo(it, signal){
@@ -932,7 +985,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     return o;
   }
 
-  const LOOKED = ["poster","wikidata","wiki","imdbId","imdb","rt","mc","creator","creatorIds","cast","castIds","genres","runtime","seasons","episodes","epLength","endYear","country","blurb","year"];
+  const LOOKED = ["release","poster","wikidata","wiki","imdbId","imdb","rt","mc","creator","creatorIds","cast","castIds","genres","runtime","seasons","episodes","epLength","endYear","country","blurb","year"];
   function fillFrom(it, m){
     const out = { ...it };
     for (const k of LOOKED) { const has = Array.isArray(out[k]) ? out[k].length : out[k]; if (!has && m[k] != null && (!Array.isArray(m[k]) || m[k].length)) out[k] = m[k]; }
@@ -1009,7 +1062,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 
   // ================= search =================
   const SUGGEST = ["Severance", "Dune: Part Two", "Christopher Nolan", "Studio Ghibli", "The Bear", "Greta Gerwig"];
-  let res = { q: "", items: [], person: null, works: null, state: "idle", err: "" }, searchCtl = null, typeTimer = null, resType = "all", addMode = "want";
+  let res = { q: "", items: [], person: null, works: null, state: "idle", err: "" }, searchCtl = null, typeTimer = null, resType = "all", addMode = "want", resMin = "", resSort = "match";
   function rcHTML(r, i, src){
     const have = findSame(r);
     const f = [r.type === "tv" ? "Series" : "Film", r.year, r.type === "tv" ? (r.seasons ? r.seasons + " seasons" : "") : fmtRun(r.runtime)].filter(Boolean);
@@ -1024,7 +1077,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     el.hidden = false;
     const head = `<div class="sechead"><h2>${res.state === "loading" ? `<span class="dots">Searching</span>` : `Results`}</h2><span class="serif">${res.q ? `for “${esc(res.q)}”` : ""}<button class="linkbtn" type="button" data-clear style="margin-left:12px;font-family:var(--f-body);font-style:normal">Close</button></span></div>
       ${addMode === "watched" ? `<div class="banner" style="margin:0"><span>Adding to <b style="font-size:18px">Seen it</b>. Tap “Seen it” on anything you've watched, then rate it right there.</span><button class="linkbtn" type="button" data-seenoff style="margin-left:auto">Back to normal</button></div>` : ""}
-      ${res.state === "done" && res.items.length > 1 ? `<div class="seg" role="group" aria-label="Show">${[["all", "All"], ["movie", "Movies"], ["tv", "Series"]].map(([k, t]) => `<button type="button" data-rtype="${k}" aria-pressed="${resType === k}">${t}<span class="n">${k === "all" ? res.items.length : res.items.filter(x => x.type === k).length}</span></button>`).join("")}</div>` : ""}`;
+      ${res.state === "done" && res.items.length > 1 ? `<div class="ctrl"><div class="seg" role="group" aria-label="Show">${[["all", "All"], ["movie", "Movies"], ["tv", "Series"]].map(([k, t]) => `<button type="button" data-rtype="${k}" aria-pressed="${resType === k}">${t}<span class="n">${k === "all" ? res.items.length : res.items.filter(x => x.type === k).length}</span></button>`).join("")}</div><div class="tools" style="margin:0">${minSel("resmin", resMin)}<select class="sel" id="ressort" aria-label="Sort results">${[["match", "Best match"], ["imdb", "IMDb rating"], ["votes", "Most popular"], ["new", "Newest"]].map(([k, t]) => `<option value="${k}" ${resSort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>` : ""}`;
     if (res.state === "loading") { el.innerHTML = head; return; }
     if (res.state === "error") { el.innerHTML = head + `<p class="status">${esc(res.err)} <button class="linkbtn" type="button" data-manual-q>Add “${esc(res.q)}” by hand</button></p>`; return; }
     let h = head;
@@ -1033,37 +1086,42 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       h += `<div><div class="sechead"><h3>${esc(res.person.name)}</h3><span class="muted" style="font-size:14px">${esc(res.person.desc)}</span></div>
         ${w === null ? `<p class="status"><span class="dots">Finding their films and series</span></p>` : w.length ? `<div class="row">${w.map((r, i) => rcHTML(r, i, "w")).join("")}</div>` : `<p class="status">No films or series found for them.</p>`}</div>`;
     }
-    const shownR = res.items.map((r, i) => [r, i]).filter(([r]) => resType === "all" || r.type === resType);
+    const shownR = res.items.map((r, i) => [r, i]).filter(([r]) => (resType === "all" || r.type === resType) && passMin(r, resMin));
+    if (resSort === "imdb") shownR.sort((a, b) => (b[0].imdb || 0) - (a[0].imdb || 0)); else if (resSort === "votes") shownR.sort((a, b) => (b[0].imdbVotes || 0) - (a[0].imdbVotes || 0)); else if (resSort === "new") shownR.sort((a, b) => (b[0].year || 0) - (a[0].year || 0));
     h += shownR.length ? `<div class="rgrid">${shownR.map(([r, i]) => rcHTML(r, i, "r")).join("")}</div>`
       : res.person ? "" : `<p class="status">No films or series matched. Try the full title, or <button class="linkbtn" type="button" data-manual-q>add it by hand</button>.</p>`;
+    if (res.state === "done" && !/tt\d{5,}/.test(res.q)) h += `<div class="qa" style="justify-content:center">${res.noMore ? `<span class="muted">That's everything we could find.</span>` : `<button class="btn" type="button" data-more ${res.moreBusy ? "disabled" : ""}>${res.moreBusy ? `<span class="dots">Looking for more</span>` : "Show more results"}</button>`}</div>`;
     h += `<p class="note" style="margin:0">Not what you meant? Paste its IMDb link into the search, or <button class="linkbtn" type="button" data-manual-q>add it by hand</button>.</p>`;
     el.innerHTML = h;
   }
   async function runSearch(q, scroll = true){
     q = String(q || "").trim(); if (!q) return;
-    res = { q, items: [], person: null, works: null, state: "loading", err: "" }; resType = "all"; $("#q").value = q;
+    res = { q, items: [], person: null, works: null, state: "loading", err: "", step: 0, next: 0, seriesDone: [], moreBusy: false, noMore: false }; resType = "all"; resMin = ""; resSort = "match"; $("#q").value = q;
     searchCtl?.abort(); searchCtl = new AbortController(); const sig = searchCtl.signal;
     renderResults();
     if (scroll) $("#results").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
     try {
       const out = await searchAll(q, sig);
       if (sig.aborted) return;
-      res = { ...res, items: out.items, person: out.person, works: out.person ? null : undefined, state: "done" };
+      res = { ...res, items: out.items, person: out.person, works: out.person ? null : undefined, state: "done", next: out.next || 0 };
       renderResults();
+      if (out.series?.length) { res.seriesDone = out.series; const mem = await seriesMembers(out.series, sig).catch(e => { if (e?.name === "AbortError") throw e; return []; }); if (sig.aborted) return; if (addToResults(mem)) renderResults(); }
       if (out.person) {
         try { res.works = await worksOf(out.person.id, sig); } catch (e) { if (e.name === "AbortError") return; res.works = []; }
         const inRow = new Set(res.works.map(x => x.wikidata)); res.items = res.items.filter(x => !inRow.has(x.wikidata));
         if (!sig.aborted) renderResults();
       }
+      if (await rateList(res.items, sig)) { if (sig.aborted) return; renderResults(); }
+      if (res.works?.length && await rateList(res.works, sig)) { if (sig.aborted) return; renderResults(); }
       const thin = res.items.filter(x => x.fromImdb && !x.wikidata).map(x => x.imdbId);
-      if (thin.length) { const w = await wdByImdb(thin, sig).catch(() => ({})); if (sig.aborted) return; if (Object.keys(w).length) { res.items = res.items.map(x => x.fromImdb && w[x.imdbId] ? merged(w[x.imdbId], x) : x); renderResults(); } }
+      if (thin.length) { const w = await wdByImdb(thin, sig).catch(() => ({})); if (sig.aborted) return; if (Object.keys(w).length) { res.items = res.items.map(x => x.fromImdb && w[x.imdbId] ? { ...merged(w[x.imdbId], x), imdb: x.imdb || w[x.imdbId].imdb, imdbVotes: x.imdbVotes } : x); renderResults(); } }
     } catch (e) {
       if (e.name === "AbortError") return;
       res.state = "error"; res.err = navigator.onLine ? "The lookup didn't answer. Try again in a moment." : "You're offline, so searching isn't available.";
       renderResults();
     }
   }
-  const resultAt = key => { const [src, i] = String(key).split(":"); return (src === "w" ? res.works : src === "m" ? moreList : src === "x" ? recShown() : src === "a" ? adder?.web : res.items)?.[Number(i)]; };
+  const resultAt = key => { const [src, i] = String(key).split(":"); return (src === "w" ? res.works : src === "m" ? moreList : src === "x" ? recShown() : src === "a" ? adder?.web : src === "t" ? disc.trend : src === "u" ? disc.up : src === "d" ? disc.list : res.items)?.[Number(i)]; };
   function addResult(r, st, extra = {}){
     if (!r) return;
     const have = findSame(r); if (have) { toast(`${r.title} is already in your library`); return; }
@@ -1074,12 +1132,13 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   }
 
   // ================= library =================
-  let view = "library", statusF = "want", typeF = "all", listF = "", sortBy = "added", libQ = "";
+  let view = "library", statusF = "want", typeF = "all", listF = "", sortBy = "added", libQ = "", libMin = "";
   function libFiltered(){
     let list = items().slice();
     if (statusF !== "all") list = list.filter(x => x.status === statusF);
     if (typeF !== "all") list = list.filter(x => (x.type || "movie") === typeF);
     if (listF) list = list.filter(x => (x.lists || []).includes(listF));
+    if (libMin) list = list.filter(x => passMin(x, libMin));
     if (libQ) { const q = norm(libQ); list = list.filter(x => norm([x.title, x.creator, (x.cast || []).join(" "), (x.genres || []).join(" ")].join(" ")).includes(q)); }
     const by = {
       added: (a, b) => (b.added || "").localeCompare(a.added || "") || (b.updatedAt || 0) - (a.updatedAt || 0),
@@ -1109,11 +1168,13 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       <div class="tools">
         <input class="filterq" id="libq" type="search" placeholder="Filter by title, person or genre" value="${esc(libQ)}" aria-label="Filter">
         ${lists().length ? `<select class="sel" id="listsel" aria-label="List"><option value="">All lists</option>${lists().map(l => `<option value="${esc(l.id)}" ${l.id === listF ? "selected" : ""}>${esc(l.name)}</option>`).join("")}</select>` : ""}
+        ${minSel("libmin", libMin)}
         <select class="sel" id="sort" aria-label="Sort">${[["added","Recently added"],["priority","Must-see first"],["short","Shortest first"],["imdb","IMDb rating"],["rating","Your rating"],["finished","Recently watched"],["year","Newest release"],["title","Title"]].map(([k, l]) => `<option value="${k}" ${sortBy === k ? "selected" : ""}>${l}</option>`).join("")}</select>
       </div>
       ${L ? `<div class="banner"><span class="mono">List</span><b>${esc(L.name)}</b><span class="muted">Titles you add from search go on this list too.</span><button class="linkbtn" type="button" data-openlist="${esc(L.id)}" style="margin-left:auto">Open the list page</button><button class="linkbtn" type="button" data-unlist>Show everything</button></div>` : ""}
       ${missing ? `<div class="fillbar"><span>${missing} title${missing === 1 ? " has" : "s have"} no poster yet.</span><button class="btn small gold" type="button" id="fill-btn" ${filling ? "disabled" : ""}>${filling ? `<span class="dots">Finding posters</span>` : "Find posters and details"}</button></div>` : ""}
-      ${list.length ? `<div class="grid">${list.map(it => cardW(it)).join("")}</div>` : emptyHTML()}`;
+      ${list.length ? `<div class="grid">${list.map(it => cardW(it)).join("")}</div>` : emptyHTML()}
+      ${homeTeaser()}`;
   }
   function cardHTML(it, opt = {}){
     let extra = "";
@@ -1172,7 +1233,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   const guessStyle = n => (STYLE_RULES.find(([re]) => re.test(n || "")) || [0, "velvet"])[1];
   const styleOf = l => l?.style || guessStyle(l?.name);
   const LIST_IDEAS = ["Date night", "Watch with friends", "Comfort rewatches", "Spooky season", "Classics to catch up on", "Weekend binge"];
-  let curList = "", lpStatus = "left", lpSort = "listed";
+  let curList = "", lpStatus = "left", lpSort = "listed", lpMin = "";
   const listById = id => lists().find(l => l.id === id);
   const autoList = () => view === "list" && curList ? curList : listF;
   function setMember(it, lid, on){
@@ -1212,7 +1273,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const left = mem.filter(x => x.status === "want" || x.status === "watching"), seen = mem.filter(x => x.status === "watched");
     const hrs = left.reduce((s, x) => s + remainingHours(x), 0);
     if (lpStatus === "left" && !left.length && mem.length) lpStatus = "all";
-    let shown = lpStatus === "left" ? left : lpStatus === "seen" ? seen : mem;
+    let shown = (lpStatus === "left" ? left : lpStatus === "seen" ? seen : mem).filter(x => passMin(x, lpMin));
     const by = { listed: (a, b) => (b.listAdded?.[l.id] || 0) - (a.listAdded?.[l.id] || 0), title: (a, b) => a.title.localeCompare(b.title), imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0), short: (a, b) => (remainingHours(a) || 999) - (remainingHours(b) || 999), rating: (a, b) => (b.rating || 0) - (a.rating || 0), year: (a, b) => (b.year || 0) - (a.year || 0) };
     shown = shown.slice().sort(by[lpSort] || by.listed);
     v.innerHTML = `<button class="back" type="button" data-go="lists">← All lists</button>
@@ -1230,7 +1291,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       </section>
       ${mem.length ? `<div class="ctrl" style="margin-top:20px">
         <div class="seg" role="group" aria-label="Show">${[["left", "To watch", left.length], ["seen", "Seen", seen.length], ["all", "Everything", mem.length]].map(([k, t, n]) => `<button type="button" data-lps="${k}" aria-pressed="${lpStatus === k}">${t}<span class="n">${n}</span></button>`).join("")}</div>
-        <select class="sel" id="lpsort" aria-label="Sort">${[["listed", "Recently added to list"], ["short", "Shortest first"], ["imdb", "IMDb rating"], ["rating", "Your rating"], ["year", "Newest release"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${lpSort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+        <div class="tools" style="margin:0">${minSel("lpmin", lpMin)}<select class="sel" id="lpsort" aria-label="Sort">${[["listed", "Recently added to list"], ["short", "Shortest first"], ["imdb", "IMDb rating"], ["rating", "Your rating"], ["year", "Newest release"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${lpSort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>
         ${shown.length ? `<div class="grid">${shown.map(it => cardW(it, { remove: l.id })).join("")}</div>` : `<div class="empty"><h3>Nothing here</h3><span class="serif">${lpStatus === "seen" ? "Nothing from this list seen yet." : "You've seen everything on this list."}</span></div>`}`
       : `<div class="empty"><h3>An empty list</h3><span class="serif">Add from your library, or find something new.</span><button class="btn primary" type="button" data-addto="${esc(l.id)}">+ Add titles</button></div>`}`;
   }
@@ -1312,7 +1373,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const q = adder.q.trim(); if (q.length < 2) { adder.web = null; renderAdder(true); return; }
     adderCtl?.abort(); adderCtl = new AbortController(); const sig = adderCtl.signal;
     adder.busy = true; renderAdder(true);
-    try { const out = await searchAll(q, sig); if (sig.aborted || !adder) return; adder.web = out.items.slice(0, 18); }
+    try { const out = await searchAll(q, sig); if (sig.aborted || !adder) return; adder.web = out.items.slice(0, 18); await rateList(adder.web, sig).catch(() => {}); if (sig.aborted || !adder) return; }
     catch (e) { if (e.name === "AbortError") return; if (adder) adder.web = []; }
     if (adder) { adder.busy = false; renderAdder(true); }
   }
@@ -1348,7 +1409,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       <button class="prow" type="button" data-poppri aria-pressed="${!!it?.priority}"><span class="sw star">★</span><span class="pn">Must see</span><span class="ck">${it?.priority ? "✓" : ""}</span></button>
       <div><span class="lbl">Lists</span><div class="plist">${lists().map(l => { const on = (it?.lists || []).includes(l.id); return `<button class="prow" type="button" data-poplist="${esc(l.id)}" aria-pressed="${on}"><span class="sw lban ls ls-${styleOf(l)}"></span><span class="pn">${l.emoji ? esc(l.emoji) + " " : ""}${esc(l.name)}</span><span class="ck">${on ? "✓" : ""}</span></button>`; }).join("")}</div>
         <form class="popnew" id="popnew"><input placeholder="New list…" maxlength="60" aria-label="New list name"><button class="btn small" type="submit">Create</button></form></div>
-      <div class="popf">${it ? `<button class="btn small" type="button" data-open="${esc(it.id)}">Open details</button>` : `<button class="btn small" type="button" data-preview="${esc(pop.key)}">More details</button>`}</div></div>`;
+      <div class="popf">${it ? `<button class="btn small" type="button" data-open="${esc(it.id)}">Open details</button><button class="btn small" type="button" data-chposter="${esc(it.id)}">Change poster</button>` : `<button class="btn small" type="button" data-preview="${esc(pop.key)}">More details</button>`}</div></div>`;
     if (!sheet) {
       const el = $("#pop-root .pop"), h = el.offsetHeight, w = el.offsetWidth, rc = pop.rect;
       let left = Math.min(Math.max(8, rc.right - w), innerWidth - w - 8), top = rc.bottom + 6;
@@ -1400,13 +1461,14 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   }
 
   // ================= seen: your collection =================
-  let sn = { type: "all", sort: "finished", genre: "", rf: "", q: "" };
+  let sn = { type: "all", sort: "finished", genre: "", rf: "", q: "", min: "" };
   const LS_RECS = "front-row-recs";
   let recState = { busy: false, prog: "", list: lsGet(LS_RECS, null)?.list || null, at: lsGet(LS_RECS, null)?.at || 0, err: "" };
   function seenFiltered(){
     let L = items().filter(x => x.status === "watched");
     if (sn.type !== "all") L = L.filter(x => (x.type || "movie") === sn.type);
     if (sn.genre) L = L.filter(x => (x.genres || []).includes(sn.genre));
+    if (sn.min) L = L.filter(x => passMin(x, sn.min));
     if (sn.rf === "fav") L = L.filter(x => x.fav); else if (sn.rf === "unrated") L = L.filter(x => !x.rating); else if (sn.rf) L = L.filter(x => (x.rating || 0) >= Number(sn.rf));
     if (sn.q) { const q = norm(sn.q); L = L.filter(x => norm([x.title, x.creator, (x.cast || []).join(" ")].join(" ")).includes(q)); }
     const by = { finished: (a, b) => (b.finished || "").localeCompare(a.finished || ""), rating: (a, b) => (b.rating || 0) - (a.rating || 0) || (b.finished || "").localeCompare(a.finished || ""), title: (a, b) => a.title.localeCompare(b.title), year: (a, b) => (b.year || 0) - (a.year || 0), imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0) };
@@ -1430,13 +1492,14 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         <div class="kpi"><span class="v">${films}</span><span class="s">films</span></div><div class="kpi"><span class="v">${shows}</span><span class="s">series</span></div>
         <div class="kpi"><span class="v">${fmtH(hours)}</span><span class="s">watched</span></div><div class="kpi"><span class="v">${avg ? avg.toFixed(1) + "★" : "–"}</span><span class="s">average rating</span></div>
         <div class="kpi"><span class="v">${favs}</span><span class="s">favourites ♥</span></div></div>` : ""}
-      <div class="qa" style="margin-top:14px"><button class="btn gold" type="button" data-seenmode>+ Add something you've already seen</button><button class="btn ghost" type="button" data-go="stats">All statistics →</button></div>
+      <div class="qa" style="margin-top:14px"><button class="btn gold" type="button" data-seenmode>+ Add something you've already seen</button><button class="btn" type="button" data-browse-jog>Jog my memory with popular films</button><button class="btn ghost" type="button" data-go="stats">All statistics →</button></div>
       ${unrated.length ? `<div class="panel" style="margin-top:18px"><div class="sechead"><h3>How was it?</h3><span class="muted" style="font-size:14px">${all.filter(x => !x.rating).length} not rated yet · tap a star, the left half gives a half star</span></div><div class="row">${unrated.map(it => `<div class="rc">${posterHTML(it, { tag: "button", attrs: `type="button" class="pb" data-open="${esc(it.id)}"` })}<span class="t">${esc(it.title)}</span>${rateHTML(it)}</div>`).join("")}</div></div>` : ""}
       ${recsHTML()}
       <div style="margin-top:22px">${all.length ? `<div class="sechead"><h3 style="font-size:28px">The collection</h3><span class="mono">${L.length} of ${all.length}</span></div>
         <div class="ctrl" style="margin-top:10px"><div class="seg" role="group" aria-label="Type">${[["all", "All"], ["movie", "Movies"], ["tv", "Series"]].map(([k, t]) => `<button type="button" data-snt="${k}" aria-pressed="${sn.type === k}">${t}</button>`).join("")}</div>
           <div class="tools" style="margin:0"><select class="sel" id="sn-rf" aria-label="Rating">${[["", "Any rating"], ["fav", "Favourites ♥"], ["5", "5 stars"], ["4", "4 stars and up"], ["3", "3 stars and up"], ["unrated", "Not rated"]].map(([k, t]) => `<option value="${k}" ${sn.rf === k ? "selected" : ""}>${t}</option>`).join("")}</select>
           ${genres.length ? `<select class="sel" id="sn-genre" aria-label="Genre"><option value="">All genres</option>${genres.map(g => `<option ${sn.genre === g ? "selected" : ""}>${esc(g)}</option>`).join("")}</select>` : ""}
+          ${minSel("sn-min", sn.min)}
           <select class="sel" id="sn-sort" aria-label="Sort">${[["finished", "When I watched it"], ["rating", "My rating"], ["imdb", "IMDb rating"], ["year", "Release year"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${sn.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>
         <input class="filterq" id="sn-q" type="search" placeholder="Filter by title or person" value="${esc(sn.q)}" style="margin-top:10px;width:100%">
         ${grid || `<div class="empty"><h3>No matches</h3><span class="serif">Try a different filter.</span></div>`}`
@@ -1499,6 +1562,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         c.because = c.why.length > 1 ? `${c.why.length} people behind your favourites made or star in it` : best.role === "made" ? `${c.type === "tv" ? "From the creator" : "Same director"} as ${from.title}${from.rating ? ` (${starTxt(from.rating)})` : ""}` : `${best.name || "An actor"} from ${from.title}`;
         delete c.why; return c;
       }).sort((a, b) => b.score - a.score).slice(0, 40);
+      await rateList(list).catch(() => {});
       recState.list = list; recState.at = Date.now(); lsSet(LS_RECS, { list, at: recState.at });
       if (!list.length) recState.err = "Couldn't find recommendations yet. Rate a few more titles you loved.";
     } catch { recState.err = navigator.onLine ? "Recommendations didn't load. Try again in a moment." : "You're offline."; }
@@ -1515,11 +1579,12 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     "Moving": ["drama","romance","biographical","coming-of-age","historical","period"],
     "Real life": ["documentary","docuseries","true crime","biographical"]
   };
-  let tn = { moods: [], time: "any", type: "all", from: "", pick: null, alts: [] };
+  let tn = { moods: [], time: "any", type: "all", from: "", pick: null, alts: [], min: "" };
   function tonightPool(){
     let c = items().filter(x => x.status === "want" || x.status === "watching");
     if (tn.from) c = c.filter(x => (x.lists || []).includes(tn.from));
     if (tn.type !== "all") c = c.filter(x => (x.type || "movie") === tn.type);
+    if (tn.min) c = c.filter(x => passMin(x, tn.min));
     const t = tn.time;
     if (t === "short") c = c.filter(x => x.type === "tv" ? epLen(x) <= 35 : !num(x.runtime) || num(x.runtime) <= 100);
     if (t === "evening") c = c.filter(x => x.type === "tv" || !num(x.runtime) || num(x.runtime) <= 150);
@@ -1559,6 +1624,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         <div class="tq"><span class="lbl">Time you have</span><div class="chips">${[["any","Any"],["short","A short one"],["evening","An evening"],["epic","Something epic"]].map(([k, l]) => `<button class="chip" type="button" data-time="${k}" aria-pressed="${tn.time === k}">${l}</button>`).join("")}</div></div>
         <div class="tq"><span class="lbl">Movie or series</span><div class="chips">${[["all","Either"],["movie","Movie"],["tv","Series"]].map(([k, l]) => `<button class="chip" type="button" data-ttype="${k}" aria-pressed="${tn.type === k}">${l}</button>`).join("")}
           ${lists().length ? `<select class="sel" id="t-from" aria-label="From list" style="margin-left:6px"><option value="">From my whole watchlist</option>${lists().map(l => `<option value="${esc(l.id)}" ${tn.from === l.id ? "selected" : ""}>From ${esc(l.name)}</option>`).join("")}</select>` : ""}</div></div>
+        <div class="tq"><span class="lbl">Only the good stuff</span><div class="chips">${[["", "Any rating"], ["7", "IMDb 7+"], ["7.5", "IMDb 7.5+"], ["8", "IMDb 8+"]].map(([k, l]) => `<button class="chip" type="button" data-tmin="${k}" aria-pressed="${tn.min === k}">${l}</button>`).join("")}</div></div>
         <div class="qa"><button class="btn primary" type="button" id="t-pick" ${pool.length ? "" : "disabled"}>${tn.pick ? "Pick again" : "Pick for me"}</button><span class="muted" style="align-self:center;font-size:14px">${pool.length ? `${pool.length} title${pool.length === 1 ? "" : "s"} in the running` : items().length ? "Nothing on your watchlist fits that. Loosen a filter." : "Add a few titles to your watchlist first."}</span></div>
       </div>
       ${tn.pick ? `<div class="ticket">${posterHTML(tn.pick)}<div><span class="mono">Tonight's feature · ${tn.pick.type === "tv" ? "Series" : "Film"}</span><h3>${esc(tn.pick.title)}</h3>${scoresHTML(tn.pick)}<p>${esc(whyOf(tn.pick))}</p>
@@ -1615,6 +1681,317 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       </div>`;
   }
 
+  // ================= IMDb ratings for everything (IMDb's daily ratings dataset via Agregarr, OMDb as a backup) =================
+  const LS_RC = "front-row-imdb", LS_OMDB = "front-row-omdb";
+  let rcache = lsGet(LS_RC, {}), ratingBusy = false, ratingNote = "";
+  const fmtVotes = v => { v = num(v); return !v ? "" : v >= 1e6 ? (v / 1e6).toFixed(v >= 1e7 ? 0 : 1).replace(/\.0$/, "") + "M" : v >= 1e3 ? Math.round(v / 1e3) + "K" : String(v); };
+  async function imdbRatings(ids, signal, force){
+    ids = [...new Set(ids.filter(x => /^tt\d+$/.test(x || "")))];
+    const out = {}, need = [];
+    for (const id of ids) { const c = rcache[id]; if (c && !force && Date.now() - c.at < 3 * 864e5) out[id] = c; else need.push(id); }
+    let agOk = !need.length;
+    for (let i = 0; i < need.length; i += 100) {
+      try {
+        const u = new URL("https://api.agregarr.org/api/ratings"); need.slice(i, i + 100).forEach(id => u.searchParams.append("id", id));
+        const r = await fetch(u, { signal }); if (!r.ok) throw new Error("ratings " + r.status);
+        const j = await r.json(); agOk = true;
+        (Array.isArray(j) ? j : j?.ratings || []).forEach(x => { if (x?.imdbId) { const c = { r: x.rating ?? null, v: x.votes ?? null, at: Date.now() }; rcache[x.imdbId] = c; out[x.imdbId] = c; } });
+      } catch (e) { if (e?.name === "AbortError") throw e; break; }
+    }
+    const key = String(lsGet(LS_OMDB, "") || "").trim();
+    if (key) for (const id of need.filter(id => !out[id]?.r).slice(0, 60)) {
+      try {
+        const r = await fetch(`https://www.omdbapi.com/?i=${id}&apikey=${encodeURIComponent(key)}`, { signal }); const j = await r.json();
+        if (j.Response === "True") { const rt = (j.Ratings || []).find(x => /Rotten/.test(x.Source)); const c = { r: parseFloat(j.imdbRating) || null, v: parseInt(String(j.imdbVotes).replace(/\D/g, "")) || null, mc: parseInt(j.Metascore) || null, rt: rt ? parseInt(rt.Value) : null, at: Date.now() }; rcache[id] = c; out[id] = c; agOk = true; }
+        else if (/invalid api key|limit/i.test(j.Error || "")) { ratingNote = "Your OMDb key didn't work: " + j.Error; break; }
+      } catch (e) { if (e?.name === "AbortError") throw e; }
+    }
+    if (!agOk && !key) ratingNote = "The IMDb ratings service didn't answer. Ratings from Wikidata are shown meanwhile. You can add a free OMDb key in Settings as a backup.";
+    else if (agOk) ratingNote = "";
+    lsSet(LS_RC, rcache); return out;
+  }
+  function withRating(x, c){
+    if (!c) return x; const o = { ...x };
+    if (c.r) { o.imdb = c.r; o.imdbVotes = c.v || o.imdbVotes || null; }
+    if (c.mc) o.mc = c.mc; if (c.rt) o.rt = c.rt;
+    return o;
+  }
+  async function rateList(list, signal){
+    if (!list?.length) return false;
+    const map = await imdbRatings(list.map(x => x.imdbId), signal).catch(e => { if (e?.name === "AbortError") throw e; return {}; });
+    let n = 0; list.forEach((x, i) => { const c = map[x.imdbId]; if (c?.r) { list[i] = withRating(x, c); n++; } });
+    return n > 0;
+  }
+  async function refreshLibRatings(force){
+    if (ratingBusy || !navigator.onLine) return 0; ratingBusy = true; if (view === "stats" || $("#rt-status")) paintRatingStatus();
+    let n = 0;
+    try {
+      for (const it of items().filter(x => !x.imdbId && !x.idTried && x.title).slice(0, 25)) {
+        try { const m = await matchOne(it); const cur = items().find(x => x.id === it.id); if (!cur) continue; const o = m ? fillFrom(cur, m) : { ...cur }; if (m?.imdbId) o.imdbId = m.imdbId; o.idTried = true; upsert(o); } catch {}
+      }
+      const map = await imdbRatings(items().map(x => x.imdbId), null, force);
+      const now = Date.now();
+      lib.items = lib.items.map(x => { const c = map[x.imdbId]; if (c?.r && (c.r !== x.imdb || (c.v && c.v !== x.imdbVotes))) { n++; return { ...withRating(x, c), updatedAt: now }; } return x; });
+      if (n) commit();
+    } catch {}
+    ratingBusy = false; paintRatingStatus();
+    return n;
+  }
+  function paintRatingStatus(){
+    const el = $("#rt-status"); if (!el) return;
+    const all = items(), have = all.filter(x => x.imdb).length;
+    el.textContent = ratingBusy ? "Fetching IMDb ratings…" : ratingNote || `${have} of ${all.length} titles have an IMDb rating.`;
+  }
+  const MIN_IMDB = [["", "Any IMDb rating"], ["6", "IMDb 6+"], ["7", "IMDb 7+"], ["7.5", "IMDb 7.5+"], ["8", "IMDb 8+"], ["8.5", "IMDb 8.5+"]];
+  const minSel = (id, cur) => `<select class="sel" id="${id}" aria-label="Minimum IMDb rating">${MIN_IMDB.map(([k, t]) => `<option value="${k}" ${String(cur || "") === k ? "selected" : ""}>${t}</option>`).join("")}</select>`;
+  const passMin = (x, m) => !m || Number(x.imdb || 0) >= Number(m);
+
+  // ================= discover: for you, trending, coming soon, browse by genre and decade =================
+  const LS_DISC = "front-row-discover";
+  let discCache = lsGet(LS_DISC, {});
+  const GENRE_RE = [["Drama", "drama"], ["Comedy", "comedy|sitcom"], ["Thriller", "thriller"], ["Horror", "horror"], ["Sci-fi", "science fiction"], ["Action", "action"], ["Romance", "romance|romantic"], ["Animation", "animat|anime"], ["Crime", "crime|gangster|heist"], ["Fantasy", "fantasy"], ["Mystery", "mystery|detective"], ["Adventure", "adventure"], ["Documentary", "documentary"], ["War", "war film|war drama|war television"], ["Musical", "musical"], ["LGBTQ+", "LGBT|lesbian|gay|queer"]];
+  const DECADES = [["", "All time"], ["2020", "2020s"], ["2010", "2010s"], ["2000", "2000s"], ["1990", "1990s"], ["1980", "1980s"], ["1970", "1970s"], ["old", "Older"]];
+  let disc = { type: "movie", genre: "", decade: "", sort: "pop", min: "", list: null, busy: false, err: "", jog: false, trend: null, trendBusy: false, up: null, upBusy: false, seasons: null };
+  async function sparql(q, signal){
+    const r = await fetch("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(q), { signal, headers: { Accept: "application/sparql-results+json" } });
+    if (!r.ok) throw new Error("sparql " + r.status); return (await r.json()).results.bindings;
+  }
+  const qidOf = b => String(b?.item?.value || "").split("/").pop();
+  async function buildFromQids(qids, signal, extra = {}){
+    const ents = await entities(qids, signal);
+    const es = qids.map(q => ents[q]).filter(e => kindOf(e));
+    const posters = await wikiPosters(es.map(e => e.sitelinks?.enwiki?.title), signal);
+    const out = await build(es.map(e => ({ e, wiki: e.sitelinks?.enwiki?.title || "", poster: posters[e.sitelinks?.enwiki?.title] || "" })), signal);
+    out.forEach(x => Object.assign(x, extra[x.wikidata] || {}));
+    return out;
+  }
+  const cacheGet = (k, ms) => { const c = discCache[k]; return c && Date.now() - c.at < ms ? c.list : null; };
+  const cacheSet = (k, list) => { discCache[k] = { at: Date.now(), list }; const keys = Object.keys(discCache).sort((a, b) => discCache[b].at - discCache[a].at); keys.slice(24).forEach(x => delete discCache[x]); lsSet(LS_DISC, discCache); };
+  async function browse(){
+    const key = `b:${disc.type}:${disc.genre}:${disc.decade}`;
+    const hit = cacheGet(key, 5 * 864e5); if (hit) { disc.list = hit; return; }
+    disc.busy = true; disc.err = ""; disc.list = null; if (view === "discover") renderDiscover();
+    try {
+      const tv = disc.type === "tv", types = tv ? "wd:Q5398426 wd:Q1259759 wd:Q581714 wd:Q63952888" : "wd:Q11424 wd:Q202866", dp = tv ? "P580" : "P577";
+      const re = (GENRE_RE.find(g => g[0] === disc.genre) || [])[1];
+      const dec = disc.decade === "old" ? `FILTER(YEAR(?d) < 1970)` : disc.decade ? `FILTER(YEAR(?d) >= ${disc.decade} && YEAR(?d) <= ${Number(disc.decade) + 9})` : "";
+      const minLinks = disc.decade || re ? (tv ? 8 : 12) : (tv ? 25 : 45);
+      const q = `SELECT DISTINCT ?item ?links WHERE {
+        VALUES ?t { ${types} } ?item wdt:P31 ?t; wikibase:sitelinks ?links. FILTER(?links >= ${minLinks})
+        ${dec ? `?item wdt:${dp} ?d. ${dec}` : ""}
+        ${re ? `FILTER EXISTS { ?item wdt:P136 ?g. ?g rdfs:label ?gl. FILTER(LANG(?gl) = "en" && REGEX(?gl, "${re}", "i")) }` : ""}
+      } ORDER BY DESC(?links) LIMIT 72`;
+      const rows = await sparql(q);
+      const list = await buildFromQids([...new Set(rows.map(qidOf))]);
+      await rateList(list).catch(() => {});
+      disc.list = list; cacheSet(key, list);
+    } catch (e) { disc.err = navigator.onLine ? "Wikidata took too long to answer. Try again, or pick a decade to narrow it down." : "You're offline."; disc.list = []; }
+    disc.busy = false; if (view === "discover") renderDiscover();
+  }
+  async function loadTrending(){
+    const hit = cacheGet("trend", 12 * 36e5); if (hit) { disc.trend = hit; return; }
+    if (disc.trendBusy) return; disc.trendBusy = true;
+    try {
+      const counts = new Map();
+      for (const back of [2, 3, 4]) {
+        const d = new Date(Date.now() - back * 864e5), y = d.getUTCFullYear(), m = String(d.getUTCMonth() + 1).padStart(2, "0"), dd = String(d.getUTCDate()).padStart(2, "0");
+        const r = await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/${y}/${m}/${dd}`); if (!r.ok) continue;
+        (await r.json()).items?.[0]?.articles?.forEach(a => { if (!/^(Main_Page|Special:|Wikipedia:|Portal:|File:|Help:|Category:|Template:|Deaths_in|List_of|\d{4}_in|Cleopatra|XXX)/.test(a.article)) counts.set(a.article, (counts.get(a.article) || 0) + a.views); });
+      }
+      const titles = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 300).map(x => x[0].replace(/_/g, " "));
+      const found = [];
+      for (let i = 0; i < titles.length; i += 50) {
+        const j = await wp({ action: "query", titles: titles.slice(i, i + 50).join("|"), prop: "pageprops|pageimages", ppprop: "wikibase_item", piprop: "thumbnail", pithumbsize: 500, pilicense: "any", pilimit: 50, redirects: 1 });
+        const back = {}; for (const x of [...(j.query?.normalized || []), ...(j.query?.redirects || [])]) back[x.to] = back[x.from] || x.from;
+        for (const pg of Object.values(j.query?.pages || {})) if (pg.pageprops?.wikibase_item) found.push({ q: pg.pageprops.wikibase_item, wiki: pg.title, poster: pg.thumbnail?.source || "", rank: titles.indexOf(back[pg.title] || pg.title) });
+      }
+      const ents = await entities(found.map(f => f.q));
+      const keep = found.filter(f => kindOf(ents[f.q])).sort((a, b) => a.rank - b.rank).slice(0, 30);
+      const list = await build(keep.map(f => ({ e: ents[f.q], wiki: f.wiki, poster: f.poster })));
+      await rateList(list).catch(() => {});
+      disc.trend = list; cacheSet("trend", list);
+    } catch { disc.trend = disc.trend || []; }
+    disc.trendBusy = false; if (view === "discover") renderDiscover(); if (view === "library") renderLibrary();
+  }
+  async function loadUpcoming(){
+    const hit = cacheGet("up", 2 * 864e5); if (hit) { disc.up = hit; return; }
+    if (disc.upBusy) return; disc.upBusy = true;
+    try {
+      const today = todayISO(), end = `${new Date().getFullYear() + 2}-12-31`;
+      const rows = await sparql(`SELECT ?item ?links (MIN(?d) AS ?date) WHERE {
+        VALUES ?t { wd:Q11424 wd:Q202866 wd:Q5398426 wd:Q1259759 } ?item wdt:P31 ?t; wikibase:sitelinks ?links. FILTER(?links >= 8)
+        ?item wdt:P577 ?d. FILTER(?d > "${today}T00:00:00Z"^^xsd:dateTime && ?d < "${end}T00:00:00Z"^^xsd:dateTime)
+        FILTER NOT EXISTS { ?item wdt:P577 ?e. FILTER(?e <= "${today}T00:00:00Z"^^xsd:dateTime) }
+      } GROUP BY ?item ?links ORDER BY DESC(?links) LIMIT 40`);
+      const extra = {}; rows.forEach(b => { extra[qidOf(b)] = { release: String(b.date?.value || "").slice(0, 10) }; });
+      const list = (await buildFromQids(rows.map(qidOf), null, extra)).sort((a, b) => (a.release || "").localeCompare(b.release || ""));
+      disc.up = list; cacheSet("up", list);
+    } catch { disc.up = disc.up || []; }
+    disc.upBusy = false; if (view === "discover") renderDiscover();
+  }
+  async function loadMySeasons(){
+    if (disc.seasons) return;
+    disc.seasons = [];
+    const shows = items().filter(x => x.type === "tv" && x.status !== "dropped" && (x.tvmaze || x.imdbId)).slice(0, 30);
+    for (const s of shows) {
+      if (s.tvAt && Date.now() - s.tvAt < 2 * 864e5) continue;
+      try { const t = await tvInfo(s); const cur = items().find(x => x.id === s.id); if (cur && t) upsert(applyTv(cur, t)); } catch {}
+    }
+    disc.seasons = null; if (view === "discover") renderDiscover();
+  }
+  function untilTxt(iso){
+    if (!iso) return ""; const d = Math.round((new Date(iso + "T00:00:00") - new Date(todayISO() + "T00:00:00")) / 864e5);
+    const exactYear = /-01-01$/.test(iso);
+    if (exactYear) return `In ${iso.slice(0, 4)}`;
+    return d <= 0 ? "Out now" : d === 1 ? "Tomorrow" : d < 45 ? `In ${d} days` : fmtDate(iso);
+  }
+  function mineUpcoming(){
+    const today = todayISO(), out = [];
+    items().forEach(x => {
+      if (x.status === "dropped") return;
+      if (x.release && x.release > today) out.push({ it: x, date: x.release, what: x.type === "tv" ? "Premieres" : "Release" });
+      else if (!x.release && x.year && x.year > new Date().getFullYear()) out.push({ it: x, date: `${x.year}-01-01`, what: "Release" });
+      if (x.type === "tv" && x.nextSeason && x.nextSeason > today) out.push({ it: x, date: x.nextSeason, what: `Season ${num(x.seasons) + 1}` });
+    });
+    return out.sort((a, b) => a.date.localeCompare(b.date));
+  }
+  function discRow(list, src, opts = {}){
+    return `<div class="row">${list.map((r, i) => { const x = rcHTML(r, i, src); return opts.badge ? x.replace('<span class="t">', `<span class="due">${esc(opts.badge(r))}</span><span class="t">`) : x; }).join("")}</div>`;
+  }
+  function renderDiscover(){
+    const v = $("#view-discover");
+    const rated = items().some(x => x.status === "watched" || x.status === "watching");
+    const mine = mineUpcoming();
+    let shown = (disc.list || []).map((r, i) => [r, i]).filter(([r]) => passMin(r, disc.min));
+    if (disc.sort === "imdb") shown.sort((a, b) => (b[0].imdb || 0) - (a[0].imdb || 0)); else if (disc.sort === "new") shown.sort((a, b) => (b[0].year || 0) - (a[0].year || 0));
+    const unseen = shown.filter(([r]) => !findSame(r)).length;
+    v.innerHTML = `<div class="sechead" style="margin-bottom:14px"><h2>Discover</h2><span class="serif">New things to watch, and the ones you forgot you saw</span></div>
+      ${rated ? recsHTML() : `<div class="panel"><h3>Recommended for you</h3><p class="status" style="margin:0">Mark a few things as seen and rate them, and recommendations show up here. <button class="linkbtn" type="button" data-browse-jog>Start with the most popular films</button></p></div>`}
+      <div class="panel" style="margin-top:18px"><div class="sechead"><h3 style="font-size:28px">Trending this week</h3><span class="muted" style="font-size:14px">What people are reading about on Wikipedia</span></div>
+        ${disc.trend === null || disc.trendBusy && !disc.trend?.length ? `<p class="status"><span class="dots">Checking what's trending</span></p>` : disc.trend.length ? discRow(disc.trend, "t") : `<p class="status">Couldn't load trending titles right now.</p>`}</div>
+      <div class="panel" style="margin-top:18px"><div class="sechead"><h3 style="font-size:28px">Coming soon</h3><span class="muted" style="font-size:14px">Add one to your watchlist to keep track of it</span></div>
+        ${mine.length ? `<div><span class="lbl">On your watchlist</span><div class="row">${mine.map(m => `<div class="rc">${posterHTML(m.it, { tag: "button", attrs: `type="button" class="pb" data-open="${esc(m.it.id)}"` })}<span class="due">${esc(untilTxt(m.date))}</span><span class="t">${esc(m.it.title)}</span><span class="f"><span>${esc(m.what)} · ${esc(/-01-01$/.test(m.date) ? m.date.slice(0, 4) : fmtDate(m.date))}</span></span></div>`).join("")}</div></div>` : ""}
+        <span class="lbl">Upcoming films and series</span>
+        ${disc.up === null || disc.upBusy && !disc.up?.length ? `<p class="status"><span class="dots">Looking ahead</span></p>` : disc.up.length ? discRow(disc.up, "u", { badge: r => untilTxt(r.release) }) : `<p class="status">Couldn't load upcoming releases right now.</p>`}</div>
+      <div class="panel" style="margin-top:18px" id="browse"><div class="sechead"><h3 style="font-size:28px">Browse the classics and the popular</h3><span class="muted" style="font-size:14px">Ranked by how widely each title is covered</span></div>
+        <div class="seg" role="group" aria-label="Type">${[["movie", "Movies"], ["tv", "Series"]].map(([k, t]) => `<button type="button" data-dtype="${k}" aria-pressed="${disc.type === k}">${t}</button>`).join("")}</div>
+        <div class="chips"><button class="chip" type="button" data-dgenre="" aria-pressed="${!disc.genre}">Every genre</button>${GENRE_RE.map(([g]) => `<button class="chip" type="button" data-dgenre="${esc(g)}" aria-pressed="${disc.genre === g}">${esc(g)}</button>`).join("")}</div>
+        <div class="chips">${DECADES.map(([k, t]) => `<button class="chip" type="button" data-ddec="${k}" aria-pressed="${disc.decade === k}">${t}</button>`).join("")}</div>
+        <div class="ctrl"><label class="jog"><input type="checkbox" id="d-jog" ${disc.jog ? "checked" : ""}> <span><b>Jog my memory:</b> mark what I've already seen, and rate it</span></label>
+          <div class="tools" style="margin:0">${minSel("d-min", disc.min)}<select class="sel" id="d-sort" aria-label="Sort">${[["pop", "Most popular"], ["imdb", "IMDb rating"], ["new", "Newest"]].map(([k, t]) => `<option value="${k}" ${disc.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>
+        ${disc.busy ? `<p class="status"><span class="dots">Gathering ${esc(disc.genre || "popular")} ${disc.type === "tv" ? "series" : "films"}${disc.decade ? " from the " + esc(DECADES.find(d => d[0] === disc.decade)?.[1] || "") : ""}</span></p>`
+          : disc.err ? `<p class="status">${esc(disc.err)} <button class="linkbtn" type="button" data-dretry>Try again</button></p>`
+          : disc.list ? (shown.length ? `<p class="note" style="margin:0">${shown.length} titles · ${unseen} not in your library yet</p><div class="rgrid">${shown.map(([r, i]) => rcHTML(r, i, "d")).join("")}</div>` : `<p class="status">Nothing matches that filter.</p>`) : ""}
+      </div>`;
+  }
+  function openDiscover(){
+    if (disc.trend === null) loadTrending();
+    if (disc.up === null) loadUpcoming();
+    if (!disc.list && !disc.busy) browse();
+    if (!disc.seasons && items().some(x => x.type === "tv" && x.status !== "dropped" && (!x.tvAt || Date.now() - x.tvAt > 2 * 864e5))) loadMySeasons();
+    if (!recState.list && !recState.busy && items().some(x => Number(x.rating) >= 4)) buildRecs();
+  }
+  function homeTeaser(){
+    if (!disc.trend?.length || libQ || listF) return "";
+    const fresh = disc.trend.filter(r => !findSame(r)).slice(0, 12); if (!fresh.length) return "";
+    return `<div class="teaser"><div class="sechead"><h3>Trending this week</h3><button class="linkbtn" type="button" data-go="discover">More in Discover →</button></div><div class="row">${fresh.map(r => { const i = disc.trend.indexOf(r); return rcHTML(r, i, "t"); }).join("")}</div></div>`;
+  }
+
+  // ================= poster picker: alternatives from IMDb, TVmaze, every Wikipedia, Wikidata and Commons =================
+  let pp = null;
+  const LANG_ORDER = ["en","hu","de","fr","es","it","pt","nl","pl","sv","da","no","fi","cs","ro","ru","uk","ja","ko","zh","tr","he"];
+  const commonsFile = (name, w = 500) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(String(name).replace(/^File:/, ""))}?width=${w}`;
+  function openPosterPicker(){
+    if (!draft) return; readFields(); pp?.ctl.abort();
+    pp = { list: [], seen: new Set(), pending: 0, q: `${draft.title} ${draft.year || ""} poster`.replace(/\s+/g, " ").trim(), ctl: new AbortController() };
+    renderPicker();
+    if (draft.poster) addCand(draft.poster, "Current");
+    gatherPosters({ ...draft });
+  }
+  function ppTile(i){
+    const c = pp.list[i];
+    return `<button class="ppick${c.url === draft?.poster ? " cur" : ""}" type="button" data-ppick="${i}" aria-label="Use this poster from ${esc(c.src)}"><img src="${esc(c.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="this.parentNode.classList.add('ok')" onerror="this.parentNode.remove()"><span class="src">${esc(c.src)}</span></button>`;
+  }
+  function addCand(url, src){
+    if (!pp || !url) return;
+    const k = String(url).replace(/^https?:/, "").split("?")[0].replace(/\/\d+px-[^/]+$/, "").replace(/\/thumb\//, "/");
+    if (pp.seen.has(k)) return; pp.seen.add(k);
+    const i = pp.list.push({ url, src }) - 1;
+    $("#pp-grid")?.insertAdjacentHTML("beforeend", ppTile(i)); ppStatus();
+  }
+  function ppStatus(){
+    const el = $("#pp-status"); if (!el || !pp) return;
+    const n = pp.list.length;
+    el.innerHTML = pp.pending ? `<span class="dots">Looking on IMDb, ${draft?.type === "tv" ? "TVmaze, " : ""}Wikipedia in other languages and Wikimedia Commons</span>`
+      : n ? "Tap a poster to use it. Ones that don't load are left out." : "No posters found online. Search below with other words, upload one, or paste an image link.";
+  }
+  async function gatherPosters(it){
+    const sig = pp.ctl.signal, type = it.type || "movie";
+    const task = async fn => { pp.pending++; ppStatus(); try { await fn(); } catch {} finally { if (pp && !sig.aborted) { pp.pending--; ppStatus(); } } };
+    const same = x => (it.imdbId && x.imdbId === it.imdbId) || (norm(x.title) === norm(it.title) && x.type === type && (!it.year || !x.year || Math.abs(x.year - it.year) <= 1));
+    task(async () => {
+      let r = await imdbSuggest(it.imdbId || `${it.title} ${it.year || ""}`, sig);
+      if (!r.some(same)) r = await imdbSuggest(it.title, sig);
+      r.filter(same).slice(0, 4).forEach(x => addCand(x.poster && x.poster.replace("_UX400_", "_UX600_"), "IMDb"));
+    });
+    task(async () => {
+      let q = it.wikidata;
+      if (!q && it.imdbId) q = (await wdByImdb([it.imdbId], sig))[it.imdbId]?.wikidata;
+      if (!q) { const m = await matchOne(it, sig); q = m?.wikidata; if (m?.poster) addCand(m.poster, m.fromImdb ? "IMDb" : "Wikipedia EN"); }
+      if (!q) return;
+      const e = (await entities([q], sig, "claims|sitelinks", true))[q]; if (!e) return;
+      [...strsOf(e, "P3383"), ...strsOf(e, "P18")].slice(0, 4).forEach(f => addCand(commonsFile(f), "Wikidata"));
+      const sl = e.sitelinks || {}, langs = LANG_ORDER.filter(l => sl[l + "wiki"]).slice(0, 14);
+      await Promise.all(langs.map(async l => {
+        const j = await api(`https://${l}.wikipedia.org/w/api.php`, { action: "query", titles: sl[l + "wiki"].title, prop: "pageimages", piprop: "thumbnail", pithumbsize: 500, pilicense: "any", redirects: 1 }, sig).catch(() => null);
+        const pg = Object.values(j?.query?.pages || {})[0]; if (pg?.thumbnail?.source) addCand(pg.thumbnail.source, `Wikipedia ${l.toUpperCase()}`);
+      }));
+    });
+    if (type === "tv") task(async () => {
+      let id = it.tvmaze;
+      if (!id) { const t = await tvInfo(it, sig); id = t?.tvmaze; if (t?.poster) addCand(t.poster, "TVmaze"); }
+      if (!id) return;
+      const r = await fetch(`https://api.tvmaze.com/shows/${id}/images`, { signal: sig }); if (!r.ok) return;
+      (await r.json()).filter(x => x.type === "poster").sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0)).slice(0, 14)
+        .forEach(x => addCand(x.resolutions?.original?.url || x.resolutions?.medium?.url, "TVmaze"));
+    });
+    task(() => commonsSearch(pp.q, sig));
+  }
+  async function commonsSearch(q, sig){
+    const j = await api("https://commons.wikimedia.org/w/api.php", { action: "query", generator: "search", gsrsearch: q, gsrnamespace: 6, gsrlimit: 20, prop: "imageinfo", iiprop: "url|size|mime", iiurlwidth: 400 }, sig);
+    Object.values(j.query?.pages || {}).sort((a, b) => (a.index || 0) - (b.index || 0)).forEach(pg => {
+      const ii = pg.imageinfo?.[0]; if (!ii || !/jpeg|png|webp/.test(ii.mime || "") || ii.height < ii.width * 1.05) return;
+      addCand(ii.thumburl || ii.url, "Commons");
+    });
+  }
+  function renderPicker(){
+    $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal" role="dialog" aria-modal="true" aria-label="Choose a poster">
+      <button class="x" type="button" id="pp-cancel" aria-label="Back">×</button>
+      <div class="mbody">
+        <div class="sechead" style="padding-right:40px"><h3 style="font-size:32px">Choose a poster</h3><span class="serif">${esc(draft.title)}${draft.year ? ` (${draft.year})` : ""}</span></div>
+        <p class="note" id="pp-status" style="margin:0"></p>
+        <div class="ppgrid" id="pp-grid">${pp.list.map((_, i) => ppTile(i)).join("")}</div>
+        <form class="ppq" id="pp-form"><input id="pp-q" value="${esc(pp.q)}" aria-label="Search for more posters"><button class="btn small" type="submit">Search for more</button></form>
+        <div><span class="lbl">Or use your own</span>
+          <div class="ppq"><input id="pp-url" inputmode="url" placeholder="Paste an image link (https://…)" aria-label="Image link"><button class="btn small" type="button" id="pp-useurl">Use link</button><button class="btn small" type="button" id="pp-upload">Upload</button></div>
+          <p class="note">On IMDb, Letterboxd or any site: right-click the poster (or press and hold on a phone), copy the image address, and paste it here. You can also paste a copied image straight into this window.</p></div>
+        <div class="chips">${draft.poster ? `<button class="btn small ghost" type="button" data-ppick="none">Use the drawn poster instead</button>` : ""}</div>
+      </div>
+      <div class="mfoot"><div class="r"><button class="btn" type="button" id="pp-cancel2">Back</button></div></div>
+    </div></div>`;
+    ppStatus();
+  }
+  function closePicker(){ if (!pp) return; pp.ctl.abort(); pp = null; if (draft) rerenderCard(); }
+  function applyPoster(url){
+    if (!draft) return;
+    if (pp) { pp.ctl.abort(); pp = null; }
+    draft.poster = url || ""; draft.lookedUp = true;
+    rerenderCard();
+    const cur = items().find(x => x.id === draft.id);
+    if (cur) upsert({ ...cur, poster: draft.poster, lookedUp: true }, url ? "Poster updated" : "Using the drawn poster");
+    else toast(url ? "Poster set" : "Using the drawn poster");
+  }
+
   // ================= the lobby card (details and editing) =================
   let draft = null, draftNew = false, confirmDel = false, cardHint = "", moreList = null, moreCtl = null, moreFor = "";
   function openCard(it, opt = {}){
@@ -1626,14 +2003,15 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     document.addEventListener("keydown", escClose);
     const ctl = new AbortController(); moreCtl = ctl;
     if (!draft.plot && draft.wiki) plotOf(draft.wiki, ctl.signal).then(p => { if (draft && p && !ctl.signal.aborted) { draft.plot = p; const el = $("#plot"); if (el) el.textContent = p; const cur = items().find(x => x.id === draft.id); if (cur && !cur.plot) { cur.plot = p; saveLocal(); } } }).catch(() => {});
+    if (draft.imdbId && (!rcache[draft.imdbId] || Date.now() - rcache[draft.imdbId].at > 3 * 864e5)) imdbRatings([draft.imdbId], ctl.signal).then(m => { const c = m[draft?.imdbId]; if (!draft || !c?.r) return; if (c.r === draft.imdb && c.v === draft.imdbVotes) return; readFields(); Object.assign(draft, withRating(draft, c)); const cur = items().find(x => x.id === draft.id); if (cur) upsert(withRating(cur, c)); rerenderCard(); }).catch(() => {});
     if (draft.type === "tv" && (!draft.tvAt || Date.now() - draft.tvAt > 3 * 864e5)) tvInfo(draft, ctl.signal).then(t => {
       if (!draft || ctl.signal.aborted || !t) return; readFields(); Object.assign(draft, applyTv(draft, t));
       const cur = items().find(x => x.id === draft.id); if (cur) upsert(applyTv(cur, t)); rerenderCard();
     }).catch(() => {});
-    if (moreFor) worksOf(moreFor, ctl.signal).then(w => { if (!draft || ctl.signal.aborted) return; moreList = w.filter(x => x.wikidata !== draft.wikidata).slice(0, 14); const el = $("#more-row"); if (el) el.outerHTML = moreHTML(); }).catch(() => { moreList = []; const el = $("#more-row"); if (el) el.outerHTML = moreHTML(); });
+    if (moreFor) worksOf(moreFor, ctl.signal).then(w => { if (!draft || ctl.signal.aborted) return; moreList = w.filter(x => x.wikidata !== draft.wikidata).slice(0, 14); const el = $("#more-row"); if (el) el.outerHTML = moreHTML(); rateList(moreList, ctl.signal).then(ch => { if (ch && draft) { const e2 = $("#more-row"); if (e2) e2.outerHTML = moreHTML(); } }).catch(() => {}); }).catch(() => { moreList = []; const el = $("#more-row"); if (el) el.outerHTML = moreHTML(); });
   }
-  function closeModal(){ const wasAdder = adder, wasLe = le; $("#modal-root").innerHTML = ""; draft = null; adder = null; le = null; adderCtl?.abort(); closePop(); if (wasAdder && view === "list") renderListPage(); if (wasAdder && view === "lists") renderLists(); moreCtl?.abort(); document.removeEventListener("keydown", escClose); document.body.style.overflow = ""; }
-  function escClose(e){ if (e.key === "Escape") { if (pop) return closePop(); closeModal(); } }
+  function closeModal(){ if (pp) { pp.ctl.abort(); pp = null; } const wasAdder = adder, wasLe = le; $("#modal-root").innerHTML = ""; draft = null; adder = null; le = null; adderCtl?.abort(); closePop(); if (wasAdder && view === "list") renderListPage(); if (wasAdder && view === "lists") renderLists(); moreCtl?.abort(); document.removeEventListener("keydown", escClose); document.body.style.overflow = ""; }
+  function escClose(e){ if (e.key === "Escape") { if (pop) return closePop(); if (pp) return closePicker(); closeModal(); } }
   function moreHTML(){
     if (!moreFor) return "";
     const name = (draft?.creator || "").split(", ")[0];
@@ -1652,7 +2030,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(d.title || "New title")}">
       <button class="x" type="button" id="x-btn" aria-label="Close">×</button>
       <div class="hero"><div class="bg" style="--pa:${a}">${d.poster ? `<img src="${esc(d.poster)}" alt="" onerror="this.remove()">` : ""}</div>
-        <div class="hgrid">${posterHTML(d)}<div style="min-width:0">
+        <div class="hgrid"><div class="hp${d.poster ? "" : " noimg"}">${posterHTML(d)}<button class="pchg" type="button" data-ppopen><span class="a">Change poster</span><span class="b">${d.poster ? "Poster didn't load · find another" : "Find a poster"}</span></button></div><div style="min-width:0">
           <span class="kind">${draftNew ? "Not in your library yet" : esc(STATUS[d.status] || "")}${d.priority ? " · Must see" : ""}</span>
           <h2>${esc(d.title || "New title")}</h2>
           <div class="facts">${facts.map(f => `<span>${esc(f)}</span>`).join("")}</div>
@@ -1683,7 +2061,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
           </div>
           <div><span class="lbl">Poster</span><div class="drop" id="drop" tabindex="0" role="button">Drop, paste or pick an image</div>
             <div class="fields" style="margin-top:8px"><label class="field full">…or paste an image link<input id="f-poster" value="${esc(d.poster && !d.poster.startsWith("data:") ? d.poster : "")}" placeholder="https://…"></label></div>
-            <div class="chips" style="margin-top:6px">${d.title ? `<button class="btn small" type="button" id="lookup-btn">Look up poster and details again</button>` : ""}${d.poster ? `<button class="btn small ghost" type="button" id="rm-poster">Remove poster</button>` : ""}</div></div>
+            <div class="chips" style="margin-top:6px">${d.title ? `<button class="btn small gold" type="button" data-ppopen>Choose from posters online</button><button class="btn small" type="button" id="lookup-btn">Look up details again</button>` : ""}${d.poster ? `<button class="btn small ghost" type="button" id="rm-poster">Remove poster</button>` : ""}</div></div>
         </div></details>
         ${confirmDel ? `<div class="confirm"><span>Remove “${esc(d.title)}” from your library?</span><button class="btn small danger" type="button" id="del-yes">Remove</button><button class="btn small" type="button" id="del-no">Keep it</button></div>` : ""}
       </div>
@@ -1725,7 +2103,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
       const W = 300, H = 450, c = document.createElement("canvas"); c.width = W; c.height = H;
       const r = Math.max(W / img.width, H / img.height), w = img.width * r, h = img.height * r;
       c.getContext("2d").drawImage(img, (W - w) / 2, (H - h) / 2, w, h); URL.revokeObjectURL(url);
-      readFields(); draft.poster = c.toDataURL("image/jpeg", .78); rerenderCard();
+      readFields(); applyPoster(c.toDataURL("image/jpeg", .78));
     };
     img.onerror = () => { URL.revokeObjectURL(url); toast("That image couldn't be read."); };
     img.src = url;
@@ -1861,11 +2239,15 @@ alter publication supabase_realtime add table public.${TABLE};`;
   async function copy(text, ok){ try { await navigator.clipboard.writeText(text); toast(ok); } catch { const ta = document.createElement("textarea"); ta.value = text; document.body.append(ta); ta.select(); try { document.execCommand("copy"); toast(ok); } catch { toast("Couldn't copy. Select the text and copy it yourself."); } ta.remove(); } }
 
   // ================= settings and backup =================
-  function openSettings(){
+  function openSettings(){ setTimeout(paintRatingStatus, 0);
     const cur = lsGet(LS_THEME, "auto");
     $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal narrow" role="dialog" aria-modal="true" aria-label="Settings">
       <div class="sechead"><h3 style="font-size:28px">Settings</h3><button class="btn small" type="button" data-mclose>Close</button></div>
       <div><span class="lbl">Theme</span><div class="themes">${[["auto","Match my device","linear-gradient(90deg,#F2EADD 50%,#100809 50%)"],["velvet","Velvet","#100809"],["matinee","Matinee","#F2EADD"]].map(([k, l, c]) => `<button type="button" data-theme-set="${k}" aria-pressed="${cur === k}"><i style="background:${c}"></i>${l}</button>`).join("")}</div></div>
+      <div><span class="lbl">IMDb ratings</span><p class="note" id="rt-status" style="margin:0 0 8px"></p>
+        <div class="chips"><button class="btn small" type="button" id="rt-refresh">Refresh all IMDb ratings now</button></div>
+        <p class="note">Ratings come from IMDb's daily ratings file and refresh by themselves every few days. As a backup you can add a free OMDb key (omdbapi.com, “API Key”, free tier):</p>
+        <div class="ppq"><input id="omdb-key" placeholder="OMDb key (optional)" value="${esc(lsGet(LS_OMDB, "") || "")}" autocomplete="off" spellcheck="false"><button class="btn small" type="button" id="omdb-save">Save key</button></div></div>
       <div><span class="lbl">Your data</span><div class="chips"><button class="btn small" type="button" id="s-backup">Download a backup</button><button class="btn small" type="button" id="s-restore">Restore a backup</button></div>
       <p class="note">Coming from the Front Row inside Claude? Press “Back up” there, copy the text, then “Restore a backup” here and paste it.</p></div>
       <p class="note" style="margin:0">Front Row v${esc(VERSION)}. Posters, cast and ratings come from Wikipedia and Wikidata, free and with no account.</p>
@@ -1907,16 +2289,16 @@ alter publication supabase_realtime add table public.${TABLE};`;
   function go(v){
     view = v;
     document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
-    closePop();
+    closePop(); if (v === "discover") openDiscover();
     document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v)) b.setAttribute("aria-current", "page"); });
-    ["library","seen","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
+    ["library","seen","discover","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
     const hv = v === "list" ? "list-" + curList : v;
     if (location.hash.slice(1) !== hv) history.replaceState(null, "", v === "library" ? location.pathname + location.search : "#" + hv);
     render();
   }
   function render(){
     renderMarquee(); renderNow();
-    if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else renderStats();
+    if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else renderStats();
     if (res.state === "done") renderResults();
     if (pop) renderPop();
   }
@@ -1934,7 +2316,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("#install-btn").hidden = false; });
   $("#install-btn").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; $("#install-btn").hidden = true; });
   addEventListener("appinstalled", () => { $("#install-btn").hidden = true; toast("Front Row is installed"); });
-  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["library","seen","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
+  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["library","seen","discover","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
   addEventListener("hashchange", routeHash);
   addEventListener("scroll", () => { if (pop && !$("#pop-root .sheet")) closePop(); }, { passive: true });
   addEventListener("resize", () => closePop());
@@ -1952,6 +2334,14 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (t.id === "sort") { sortBy = t.value; renderLibrary(); }
     if (t.id === "listsel") { listF = t.value; renderLibrary(); }
     if (t.id === "lpsort") { lpSort = t.value; renderListPage(); }
+    if (t.id === "lpmin") { lpMin = t.value; renderListPage(); }
+    if (t.id === "d-min") { disc.min = t.value; renderDiscover(); }
+    if (t.id === "d-sort") { disc.sort = t.value; renderDiscover(); }
+    if (t.id === "d-jog") { disc.jog = t.checked; addMode = t.checked ? "watched" : "want"; renderDiscover(); if (res.state === "done") renderResults(); }
+    if (t.id === "libmin") { libMin = t.value; renderLibrary(); }
+    if (t.id === "sn-min") { sn.min = t.value; renderSeen(); }
+    if (t.id === "resmin") { resMin = t.value; renderResults(); }
+    if (t.id === "ressort") { resSort = t.value; renderResults(); }
     if (t.id === "sn-rf") { sn.rf = t.value; renderSeen(); }
     if (t.id === "sn-genre") { sn.genre = t.value; renderSeen(); }
     if (t.id === "sn-sort") { sn.sort = t.value; renderSeen(); }
@@ -1960,6 +2350,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   document.addEventListener("submit", e => {
     const f = e.target;
     if (f.id === "le-form") { e.preventDefault(); saveListEditor(); }
+    if (f.id === "pp-form") { e.preventDefault(); if (!pp) return; pp.q = $("#pp-q").value.trim(); if (!pp.q) return; pp.pending++; ppStatus(); const sig = pp.ctl.signal; commonsSearch(pp.q, sig).catch(() => {}).finally(() => { if (pp && !sig.aborted) { pp.pending--; ppStatus(); } }); }
     if (f.id === "popnew") { e.preventDefault(); const name = f.querySelector("input").value.trim(); if (!name) return; if (lists().some(l => norm(l.name) === norm(name))) { toast(`You already have a list called ${name}`); return; } const l = newListObj(name); setLists([...lists(), l]); const it = ensureIt(pop.key); if (it) upsert(setMember(it, l.id, true), `Created ${l.name} and added ${it.title}`); renderPop(); }
     if (f.id === "cardnewlist") { e.preventDefault(); const name = f.querySelector("input").value.trim(); if (!name || !draft) return; readFields(); let l = lists().find(x => norm(x.name) === norm(name)); if (!l) { l = newListObj(name); setLists([...lists(), l], `Created ${l.name}`); } if (!draft.lists.includes(l.id)) draft.lists.push(l.id); draft.listAdded = { ...(draft.listAdded || {}), [l.id]: Date.now() }; rerenderCard(); }
   });
@@ -1967,7 +2358,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     const t = e.target.closest("button,a,[data-scrim],[data-popclose],#drop");
     if (!t) return;
     const D = t.dataset;
-    if (t.matches("[data-scrim]")) { if (e.target === t) closeModal(); return; }
+    if (t.matches("[data-scrim]")) { if (e.target === t) { if (pp) closePicker(); else closeModal(); } return; }
     if (pop && !t.closest("#pop-root") && !D.listpop) closePop();
     if (D.popclose !== undefined) return closePop();
     if (D.listpop) { if (pop && pop.key === D.listpop) return closePop(); return openPop(t, D.listpop); }
@@ -1990,6 +2381,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.go) { go(D.go); if (D.go === "library" && t.classList.contains("brand")) scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }); return; }
     if (D.themeSet) { applyTheme(D.themeSet); document.querySelectorAll("[data-theme-set]").forEach(b => b.setAttribute("aria-pressed", b.dataset.themeSet === D.themeSet)); return; }
     if (t.id === "s-backup") return downloadBackup();
+    if (t.id === "rt-refresh") { refreshLibRatings(true).then(n => { toast(n ? `Updated ${n} IMDb rating${n === 1 ? "" : "s"}` : ratingNote || "IMDb ratings are up to date"); }); return; }
+    if (t.id === "omdb-save") { lsSet(LS_OMDB, $("#omdb-key").value.trim()); toast("OMDb key saved"); refreshLibRatings(true).then(() => paintRatingStatus()); return; }
     if (t.id === "s-restore") return openRestore();
     if (t.id === "bk-file") return $("#restore-file").click();
     if (t.id === "bk-load") return restore($("#bk-text").value);
@@ -2026,17 +2419,30 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.pickfrom) { closeModal(); tn.from = D.pickfrom; tn.pick = null; go("tonight"); drawPick(); renderTonight(); return; }
     if (D.snt) { sn.type = D.snt; return renderSeen(); }
     if (D.seenmode !== undefined) { addMode = "watched"; scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }); setTimeout(() => $("#q").focus(), 250); $("#q").placeholder = "What have you already seen?"; if (res.state === "done") renderResults(); toast("Search for anything you've seen. It goes straight into Seen it."); return; }
-    if (D.seenoff !== undefined) { addMode = "want"; $("#q").placeholder = "Find a movie, show, director or actor…"; return renderResults(); }
+    if (D.seenoff !== undefined) { addMode = "want"; disc.jog = false; $("#q").placeholder = "Find a movie, show, director or actor…"; return renderResults(); }
     if (D.rtype) { resType = D.rtype; return renderResults(); }
+    if (D.more !== undefined) return moreResults();
+    if (D.dtype) { disc.type = D.dtype; return browse(); }
+    if (D.dgenre !== undefined) { disc.genre = D.dgenre; return browse(); }
+    if (D.ddec !== undefined) { disc.decade = D.ddec; return browse(); }
+    if (D.dretry !== undefined) return browse();
+    if (D.browseJog !== undefined) { if (view !== "discover") go("discover"); disc.jog = true; addMode = "watched"; disc.genre = ""; disc.decade = ""; disc.type = "movie"; browse(); renderDiscover(); $("#browse")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }); return; }
     if (D.recs !== undefined) return buildRecs();
     if (D.nope) { lib.notForMe = [...new Set([...(lib.notForMe || []), D.nope])]; commit(); toast("Got it, not for you"); return; }
     if (D.mood) { const i = tn.moods.indexOf(D.mood); i >= 0 ? tn.moods.splice(i, 1) : tn.moods.push(D.mood); return renderTonight(); }
     if (D.time) { tn.time = D.time; return renderTonight(); }
+    if (D.tmin !== undefined) { tn.min = D.tmin; return renderTonight(); }
     if (D.ttype) { tn.type = D.ttype; return renderTonight(); }
     if (t.id === "t-pick" || t.id === "t-again") { drawPick(); renderTonight(); $("#view-tonight .ticket")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" }); return; }
     if (D.tpick) { const it = items().find(x => x.id === D.tpick); if (it) { tn.alts = tn.alts.filter(x => x.id !== it.id).concat(tn.pick ? [tn.pick] : []); tn.pick = it; renderTonight(); } return; }
+    if (D.chposter) { const it = items().find(x => x.id === D.chposter); closePop(); if (it) { closeModal(); openCard(it); openPosterPicker(); } return; }
     // lobby card
     if (!draft) return;
+    if (D.ppopen !== undefined) return openPosterPicker();
+    if (t.id === "pp-cancel" || t.id === "pp-cancel2") return closePicker();
+    if (D.ppick) { if (D.ppick === "none") return applyPoster(""); const c = pp?.list[Number(D.ppick)]; if (c) applyPoster(c.url); return; }
+    if (t.id === "pp-upload") return $("#poster-file").click();
+    if (t.id === "pp-useurl") { const u = $("#pp-url").value.trim(); if (!/^https:\/\/\S+$/i.test(u)) { toast("Paste a link that starts with https://"); return; } const img = new Image(); img.onload = () => applyPoster(u); img.onerror = () => toast("That link didn't load as an image. Copy the image address, not the page address."); img.referrerPolicy = "no-referrer"; img.src = u; return; }
     if (t.id === "save-btn") return saveDraft();
     if (t.id === "del-btn") { readFields(); confirmDel = true; return rerenderCard(); }
     if (t.id === "del-no") { readFields(); confirmDel = false; return rerenderCard(); }
@@ -2067,7 +2473,12 @@ alter publication supabase_realtime add table public.${TABLE};`;
   // ================= start =================
   if (!routeHash()) go("library");
   sync.paint();
-  addEventListener("load", () => { sync.connect(); if (items().some(x => !x.poster && !x.lookedUp) && navigator.onLine) setTimeout(fillMissing, 1500); });
+  addEventListener("load", () => {
+    sync.connect();
+    if (navigator.onLine) setTimeout(loadTrending, 2500);
+    if (items().some(x => !x.poster && !x.lookedUp) && navigator.onLine) setTimeout(fillMissing, 1500);
+    setTimeout(() => { if (items().some(x => (x.imdbId && (!rcache[x.imdbId] || Date.now() - rcache[x.imdbId].at > 3 * 864e5)) || (!x.imdbId && !x.idTried))) refreshLibRatings(false); }, 4000);
+  });
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 })();
 </script>

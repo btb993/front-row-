@@ -1,5 +1,5 @@
 // Front Row: lets the app open offline and remembers posters.
-const SHELL = "frontrow-shell-v2", POSTERS = "frontrow-posters-v1";
+const SHELL = "frontrow-shell-v4", POSTERS = "frontrow-posters-v1";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "favicon-64.png"];
 
 self.addEventListener("install", e => {
@@ -21,7 +21,7 @@ self.addEventListener("fetch", e => {
     return;
   }
   // posters, fonts and the sync library: keep a copy once loaded
-  if (/upload\.wikimedia\.org|m\.media-amazon\.com|static\.tvmaze\.com|fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net/.test(url.host)) {
+  if (/upload\.wikimedia\.org|m\.media-amazon\.com|static\.tvmaze\.com|commons\.wikimedia\.org|fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net/.test(url.host)) {
     e.respondWith(caches.open(POSTERS).then(async c => {
       const hit = await c.match(req); if (hit) return hit;
       const r = await fetch(req);
