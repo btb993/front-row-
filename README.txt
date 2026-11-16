@@ -36,6 +36,12 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.6)
+  - Marking something as seen no longer stamps today's date. The date is
+    optional: pick an exact date, just a year, or tap "Today" in the
+    title's window. Titles that got today's date automatically were
+    cleared once. Undated titles sit under "Date not set" in Seen it.
+
 WHAT'S INSIDE (v1.5)
   - "✓ Seen it" under every poster on list pages and in the watchlist;
     once seen, the button becomes stars so you can rate it right there.

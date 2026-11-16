@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="1.5">
+<html lang="en" data-ver="1.6">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -549,6 +549,9 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 #view-discover .panel{gap:14px}
 .cquick{display:flex;gap:6px}
 .cquick .btn.gold{flex:1}
+.wdate{display:flex;gap:6px}
+.wdate input,.wdate select{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:8px 10px;font-size:15px;color:var(--ink)}
+.field .chips{margin-top:6px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:80;box-shadow:var(--shadow);max-width:90vw;display:flex;gap:12px;align-items:center;animation:rise .25s}
 .toast button{border:0;background:none;color:var(--gold);font-weight:700;cursor:pointer;padding:0}
 @media (min-width:761px){.toast{bottom:24px}}
@@ -646,6 +649,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   if (legacy && !lib.items.length) { lib.items = legacy; lib.lists = lsGet("front-row-lists", []); }
   lib.items = lib.items || []; lib.deleted = lib.deleted || {}; lib.lists = lib.lists || []; lib.listsAt = lib.listsAt || 0;
   const items = () => lib.items, lists = () => lib.lists;
+  if (!lib.undated) { const now = Date.now(); lib.items = lib.items.map(x => x.status === "watched" && x.finished && x.finished === x.added && !x.dateSet ? { ...x, finished: "", updatedAt: now } : x); lib.undated = 1; try { localStorage.setItem("front-row-library", JSON.stringify(lib)); } catch {} }
   function saveLocal(){ if (!lsSet(LS, lib)) toast("This browser's storage is full. Remove a few uploaded poster images."); }
   function commit(){ saveLocal(); render(); sync.schedule(); }
   function upsert(it, msg, undo){
@@ -1061,9 +1065,9 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   }
   function markDone(id){
     const it = items().find(x => x.id === id); if (!it) return;
-    const out = { ...it, status: "watched", finished: todayISO() };
+    const out = { ...it, status: "watched" };
     upsert(out, `Watched ${it.title}`, true);
-    openCard(out, { hint: "How was it? Rate it while it's fresh." });
+    openCard(out, { hint: "How was it? Rate it, and add when you watched it if you like." });
   }
 
   // ================= search =================
@@ -1186,7 +1190,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     let extra = "";
     if (it.priority && it.status === "want") extra += `<span class="ribbon">Must see</span>`;
     if (it.fav && it.status === "watched") extra += `<span class="ribbon fav">♥ Favourite</span>`;
-    if (it.status === "watched" && !opt.rate && !opt.quick) extra += `<span class="stub"><span>${it.finished ? esc(fmtDate(it.finished).replace(/ \d{4}$/, "")) : "Seen"}</span><span class="st">${starTxt(it.rating)}</span></span>`;
+    if (it.status === "watched" && !opt.rate && !opt.quick) extra += `<span class="stub"><span>${it.finished ? esc(/^\d{4}$/.test(it.finished) ? it.finished : fmtDate(it.finished).replace(/ \d{4}$/, "")) : "Seen"}</span><span class="st">${starTxt(it.rating)}</span></span>`;
     const sub = it.type === "tv" ? (it.seasons ? `${it.seasons} season${it.seasons > 1 ? "s" : ""}` : "Series") : (fmtRun(it.runtime) || "Film");
     const right = it.status === "watching" && it.type === "tv" ? `<span class="mono" style="font-size:11px">S${num(it.season) || 1}·E${num(it.episode)}</span>` : it.imdb ? `<span class="sc imdb">${Number(it.imdb).toFixed(1)}</span>` : "";
     return `<button class="card" type="button" data-open="${esc(it.id)}">${posterHTML(it, { extra })}<span class="ct">${esc(it.title)}${listDots(it)}</span><span class="cs"><span>${esc([it.year, sub].filter(Boolean).join(" · "))}</span>${right}</span>${it.status === "watching" && it.type === "tv" && tvProgress(it) ? `<span class="mini"><span style="width:${tvProgress(it)}%"></span></span>` : ""}${(view === "library" && statusF === "all") || (view === "list" && lpStatus === "all") ? `<span><span class="pill ${it.status}">${esc(STATUS[it.status])}</span></span>` : ""}</button>`;
@@ -1425,7 +1429,6 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   }
   function withStatus(it, st){
     const o = { ...it, status: st }, d = todayISO();
-    if (st === "watched" && !o.finished) o.finished = d;
     if (st === "watching") { o.started = o.started || d; if (o.type === "tv" && !o.season) { o.season = 1; o.episode = 0; } }
     return o;
   }
@@ -1490,8 +1493,8 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const L = seenFiltered();
     let grid = "";
     if (L.length && sn.sort === "finished") {
-      const groups = {}; L.forEach(x => { const y = (x.finished || "").slice(0, 4) || "Earlier"; (groups[y] = groups[y] || []).push(x); });
-      grid = Object.keys(groups).sort((a, b) => b.localeCompare(a)).map(y => `<div class="yhead"><h3>${esc(y)}</h3><span class="mono">${groups[y].length} seen</span></div><div class="grid">${groups[y].map(it => cardW(it, { rate: true })).join("")}</div>`).join("");
+      const groups = {}; L.forEach(x => { const y = (x.finished || "").slice(0, 4) || "Date not set"; (groups[y] = groups[y] || []).push(x); });
+      grid = Object.keys(groups).sort((a, b) => a === "Date not set" ? 1 : b === "Date not set" ? -1 : b.localeCompare(a)).map(y => `<div class="yhead"><h3>${esc(y)}</h3><span class="mono">${groups[y].length} seen</span></div><div class="grid">${groups[y].map(it => cardW(it, { rate: true })).join("")}</div>`).join("");
     } else if (L.length) grid = `<div class="grid">${L.map(it => cardW(it, { rate: true })).join("")}</div>`;
     v.innerHTML = `<div class="sechead" style="margin-bottom:14px"><h2>Seen it</h2><span class="serif">Your collection of everything watched</span></div>
       ${all.length ? `<div class="kpis">
@@ -1654,7 +1657,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const yr = new Date().getFullYear();
     const months = Array.from({ length: 12 }, () => ({ movie: 0, tv: 0 }));
     const thisYear = watched.filter(x => x.finished && x.finished.startsWith(String(yr))).sort((a, b) => a.finished.localeCompare(b.finished));
-    thisYear.forEach(x => months[Number(x.finished.slice(5, 7)) - 1][x.type === "tv" ? "tv" : "movie"]++);
+    thisYear.forEach(x => { if (x.finished.length >= 7) months[Number(x.finished.slice(5, 7)) - 1][x.type === "tv" ? "tv" : "movie"]++; });
     const top = rated.slice().sort((a, b) => b.rating - a.rating || (b.finished || "").localeCompare(a.finished || "")).slice(0, 10);
     const people = {}; L.filter(x => x.status !== "dropped" && x.creator).forEach(x => x.creator.split(", ").forEach(p => { people[p] = (people[p] || 0) + 1; }));
     const ptop = Object.entries(people).filter(p => p[1] > 1).sort((a, b) => b[1] - a[1]).slice(0, 6);
@@ -2049,7 +2052,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         ${d.plot || d.wiki ? `<p class="plot" id="plot" style="margin:0">${esc(d.plot || d.blurb || "")}</p>` : d.blurb ? `<p class="plot" style="margin:0">${esc(d.blurb)}</p>` : ""}
         <div><span class="lbl">Status</span><div class="statpick" role="group" aria-label="Status">${Object.entries(STATUS).map(([k, l]) => `<button type="button" data-fst="${k}" aria-pressed="${d.status === k}">${l}</button>`).join("")}</div></div>
         ${tv && d.status !== "want" ? `<div class="fields three"><label class="field">Season you're on<input id="f-season" type="number" inputmode="numeric" min="1" value="${esc(num(d.season) || 1)}"></label><label class="field">Last episode seen<input id="f-episode" type="number" inputmode="numeric" min="0" value="${esc(num(d.episode))}"></label><label class="field">Episodes seen in total<input id="f-weps" type="number" inputmode="numeric" min="0" value="${esc(epsWatched(d))}"></label></div>` : ""}
-        ${d.status === "watched" ? `<div class="fields"><div class="field"><span>Your rating · left half of a star gives a half</span><div class="crate big">${rateHTML(d, "draft")}<button class="fav${d.fav ? " on" : ""}" type="button" data-ffav aria-pressed="${!!d.fav}" aria-label="Favourite">♥</button></div></div><label class="field">Finished on<input id="f-finished" type="date" value="${esc(d.finished || "")}"></label>${!tv ? `<label class="field">Times rewatched<input id="f-rew" type="number" min="0" value="${esc(num(d.rewatches))}"></label>` : ""}</div>` : ""}
+        ${d.status === "watched" ? `<div class="fields"><div class="field"><span>Your rating · left half of a star gives a half</span><div class="crate big">${rateHTML(d, "draft")}<button class="fav${d.fav ? " on" : ""}" type="button" data-ffav aria-pressed="${!!d.fav}" aria-label="Favourite">♥</button></div></div><div class="field"><span>When you watched it (optional)</span><div class="wdate"><input id="f-finished" type="date" value="${esc(/^\d{4}-\d{2}-\d{2}$/.test(d.finished || "") ? d.finished : "")}" aria-label="Date watched"><select id="f-fyear" aria-label="Or just the year"><option value="">or just the year</option>${Array.from({ length: new Date().getFullYear() - 1949 }, (_, i) => new Date().getFullYear() - i).map(y => `<option ${/^\d{4}$/.test(d.finished || "") && Number(d.finished) === y ? "selected" : ""}>${y}</option>`).join("")}</select></div><div class="chips"><button class="chip" type="button" data-fdate="today">Today</button>${d.finished ? `<button class="chip" type="button" data-fdate="">No date</button>` : ""}</div></div>${!tv ? `<label class="field">Times rewatched<input id="f-rew" type="number" min="0" value="${esc(num(d.rewatches))}"></label>` : ""}</div>` : ""}
         <label style="display:flex;gap:9px;align-items:center;font-size:15px;cursor:pointer"><input type="checkbox" id="f-pri" ${d.priority ? "checked" : ""}> Must see (goes first and comes up more often tonight)</label>
         <div><span class="lbl">Lists</span><div class="lpick">${lists().map(l => `<button type="button" data-flist="${esc(l.id)}" aria-pressed="${d.lists.includes(l.id)}"><i class="sw lban ls ls-${styleOf(l)}"></i>${l.emoji ? esc(l.emoji) + " " : ""}${esc(l.name)}${d.lists.includes(l.id) ? " ✓" : ""}</button>`).join("")}<form class="cardnew" id="cardnewlist"><input placeholder="+ New list" maxlength="60" aria-label="New list name"></form></div></div>
         <div class="fields"><label class="field">Where you'll watch it<input id="f-where" value="${esc(d.where || "")}" placeholder="Netflix, HBO Max, cinema…"></label><label class="field">Recommended by<input id="f-recby" value="${esc(d.recBy || "")}" placeholder="Who told you about it?"></label><label class="field full">Notes<textarea id="f-notes" placeholder="Thoughts, favourite scenes, who to watch it with…">${esc(d.notes || "")}</textarea></label></div>
@@ -2085,7 +2088,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     if ($("#f-runtime")) d.runtime = num(g("#f-runtime")) || null;
     if ($("#f-seasons")) { d.seasons = num(g("#f-seasons")) || null; d.episodes = num(g("#f-episodes")) || null; d.epLength = num(g("#f-eplen")) || null; }
     if ($("#f-season")) { d.season = num(g("#f-season")) || 1; d.episode = num(g("#f-episode")); d.watchedEps = num(g("#f-weps")); }
-    if ($("#f-finished")) d.finished = g("#f-finished") || "";
+    if ($("#f-finished")) d.finished = g("#f-finished") || g("#f-fyear") || "";
     if ($("#f-rew")) d.rewatches = num(g("#f-rew"));
   }
   function rerenderCard(){ const open = $("details.more")?.open, st = $(".modal")?.scrollTop || 0; renderCard(open); const m = $(".modal"); if (m) m.scrollTop = st; }
@@ -2093,11 +2096,10 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     readFields(); const d = draft;
     if (!d.title) { toast("Give it a title first."); const det = $("details.more"); if (det) det.open = true; $("#f-title")?.focus(); return; }
     if (draftNew && findSame(d)) { toast(`${d.title} is already in your library`); return; }
-    if (d.status === "watched" && !d.finished) d.finished = todayISO();
     if (d.status === "watching" && !d.started) d.started = todayISO();
     if (d.type === "tv" && d.status === "watching" && !d.season) d.season = 1;
     if (d.type === "tv" && num(d.episode) && !num(d.watchedEps)) d.watchedEps = Math.round((num(d.season || 1) - 1) * (perSeason(d) || 8) + num(d.episode));
-    d.added = d.added || todayISO(); if (draftNew) delete d.role;
+    d.added = d.added || todayISO(); if (draftNew) delete d.role; if (d.finished) d.dateSet = true;
     const isNew = draftNew;
     upsert({ ...d }, isNew ? `Added ${d.title}` : "Saved", isNew);
     closeModal(); if (isNew) enrichNew(d.id);
@@ -2340,6 +2342,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (t.id === "sort") { sortBy = t.value; renderLibrary(); }
     if (t.id === "listsel") { listF = t.value; renderLibrary(); }
     if (t.id === "lpsort") { lpSort = t.value; renderListPage(); }
+    if (t.id === "f-fyear" && t.value && $("#f-finished")) $("#f-finished").value = "";
+    if (t.id === "f-finished" && t.value && $("#f-fyear")) $("#f-fyear").value = "";
     if (t.id === "lpmin") { lpMin = t.value; renderListPage(); }
     if (t.id === "d-min") { disc.min = t.value; renderDiscover(); }
     if (t.id === "d-sort") { disc.sort = t.value; renderDiscover(); }
@@ -2464,7 +2468,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
       if (draft) rerenderCard(); return;
     }
     if (D.ftype) { readFields(); draft.type = D.ftype; return rerenderCard(); }
-    if (D.fst) { readFields(); draft.status = D.fst; if (D.fst === "watched" && !draft.finished) draft.finished = todayISO(); if (D.fst === "watching" && draft.type === "tv" && !draft.season) { draft.season = 1; draft.episode = 0; } return rerenderCard(); }
+    if (D.fst) { readFields(); draft.status = D.fst; if (D.fst === "watching" && draft.type === "tv" && !draft.season) { draft.season = 1; draft.episode = 0; } return rerenderCard(); }
+    if (D.fdate !== undefined) { readFields(); draft.finished = D.fdate === "today" ? todayISO() : ""; return rerenderCard(); }
     if (D.ffav !== undefined) { readFields(); draft.fav = !draft.fav; return rerenderCard(); }
     if (D.flist) { readFields(); const i = draft.lists.indexOf(D.flist); draft.listAdded = { ...(draft.listAdded || {}) }; if (i >= 0) { draft.lists.splice(i, 1); delete draft.listAdded[D.flist]; } else { draft.lists.push(D.flist); draft.listAdded[D.flist] = Date.now(); } return rerenderCard(); }
   });
