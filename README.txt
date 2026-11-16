@@ -36,6 +36,15 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v2.0)
+  - Fun stats: your viewing personality, days of watching in flights and
+    Lord of the Rings marathons, oldest and newest film, longest sit,
+    binge record and streak, your favourite weekday, how you rate
+    against IMDb, your hidden gem and hottest take, countries, most
+    watched show, the title waiting longest, favourites, perfect
+    scores, and Genre bingo.
+  - Posters in sideways rows load straight away.
+
 WHAT'S INSIDE (v1.9)
   - Fixed: posters on search, Discover and recommendation cards were
     invisible since v1.7.

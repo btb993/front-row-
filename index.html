@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ver="1.9">
+<html lang="en" data-ver="2.0">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -628,6 +628,20 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .eprow:hover .epupto,.epupto:focus-visible{opacity:1}
 @media (hover:none){.epupto{opacity:.8}}
 @media (max-width:560px){.eprow{grid-template-columns:28px 32px minmax(0,1fr) 70px}.epd{display:none}.cwrow .cw1{flex-basis:290px}}
+.persona{display:flex;gap:18px;align-items:center;margin-top:14px;padding:18px 22px;border-radius:18px;background:radial-gradient(ellipse 50% 140% at 0 50%,#4A1820,transparent 70%),linear-gradient(180deg,var(--house),var(--house2));color:var(--cream);box-shadow:var(--shadow)}
+.persona .pe{font-size:54px;line-height:1;filter:drop-shadow(0 0 14px rgba(255,190,110,.5))}
+.persona .mono{color:#E7B9A4}
+.persona h3{font-size:34px;font-weight:900;text-transform:uppercase;color:#fff;text-shadow:0 0 16px rgba(255,150,90,.4)}
+.persona p{margin:2px 0 0;font-family:var(--f-serif);font-style:italic;color:var(--dim);font-size:17px}
+.fun{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px;margin-top:14px}
+.func{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+.func .fe{font-size:26px;line-height:1.1}
+.func b{font-family:var(--f-display);font-size:21px;font-weight:800;line-height:1.1}
+.func span:last-child{font-size:14px;color:var(--muted)}
+.bingo{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px}
+.bg{border:1.5px dashed var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;opacity:.6}
+.bg b{font-size:14.5px}.bg span{font-size:12px;color:var(--muted)}
+.bg.on{border-style:solid;border-color:var(--gold);background:var(--gold-soft);opacity:1}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:80;box-shadow:var(--shadow);max-width:90vw;display:flex;gap:12px;align-items:center;animation:rise .25s}
 .toast button{border:0;background:none;color:var(--gold);font-weight:700;cursor:pointer;padding:0}
 @media (min-width:761px){.toast{bottom:24px}}
@@ -776,8 +790,8 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   const yearText = it => it.type === "tv" && it.year ? `${it.year}–${it.endYear || ""}` : (it.year || "");
   function posterHTML(it, opt = {}){
     const [a, b] = palOf(it), tag = opt.tag || "div";
-    const src = it.poster || "";
-    return `<${tag} class="poster" ${opt.attrs || ""} style="${opt.style || ""}--pa:${a};--pb:${b}">${motif(it, b)}<div class="pt"><span class="ptype">${it.type === "tv" ? "Series" : "Film"}</span><b>${esc(it.title)}</b><span class="py">${esc(yearText(it))}</span></div>${src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onload="this.classList.add('in')" onerror="var h=this.closest('.hp');if(h)h.classList.add('noimg');this.remove()">` : ""}${opt.extra || ""}</${tag}>`;
+    const src = it.poster || "", lazy = opt.eager ? "eager" : "lazy";
+    return `<${tag} class="poster" ${opt.attrs || ""} style="${opt.style || ""}--pa:${a};--pb:${b}">${motif(it, b)}<div class="pt"><span class="ptype">${it.type === "tv" ? "Series" : "Film"}</span><b>${esc(it.title)}</b><span class="py">${esc(yearText(it))}</span></div>${src ? `<img src="${esc(src)}" alt="" loading="${lazy}" decoding="async" onload="this.classList.add('in')" onerror="var h=this.closest('.hp');if(h)h.classList.add('noimg');this.remove()">` : ""}${opt.extra || ""}</${tag}>`;
   }
   const stars = n => starTxt(n);
   function scoresHTML(it){
@@ -1211,7 +1225,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   function rcHTML(r, i, src){
     const have = findSame(r);
     const f = [r.type === "tv" ? "Series" : "Film", r.year, r.type === "tv" ? (r.seasons ? r.seasons + " seasons" : "") : fmtRun(r.runtime)].filter(Boolean);
-    return `<div class="rc"><div class="rcp"><button class="pb" type="button" data-preview="${src}:${i}" aria-label="More about ${esc(r.title)}">${posterHTML(r, { extra: r.type === "tv" ? `<span class="tvmark">TV</span>` : "" })}</button><button class="cbtn" type="button" data-listpop="${src}:${i}" aria-label="Status and lists for ${esc(r.title)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button>${src === "x" ? `<button class="cbtn nope" type="button" data-nope="${esc(r.wikidata)}" aria-label="Not for me" title="Not for me">✕</button>` : ""}</div>
+    return `<div class="rc"><div class="rcp"><button class="pb" type="button" data-preview="${src}:${i}" aria-label="More about ${esc(r.title)}">${posterHTML(r, { eager: i < 10, extra: r.type === "tv" ? `<span class="tvmark">TV</span>` : "" })}</button><button class="cbtn" type="button" data-listpop="${src}:${i}" aria-label="Status and lists for ${esc(r.title)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button>${src === "x" ? `<button class="cbtn nope" type="button" data-nope="${esc(r.wikidata)}" aria-label="Not for me" title="Not for me">✕</button>` : ""}</div>
       <span class="t">${esc(r.title)}</span><span class="f">${f.map(esc).map(x => `<span>${x}</span>`).join("")}</span>${scoresHTML(r)}
       ${have && have.status === "watched" ? rateHTML(have) : ""}
       <div class="acts">${have ? `<button class="have" type="button" data-open="${esc(have.id)}">✓ ${esc(STATUS[have.status])}</button>` : `<button class="btn small ${addMode === "watched" ? "" : "primary"}" type="button" data-add="${src}:${i}" data-st="want" title="Add to watchlist">+ Watchlist</button><button class="btn small ${addMode === "watched" ? "gold" : "seenb"}" type="button" data-add="${src}:${i}" data-st="watched" data-quiet="1" title="Already seen it">✓ Seen</button>`}</div></div>`;
@@ -1844,6 +1858,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
         <div class="kpi"><span class="v">${avg ? avg.toFixed(1) + "★" : "–"}</span><span class="s">your average rating</span></div>
         <div class="kpi"><span class="v">${fmtH(left)}</span><span class="s">to clear the watchlist</span></div>
       </div>
+      ${funHTML(L)}
       <div class="panels">
         <div class="panel wide"><div class="sechead"><h3>Ticket stubs, ${yr}</h3><span class="mono">${thisYear.length} seen</span></div>${thisYear.length ? `<div class="stubs">${thisYear.slice().reverse().slice(0, 40).map(x => `<button class="tstub" type="button" data-open="${esc(x.id)}" style="--r:${(hashNum(x.id, 5) - 2) * .6}deg">${posterHTML(x)}<span style="min-width:0"><small><span>ADMIT ONE</span><span>${esc(fmtDate(x.finished).replace(/ \d{4}$/, ""))}</span></small><b>${esc(x.title)}</b><small><span>${x.type === "tv" ? "Series" : "Film"}</span><span class="st">${x.rating ? starTxt(x.rating) : ""}</span></small></span></button>`).join("")}</div>` : `<span class="muted">Everything you finish this year gets a stub here.</span>`}</div>
         <div class="panel"><h3>Finished in ${yr}</h3><div class="months">${months.map((m, i) => `<div class="mo" title="${MONTHS[i]}: ${m.movie} films, ${m.tv} series"><span class="n">${m.movie + m.tv || ""}</span><div class="c">${'<i class="movie"></i>'.repeat(Math.min(m.movie, 12))}${'<i class="tv"></i>'.repeat(Math.min(m.tv, 12))}</div><span class="m">${MONTHS[i]}</span></div>`).join("")}</div><div class="legend"><span><i style="background:var(--gold)"></i>Films</span><span><i style="background:var(--blue)"></i>Series</span></div></div>
@@ -2182,6 +2197,81 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
     const airedAll = draftEps.eps.filter(e => e.air && e.air <= todayISO());
     rerenderCard();
     if (airedAll.length && airedAll.every(e => set.has(e.k)) && draft.status !== "watched") toast(`All caught up on ${draft.title}! Mark it Watched when it's over.`);
+  }
+
+  // ================= fun stats =================
+  const DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function persona(L){
+    const w = L.filter(x => x.status === "watched" || x.status === "watching"); if (w.length < 3) return null;
+    const g = {}; w.forEach(x => (x.genres || []).forEach(k => { const key = k.toLowerCase(); g[key] = (g[key] || 0) + (Number(x.rating) || 3); }));
+    const score = re => Object.entries(g).filter(([k]) => re.test(k)).reduce((s, [, v]) => s + v, 0);
+    const tvShare = w.filter(x => x.type === "tv").length / w.length;
+    const yrs = w.filter(x => x.year).map(x => x.year), avgY = yrs.length ? yrs.reduce((a, b) => a + b, 0) / yrs.length : 2010;
+    const cands = [
+      ["🦇", "The Midnight Horror Hound", "Lights off, volume up, never scared. Probably.", score(/horror|slasher|supernatural/)],
+      ["🎭", "The Laugh Track Lover", "If it isn't funny, why bother?", score(/comedy|sitcom|satire/)],
+      ["💌", "The Hopeless Romantic", "Swoons first, asks questions later.", score(/romance|romantic/)],
+      ["🚀", "The Starship Captain", "Happiest a few light years from Earth.", score(/science fiction|sci-fi|space/)],
+      ["🎻", "The Drama Connoisseur", "Brings tissues and strong opinions.", score(/drama/) * .6],
+      ["🧸", "Forever Young at Heart", "Animation is cinema, and you'll fight anyone who says otherwise.", score(/animat|anime|family/)],
+      ["🔎", "The Fact Finder", "Real stories beat made-up ones.", score(/documentary|biograph/)],
+      ["🕵️", "The Armchair Detective", "Guessed the killer in the first ten minutes.", score(/crime|thriller|mystery|detective|noir/)],
+      ["💥", "The Blockbuster Buff", "Explosions, popcorn, the bigger the better.", score(/action|adventure|superhero/)],
+      ["🐉", "The Dragon Rider", "Prefers worlds with maps at the front.", score(/fantasy/)],
+      ["🌈", "The Pride Parader", "Queer cinema is your home turf.", score(/lgbt|gay|lesbian|queer/) * 1.6]
+    ].sort((a, b) => b[3] - a[3]);
+    if (tvShare > .6) return ["🛋️", "Binge Royalty", "One more episode? Always one more episode."];
+    if (avgY < 1980) return ["🎞️", "The Golden Age Devotee", "They really don't make them like they used to."];
+    return cands[0][3] > 0 ? cands[0] : ["🍿", "The Omnivore", "A bit of everything, and loving it."];
+  }
+  function funFacts(L){
+    const out = [], watched = L.filter(x => x.status === "watched");
+    const H = L.reduce((s, x) => s + itemHours(x), 0);
+    if (H >= 2) {
+      out.push(["⏳", `${(H / 24).toFixed(1)} full days`, `of watching. That's ${Math.max(1, Math.round(H / 9.5))} flight${Math.max(1, Math.round(H / 9.5)) === 1 ? "" : "s"} from Budapest to New York.`]);
+      out.push(["🧙", `${(H / 11.4).toFixed(1)}× Lord of the Rings`, "measured in extended-edition trilogy marathons (11.4 hours each)."]);
+    }
+    const films = watched.filter(x => x.type !== "tv" && x.year).sort((a, b) => a.year - b.year);
+    if (films.length >= 2) { const avg = Math.round(films.reduce((s, x) => s + x.year, 0) / films.length); out.push(["🕰️", `From ${films[0].year} to ${films[films.length - 1].year}`, `Oldest: ${films[0].title}. Newest: ${films[films.length - 1].title}. Your average film is from ${avg}.`]); }
+    const rt = watched.filter(x => x.type !== "tv" && num(x.runtime)).sort((a, b) => b.runtime - a.runtime);
+    if (rt.length >= 2) out.push(["📏", `Longest sit: ${rt[0].title}`, `${fmtRun(rt[0].runtime)}. Quickest: ${rt[rt.length - 1].title}, ${fmtRun(rt[rt.length - 1].runtime)}.`]);
+    const days = {}; L.forEach(x => (x.log || []).forEach(l => { days[l.d] = (days[l.d] || 0) + l.n; }));
+    const best = Object.entries(days).sort((a, b) => b[1] - a[1])[0];
+    if (best && best[1] >= 2) out.push(["🍿", `Binge record: ${best[1]} episodes`, `in one day, on ${fmtDate(best[0])}.`]);
+    const ds = Object.keys(days).sort(); let run = 0, bestRun = 0, prev = null;
+    for (const d of ds) { const t = new Date(d + "T00:00:00").getTime(); run = prev && t - prev === 864e5 ? run + 1 : 1; bestRun = Math.max(bestRun, run); prev = t; }
+    if (bestRun >= 2) out.push(["🔥", `${bestRun}-day streak`, "your longest run of days in a row with episodes."]);
+    const wd = Array(7).fill(0); Object.entries(days).forEach(([d, n]) => { wd[new Date(d + "T00:00:00").getDay()] += n; });
+    watched.forEach(x => { if (/^\d{4}-\d{2}-\d{2}$/.test(x.finished || "")) wd[new Date(x.finished + "T00:00:00").getDay()] += 1; });
+    const wt = wd.reduce((a, b) => a + b, 0);
+    if (wt >= 4) { const i = wd.indexOf(Math.max(...wd)); out.push(["📅", `${DAYNAMES[i]}s are for watching`, `${Math.round(wd[i] / wt * 100)}% of what you log happens on a ${DAYNAMES[i]}.`]); }
+    const both = watched.filter(x => Number(x.rating) && x.imdb);
+    if (both.length >= 3) {
+      const diff = both.reduce((s, x) => s + (x.rating * 2 - x.imdb), 0) / both.length;
+      out.push(["⚖️", Math.abs(diff) < .3 ? "In tune with IMDb" : diff > 0 ? "Easier to please than IMDb" : "Tougher than IMDb", `you rate ${Math.abs(diff).toFixed(1)} points ${diff >= 0 ? "higher" : "lower"} than IMDb voters on average (out of 10).`]);
+      const gem = both.slice().sort((a, b) => (b.rating * 2 - b.imdb) - (a.rating * 2 - a.imdb))[0], hot = both.slice().sort((a, b) => (a.rating * 2 - a.imdb) - (b.rating * 2 - b.imdb))[0];
+      if (gem.rating * 2 - gem.imdb >= 1.5) out.push(["💘", `Your hidden gem: ${gem.title}`, `you gave it ${starTxt(gem.rating)}, IMDb only ${Number(gem.imdb).toFixed(1)}.`]);
+      if (hot.rating * 2 - hot.imdb <= -2) out.push(["🌶️", `Hot take: ${hot.title}`, `IMDb says ${Number(hot.imdb).toFixed(1)}, you say ${starTxt(hot.rating)}.`]);
+    }
+    const cs = [...new Set(watched.map(x => x.country).filter(Boolean))];
+    if (cs.length >= 2) out.push(["🌍", `${cs.length} countries`, `on your passport so far: ${cs.slice(0, 5).join(", ")}${cs.length > 5 ? "…" : ""}.`]);
+    const topShow = L.filter(x => x.type === "tv").sort((a, b) => epsWatched(b) - epsWatched(a))[0];
+    if (topShow && epsWatched(topShow) >= 5) out.push(["📺", `Most-watched show: ${topShow.title}`, `${epsWatched(topShow)} episodes, about ${fmtH(epsWatched(topShow) * epLen(topShow) / 60)}.`]);
+    const waiting = L.filter(x => x.status === "want" && x.added).sort((a, b) => a.added.localeCompare(b.added))[0];
+    if (waiting) { const d = Math.round((Date.now() - new Date(waiting.added + "T00:00:00")) / 864e5); if (d >= 7) out.push(["🪦", `Waiting longest: ${waiting.title}`, `on your watchlist for ${d} days. Tonight's the night?`]); }
+    const favs = watched.filter(x => x.fav).length; if (favs) out.push(["♥", `${favs} favourite${favs === 1 ? "" : "s"}`, `${Math.round(favs / Math.max(1, watched.length) * 100)}% of what you've seen made the cut.`]);
+    if (L.length >= 5) { const n = watched.length; out.push(["🎯", `${Math.round(n / L.length * 100)}% of your library seen`, `${n} of ${L.length} titles. ${L.filter(x => x.status === "want").length} still waiting.`]); }
+    const perfect = watched.filter(x => Number(x.rating) === 5).length; if (perfect) out.push(["🏆", `${perfect} perfect score${perfect === 1 ? "" : "s"}`, "five stars, no notes."]);
+    return out;
+  }
+  function funHTML(L){
+    const p = persona(L), facts = funFacts(L);
+    const watched = L.filter(x => x.status === "watched" || x.status === "watching");
+    const bingo = GENRE_RE.map(([name, re]) => { const r = new RegExp(re, "i"); const n = watched.filter(x => (x.genres || []).some(g => r.test(g))).length; return [name, n]; });
+    const got = bingo.filter(b => b[1]).length;
+    return `${p ? `<div class="persona"><span class="pe">${p[0]}</span><div><span class="mono">Your viewing personality</span><h3>${esc(p[1])}</h3><p>${esc(p[2])}</p></div></div>` : ""}
+      ${facts.length ? `<div class="fun">${facts.map(([e, t, d]) => `<div class="func"><span class="fe">${e}</span><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join("")}</div>` : ""}
+      <div class="panel" style="margin-top:14px"><div class="sechead"><h3>Genre bingo</h3><span class="mono">${got} of ${bingo.length}</span></div><div class="bingo">${bingo.map(([n, c]) => `<div class="bg${c ? " on" : ""}"><b>${esc(n)}</b><span>${c ? `${c} seen` : "not yet"}</span></div>`).join("")}</div>${got === bingo.length ? `<p class="note" style="margin:0">BINGO! You've seen every genre. 🎉</p>` : ""}</div>`;
   }
 
   // ================= poster picker: alternatives from IMDb, TVmaze, every Wikipedia, Wikidata and Commons =================
