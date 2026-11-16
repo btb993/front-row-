@@ -185,6 +185,7 @@ a{color:var(--accent)}
 .poster b{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:calc(var(--fs,14px)*1.4);line-height:.92;color:#fff;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;text-shadow:0 1px 6px rgba(0,0,0,.35)}
 .poster .py{font-family:var(--f-mono);font-size:calc(var(--fs,14px)*.64);color:var(--pb)}
 .poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity .35s}
+.poster img.logo{object-fit:contain;padding:22% 14% 44%;box-sizing:border-box;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .poster img.in{opacity:1}
 .poster::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.16),transparent 32%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);border-radius:inherit}
 .ribbon{position:absolute;z-index:4;top:8px;left:-4px;background:var(--gold);color:#1A0F0C;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px 2px 10px;border-radius:0 3px 3px 0;box-shadow:0 2px 6px rgba(0,0,0,.35)}
@@ -931,23 +932,26 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   }
   const yearText = it => it.type === "tv" && it.year ? `${it.year}–${it.endYear || ""}` : (it.year || "");
   // TV: Wikipedia mostly has the show's logo or title card, not a poster. Swap in TVmaze's poster (cached).
-  const TVP = lsGet("front-row-tvp", {});
+  const TVP = lsGet("front-row-tvp2", {});
   const tvKey = it => it.imdbId || ("t:" + norm(it.title || "") + ":" + (it.year || ""));
-  const tvWants = it => it.type === "tv" && !it.posterPicked && (!it.poster || /upload\.wikimedia\.org/.test(it.poster));
+  const tvWants = it => it.type === "tv" && !it.posterPicked && (!it.poster || /wikimedia\.org/.test(it.poster));
   let tvQ = [], tvBusy = 0, tvSaveT = null;
   async function tvLookup(k, imdb, title, year){
-    const get = u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null);
+    let failed = false;
+    const get = async u => { for (let a = 0; a < 4; a++) { try { const r = await fetch(u); if (r.status === 429) { await new Promise(ok => setTimeout(ok, 2500 * (a + 1))); continue; } if (r.status === 404) return null; if (!r.ok) { failed = true; return null; } return await r.json(); } catch { failed = true; return null; } } failed = true; return null; };
     let sh = imdb ? await get(`https://api.tvmaze.com/lookup/shows?imdb=${imdb}`) : null;
     if (!sh && title) { sh = await get(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(title)}`); if (sh && year && sh.premiered && Math.abs(+sh.premiered.slice(0, 4) - year) > 1) sh = null; }
-    return sh?.image?.medium || sh?.image?.original || "";
+    const url = sh?.image?.medium || sh?.image?.original || "";
+    return url || (failed ? null : "");
   }
   function tvPump(){
-    while (tvBusy < 3 && tvQ.length) {
+    while (tvBusy < 2 && tvQ.length) {
       const el = tvQ.shift(), k = el.dataset.tvq; if (k in TVP) { tvSwap(k); continue; }
       tvBusy++;
       tvLookup(k, el.dataset.tvi, el.dataset.tvt, Number(el.dataset.tvy) || 0).then(url => {
-        TVP[k] = url; clearTimeout(tvSaveT); tvSaveT = setTimeout(() => lsSet("front-row-tvp", TVP), 1500); tvSwap(k);
-      }).finally(() => { tvBusy--; setTimeout(tvPump, 120); });
+        if (url === null) { el.removeAttribute("data-tvqd"); return; }
+        TVP[k] = url; clearTimeout(tvSaveT); tvSaveT = setTimeout(() => lsSet("front-row-tvp2", TVP), 1500); tvSwap(k);
+      }).finally(() => { tvBusy--; setTimeout(tvPump, 400); });
     }
   }
   function tvSwap(k){
@@ -955,7 +959,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     document.querySelectorAll(`[data-tvq="${CSS.escape(k)}"]`).forEach(el => {
       el.removeAttribute("data-tvq"); let img = el.querySelector("img");
       if (!img) { img = document.createElement("img"); img.alt = ""; img.decoding = "async"; img.onload = () => img.classList.add("in"); el.querySelector(".pt")?.after(img); }
-      img.classList.remove("in"); img.src = url; if (img.complete) img.classList.add("in");
+      img.classList.remove("in", "logo"); img.src = url; if (img.complete) img.classList.add("in");
     });
   }
   new MutationObserver(() => { const els = document.querySelectorAll("[data-tvq]:not([data-tvqd])"); if (!els.length) return; els.forEach(el => { el.setAttribute("data-tvqd", ""); tvQ.push(el); }); tvPump(); }).observe(document.documentElement, { childList: true, subtree: true });
@@ -963,8 +967,8 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const [a, b] = palOf(it), tag = opt.tag || "div";
     let src = it.poster || "", tvq = "";
     if (tvWants(it)) { const k = tvKey(it); if (TVP[k]) src = TVP[k]; else if (!(k in TVP)) tvq = ` data-tvq="${esc(k)}" data-tvi="${esc(it.imdbId || "")}" data-tvt="${esc(it.title || "")}" data-tvy="${esc(it.year || "")}"`; }
-    const lazy = opt.eager ? "eager" : "lazy";
-    return `<${tag} class="poster"${tvq} ${opt.attrs || ""} style="${opt.style || ""}--pa:${a};--pb:${b}">${motif(it, b)}<div class="pt"><span class="ptype">${it.type === "tv" ? "Series" : "Film"}</span><b>${esc(it.title)}</b><span class="py">${esc(yearText(it))}</span></div>${src ? `<img src="${esc(src)}" alt="" loading="${lazy}" decoding="async" onload="this.classList.add('in')" onerror="var h=this.closest('.hp');if(h)h.classList.add('noimg');this.remove()">` : ""}${opt.extra || ""}</${tag}>`;
+    const lazy = opt.eager ? "eager" : "lazy", logo = it.type === "tv" && /wikimedia\.org/.test(src) && !it.posterPicked;
+    return `<${tag} class="poster"${tvq} ${opt.attrs || ""} style="${opt.style || ""}--pa:${a};--pb:${b}">${motif(it, b)}<div class="pt"><span class="ptype">${it.type === "tv" ? "Series" : "Film"}</span><b>${esc(it.title)}</b><span class="py">${esc(yearText(it))}</span></div>${src ? `<img${logo ? ' class="logo"' : ""} src="${esc(src)}" alt="" loading="${lazy}" decoding="async" onload="this.classList.add('in')" onerror="var h=this.closest('.hp');if(h)h.classList.add('noimg');this.remove()">` : ""}${opt.extra || ""}</${tag}>`;
   }
   const stars = n => starTxt(n);
   function scoresHTML(it){
@@ -2139,7 +2143,8 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   const cacheSet = (k, list) => { discCache[k] = { at: Date.now(), list }; const keys = Object.keys(discCache).sort((a, b) => discCache[b].at - discCache[a].at); keys.slice(24).forEach(x => delete discCache[x]); lsSet(LS_DISC, discCache); };
   async function browse(){
     const key = `b:${disc.type}:${disc.genre}:${disc.decade}`;
-    const hit = cacheGet(key, 5 * 864e5); if (hit) { disc.list = hit; return; }
+    const my = (browse.seq = (browse.seq || 0) + 1);
+    const hit = cacheGet(key, 5 * 864e5); if (hit) { disc.list = hit; disc.busy = false; disc.err = ""; if (view === "discover") renderDiscover(); return; }
     disc.busy = true; disc.err = ""; disc.list = null; if (view === "discover") renderDiscover();
     try {
       const tv = disc.type === "tv", types = tv ? "wd:Q5398426 wd:Q1259759 wd:Q581714 wd:Q63952888" : "wd:Q11424 wd:Q202866", dp = tv ? "P580" : "P577";
@@ -2154,8 +2159,9 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       const rows = await sparql(q);
       const list = await buildFromQids([...new Set(rows.map(qidOf))]);
       await rateList(list).catch(() => {});
-      disc.list = list; cacheSet(key, list);
-    } catch (e) { disc.err = navigator.onLine ? "Wikidata took too long to answer. Try again, or pick a decade to narrow it down." : "You're offline."; disc.list = []; }
+      cacheSet(key, list); if (my !== browse.seq) return;
+      disc.list = list;
+    } catch (e) { if (my !== browse.seq) return; disc.err = navigator.onLine ? "Wikidata took too long to answer. Try again, or pick a decade to narrow it down." : "You're offline."; disc.list = []; }
     disc.busy = false; if (view === "discover") renderDiscover();
   }
   async function loadTrending(){
@@ -2910,7 +2916,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       if (e1) throw e1;
       soc.me = me || null;
       const { error: e0 } = await C().from("fr_shelves").select("user_id").limit(1); if (e0) throw e0;
-      if (!me) { soc.state = "noprofile"; if (view === "friends") renderFriends(); return; }
+      if (!me) { soc.me = await autoProfile(); if (!soc.me) { soc.state = "noprofile"; if (view === "friends") renderFriends(); return; } }
       const { data: rel, error: e2 } = await C().from("sp_friends").select("requester, addressee, status, created_at").or(`requester.eq.${uid},addressee.eq.${uid}`);
       if (e2) throw e2;
       const otherOf = r => r.requester === uid ? r.addressee : r.requester;
@@ -2927,6 +2933,19 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       publishShelf();
     } catch (e) { soc.state = isMissing(e) ? "setup" : "error"; soc.err = e?.message || "Something went wrong."; }
     if (view === "friends" || view === "friend") render(); else if (view === "home") renderHome();
+  }
+  async function autoProfile(){
+    const u = U(), md = u.user_metadata || {}, mail = String(u.email || "").split("@")[0];
+    const name = String(md.name || md.full_name || mail || "Friend").slice(0, 40);
+    let base = (md.handle || mail || name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 16);
+    if (base.length < 3) base = (base + "fan").slice(0, 16);
+    for (let a = 0; a < 6; a++) {
+      const h = a ? base + Math.floor(10 + Math.random() * 989) : base;
+      const { data, error } = await C().from("sp_profiles").insert({ user_id: u.id, handle: h, name }).select("user_id, handle, name").maybeSingle();
+      if (!error && data) { toast(`Friends can find you as @${h}`); return data; }
+      if (error && !/duplicate|unique/i.test(error.message)) return null;
+    }
+    return null;
   }
   function shelfData(){
     const L = items(), w = L.filter(x => x.status === "watched");
@@ -2978,8 +2997,11 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     v.innerHTML = head + `
       <div class="mecard">${avatar(me, 58)}<div><b>${esc(me.name || me.handle)}</b><span class="muted">@${esc(me.handle)}${mineSh.persona ? ` · ${esc(mineSh.persona)}` : ""}</span>
         <label class="note" style="display:flex;gap:8px;align-items:center;margin-top:4px"><input type="checkbox" id="soc-share" ${sharing() ? "checked" : ""}> Friends can see my watchlist, seen titles, ratings and lists (never notes)</label></div>
-        <div class="qa"><button class="btn small gold" type="button" data-socinvite>Invite a friend</button><button class="btn small" type="button" data-socretry>Refresh</button></div></div>
-      <form class="ppq" id="soc-add" style="margin-top:14px"><input id="soc-addh" placeholder="Add a friend by @handle" autocapitalize="none" spellcheck="false"><button class="btn primary" type="submit">Send request</button></form>
+        <div class="qa"><button class="btn small" type="button" data-socedit>Edit profile</button><button class="btn small gold" type="button" data-socinvite>Invite a friend</button><button class="btn small" type="button" data-socretry>Refresh</button></div></div>
+      ${soc.edit ? `<form class="ppq" id="soc-edit" style="margin-top:10px"><input id="soc-eh" value="${esc(me.handle)}" maxlength="20" autocapitalize="none" spellcheck="false" aria-label="Handle"><input id="soc-en" value="${esc(me.name || "")}" maxlength="40" aria-label="Name"><button class="btn primary" type="submit">Save</button><button class="btn ghost" type="button" data-socedit>Cancel</button></form>${soc.hint ? `<p class="note">${esc(soc.hint)}</p>` : ""}` : ""}
+      <form class="ppq" id="soc-add" style="margin-top:14px"><input id="soc-addh" value="${esc(soc.findQ || "")}" placeholder="Find friends by name or @handle" autocapitalize="none" spellcheck="false"><button class="btn primary" type="submit">Search</button></form>
+      ${soc.found ? `<div class="panel" style="margin-top:10px">${soc.found.length ? soc.found.map(p => { const fr = soc.friends.some(f => f.user_id === p.user_id), out = soc.outgoing.some(f => f.user_id === p.user_id), inc = soc.incoming.some(f => f.user_id === p.user_id), me2 = p.user_id === U().id;
+          return `<div class="freq">${avatar(p, 36)}<span><b>${esc(p.name || p.handle)}</b> <span class="muted">@${esc(p.handle)}</span></span>${me2 ? `<span class="muted">That's you</span>` : fr ? `<span class="muted">✓ Friends</span>` : out ? `<span class="muted">Request sent</span>` : inc ? `<button class="btn small primary" type="button" data-socaccept="${esc(p.user_id)}">Accept</button>` : `<button class="btn small primary" type="button" data-socreq="${esc(p.user_id)}">Add friend</button>`}</div>`; }).join("") : `<p class="note" style="margin:0">Nobody found. They need to sign in to Front Row (or Save Point) once, then they show up here. You can also send them an invite.</p>`}</div>` : ""}
       ${soc.addMsg ? `<p class="note">${esc(soc.addMsg)}</p>` : ""}
       ${soc.incoming.length ? `<div class="panel" style="margin-top:14px"><h3>Friend requests</h3>${soc.incoming.map(f => `<div class="freq">${avatar(f, 36)}<span><b>${esc(f.name || f.handle)}</b> <span class="muted">@${esc(f.handle)}</span></span><button class="btn small primary" type="button" data-socaccept="${esc(f.user_id)}">Accept</button><button class="btn small ghost" type="button" data-socdecline="${esc(f.user_id)}">Decline</button></div>`).join("")}</div>` : ""}
       ${soc.outgoing.length ? `<p class="note">Waiting for: ${soc.outgoing.map(f => "@" + esc(f.handle)).join(", ")}</p>` : ""}
@@ -3535,13 +3557,11 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (f.id === "soc-prof") { e.preventDefault(); const h = $("#soc-handle").value.trim().toLowerCase().replace(/^@/, ""), n = $("#soc-name").value.trim();
       if (!/^[a-z0-9_]{3,20}$/.test(h)) { soc.hint = "Handles are 3–20 letters, numbers or _."; return renderFriends(); }
       C().from("sp_profiles").insert({ user_id: U().id, handle: h, name: n }).then(({ error }) => { if (error) { soc.hint = /duplicate|unique/i.test(error.message) ? "That handle is taken. Try another." : error.message; renderFriends(); } else { soc.hint = ""; toast(`You're @${h}`); loadSocial(true); } }); }
-    if (f.id === "soc-add") { e.preventDefault(); const h = $("#soc-addh").value.trim().toLowerCase().replace(/^@/, ""); if (!h) return;
-      (async () => { const { data: p } = await C().from("sp_profiles").select("user_id, handle, name").eq("handle", h).maybeSingle();
-        if (!p) soc.addMsg = `No one is called @${h} yet. Send them an invite.`; else if (p.user_id === U().id) soc.addMsg = "That's you!";
-        else if (soc.friends.some(f => f.user_id === p.user_id)) soc.addMsg = `You and @${h} are already friends.`;
-        else if (soc.incoming.some(f => f.user_id === p.user_id)) { await C().from("sp_friends").update({ status: "accepted" }).eq("requester", p.user_id).eq("addressee", U().id); soc.addMsg = `You and @${h} are now friends.`; }
-        else { const { error } = await C().from("sp_friends").insert({ requester: U().id, addressee: p.user_id }); soc.addMsg = error ? (/duplicate/i.test(error.message) ? `Request to @${h} already sent.` : error.message) : `Request sent to @${h}.`; }
-        await loadSocial(true); renderFriends(); })(); }
+    if (f.id === "soc-add") { e.preventDefault(); const q = $("#soc-addh").value.trim().replace(/^@/, "").replace(/[%,()]/g, ""); soc.findQ = q; soc.addMsg = ""; if (q.length < 2) { soc.found = null; return renderFriends(); }
+      C().from("sp_profiles").select("user_id, handle, name").or(`handle.ilike.%${q}%,name.ilike.%${q}%`).limit(25).then(({ data, error }) => { soc.found = error ? [] : (data || []); if (error) soc.addMsg = error.message; renderFriends(); }); }
+    if (f.id === "soc-edit") { e.preventDefault(); const h = $("#soc-eh").value.trim().toLowerCase().replace(/^@/, ""), n = $("#soc-en").value.trim();
+      if (!/^[a-z0-9_]{3,20}$/.test(h)) { soc.hint = "Handles are 3–20 letters, numbers or _."; return renderFriends(); }
+      C().from("sp_profiles").update({ handle: h, name: n, updated_at: new Date().toISOString() }).eq("user_id", U().id).then(({ error }) => { if (error) { soc.hint = /duplicate|unique/i.test(error.message) ? "That handle is taken. Try another." : error.message; return renderFriends(); } soc.edit = false; soc.hint = ""; toast(`Saved. You're @${h}`); loadSocial(true); }); }
     if (f.id === "pp-form") { e.preventDefault(); if (!pp) return; pp.q = $("#pp-q").value.trim(); if (!pp.q) return; pp.pending++; ppStatus(); const sig = pp.ctl.signal; commonsSearch(pp.q, sig).catch(() => {}).finally(() => { if (pp && !sig.aborted) { pp.pending--; ppStatus(); } }); }
     if (f.id === "popnew") { e.preventDefault(); const name = f.querySelector("input").value.trim(); if (!name) return; if (lists().some(l => norm(l.name) === norm(name))) { toast(`You already have a list called ${name}`); return; } const l = newListObj(name); setLists([...lists(), l]); const it = ensureIt(pop.key); if (it) upsert(setMember(it, l.id, true), `Created ${l.name} and added ${it.title}`); renderPop(); }
     if (f.id === "cardnewlist") { e.preventDefault(); const name = f.querySelector("input").value.trim(); if (!name || !draft) return; readFields(); let l = lists().find(x => norm(x.name) === norm(name)); if (!l) { l = newListObj(name); setLists([...lists(), l], `Created ${l.name}`); } if (!draft.lists.includes(l.id)) draft.lists.push(l.id); draft.listAdded = { ...(draft.listAdded || {}), [l.id]: Date.now() }; rerenderCard(); }
@@ -3652,6 +3672,8 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.socretry !== undefined) return loadSocial(true);
     if (D.copysocial !== undefined) { try { const sql = await fetch("supabase/social.sql").then(r => r.text()); await navigator.clipboard.writeText(sql); toast("Friends setup copied"); } catch { toast("Couldn't copy. Open supabase/social.sql on GitHub instead."); } return; }
     if (D.socinvite !== undefined) { const txt = `Come watch along with me on Front Row 🎬\n${location.origin}${location.pathname}\nCreate an account with the invite code ${INVITE}, then add me: @${soc.me?.handle || ""}\n(Already use Book Nook or Save Point? Just sign in with that account.)`; if (navigator.share) { try { await navigator.share({ text: txt }); } catch {} } else { try { await navigator.clipboard.writeText(txt); toast("Invite copied. Paste it to your friend."); } catch {} } return; }
+    if (D.socedit !== undefined) { soc.edit = !soc.edit; soc.hint = ""; return renderFriends(); }
+    if (D.socreq) { const { error } = await C().from("sp_friends").insert({ requester: U().id, addressee: D.socreq }); toast(error ? (/duplicate/i.test(error.message) ? "Request already sent" : error.message) : "Friend request sent"); return loadSocial(true); }
     if (D.socaccept) { await C().from("sp_friends").update({ status: "accepted" }).eq("requester", D.socaccept).eq("addressee", U().id); toast("Friend added"); return loadSocial(true); }
     if (D.socdecline) { await C().from("sp_friends").delete().eq("requester", D.socdecline).eq("addressee", U().id); return loadSocial(true); }
     if (D.socunfriend) { if (!confirmUnfriend || confirmUnfriend !== D.socunfriend) { confirmUnfriend = D.socunfriend; t.textContent = "Tap again to remove"; return; } confirmUnfriend = null; await C().from("sp_friends").delete().or(`and(requester.eq.${U().id},addressee.eq.${D.socunfriend}),and(requester.eq.${D.socunfriend},addressee.eq.${U().id})`); await loadSocial(true); return go("friends"); }
