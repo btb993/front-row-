@@ -36,6 +36,25 @@ What's in this folder
   Here, press "Restore a backup", paste it and press Restore.
   Posters and details are then looked up for every title.
 
+WHAT'S INSIDE (v1.9)
+  - Fixed: posters on search, Discover and recommendation cards were
+    invisible since v1.7.
+  - Home page: Continue watching (compact, scrolls sideways), What's
+    playing tonight, Movies to watch, Shows to start, Coming soon on
+    your list, Recommended for you, Trending and quick stats.
+  - The marquee is smaller and slims down on every page except Home;
+    real bulbs chase around the frame with a warm flicker, and the neon
+    flickers now and then.
+  - Movies and TV shows kept apart: big Movies / TV shows tabs on the
+    watchlist and Seen it (remembered), and a Movies / TV switch next to
+    the search.
+  - Episode checklist for every show (from TVmaze): season tabs, tick
+    episodes, "up to here", mark or unmark a whole season; season and
+    episode progress follow along.
+  - Recommendations: lookups run four at a time and are saved for a
+    week, results appear while they load, sequels and spin-offs of what
+    you loved come first, and weak picks (IMDb under 6) are left out.
+
 WHAT'S INSIDE (v1.8)
   - IMDb helper (recommended, one time, about 2 minutes): a tiny function
     on your Supabase (supabase/imdb/index.ts) that asks IMDb for the app,
