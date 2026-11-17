@@ -2693,7 +2693,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   // ================= in cinemas now (Wikidata: films released in the last ~7 weeks, best known first) =================
   let cin = { list: null, busy: false };
   async function loadCinema(){
-    const hit = cacheGet("cin", 864e5); if (hit) { cin.list = hit; return; }
+    const hit = cacheGet("cin2", 864e5); if (hit) { cin.list = hit; if (hit.some(r => r.imdbId && !r.imdb)) rateList(hit).then(() => { cin.list = hit.slice(); cacheSet("cin2", cin.list); if (view === "tv") renderTvGuide(); }).catch(() => {}); return; }
     if (cin.busy) return; cin.busy = true;
     try {
       const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
@@ -2703,7 +2703,10 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
         FILTER NOT EXISTS { ?item wdt:P577 ?old. FILTER(?old < "${day(-300)}T00:00:00Z"^^xsd:dateTime) }
       } GROUP BY ?item ?links ORDER BY DESC(?links) LIMIT 48`);
       const extra = {}; rows.forEach(b => { extra[qidOf(b)] = { release: String(b.date?.value || "").slice(0, 10) }; });
-      cin.list = await buildFromQids(rows.map(qidOf), null, extra); cacheSet("cin", cin.list);
+      const list = await buildFromQids(rows.map(qidOf), null, extra);
+      cin.list = list; cin.busy = false; if (view === "tv") renderTvGuide();
+      await rateList(list).catch(() => {});
+      cin.list = list.slice(); cacheSet("cin2", cin.list);
     } catch { cin.list = cin.list || []; }
     cin.busy = false; if (view === "tv") renderTvGuide(); else if (view === "home") renderHome();
   }
@@ -3882,7 +3885,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.stopnew !== undefined) return openStop(null);
     if (D.tvg) { tg.tab = D.tvg; if (view !== "tv") { go("tv"); scrollTo({ top: 0 }); } else renderTvGuide(); if (!newEps.at && !newEps.busy) checkNewEpisodes(); return; }
     if (D.tgup) { tg.up = D.tgup; return renderTvGuide(); }
-    if (D.cinretry !== undefined) { cacheSet("cin", null); cin.list = null; loadCinema(); return renderTvGuide(); }
+    if (D.cinretry !== undefined) { cacheSet("cin2", null); cin.list = null; loadCinema(); return renderTvGuide(); }
     if (D.stop) { const it = items().find(x => x.id === D.stop); return it && openStop(it); }
     if (D.pause) { const it = items().find(x => x.id === D.pause); return it && upsert({ ...it, paused: true }, `${it.title}: on a break. Find it under "On a break" on Home.`, true); }
     if (D.resume) { const it = items().find(x => x.id === D.resume); return it && upsert({ ...it, paused: false, updatedAt: Date.now() }, `${it.title}: back to watching`, true); }
