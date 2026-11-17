@@ -306,7 +306,7 @@ select.sel{border:1px solid var(--line);background:var(--panel);border-radius:9p
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .panel.wide{grid-column:1/-1}
 .hbars{display:grid;gap:8px}
-.hb{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:14.5px}
+.hb{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14.5px}
 .hb .k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hb .tr{height:12px;border-radius:0 4px 4px 0;background:var(--bg2);overflow:hidden}
 .hb .tr span{display:block;height:100%;border-radius:0 4px 4px 0;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 60%,var(--gold)))}
@@ -776,6 +776,7 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* v2.2: ready-made lists, import, friends */
+.dist.eph{grid-template-columns:repeat(12,minmax(0,1fr))}.dist.eph .db i{background:var(--blue)}
 .tgtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .tgtile{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;color:var(--ink);font:inherit;cursor:pointer;min-height:92px}
 .tgtile:hover{border-color:var(--gold)}
@@ -790,7 +791,8 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .tgtabs button small{margin-left:6px;opacity:.65;font-size:12px}
 .tgtabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .tggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
-.tggrid .cw1{flex:none;width:auto}
+.tggrid .cw1{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:10px;border-radius:14px;background:linear-gradient(180deg,var(--house),var(--house2));color:var(--cream);box-shadow:var(--shadow)}
+.tggrid .cw1 .poster{width:76px}
 .tglist{display:grid;gap:8px}
 .tgep{display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
 .tgep .poster,.tgshow .poster{border-radius:6px;--fs:7px}
@@ -2091,9 +2093,10 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   }
 
   // ================= stats =================
+  let stT = lsGet("front-row-stt", "all");
   function renderStats(){
-    const v = $("#view-stats"), L = items();
-    if (!L.length) { v.innerHTML = `<div class="empty"><h3>No stats yet</h3><span class="serif">Add and watch a few things and your numbers show up here.</span></div>`; return; }
+    const ALL = items(), L = stT === "all" ? ALL : ALL.filter(x => (x.type === "tv") === (stT === "tv")), v = $("#view-stats");
+    if (!ALL.length) { v.innerHTML = `<div class="empty"><h3>No stats yet</h3><span class="serif">Add and watch a few things and your numbers show up here.</span></div>`; return; }
     const watched = L.filter(x => x.status === "watched");
     const films = watched.filter(x => x.type !== "tv").length, shows = watched.length - films;
     const eps = L.reduce((s, x) => s + (x.type === "tv" ? epsWatched(x) : 0), 0);
@@ -2106,7 +2109,27 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const yr = new Date().getFullYear();
     const months = Array.from({ length: 12 }, () => ({ movie: 0, tv: 0 }));
     const thisYear = watched.filter(x => x.finished && x.finished.startsWith(String(yr))).sort((a, b) => a.finished.localeCompare(b.finished));
-    thisYear.forEach(x => { if (x.finished.length >= 7) months[Number(x.finished.slice(5, 7)) - 1][x.type === "tv" ? "tv" : "movie"]++; });
+    let noMonth = 0; thisYear.forEach(x => { if (x.finished.length >= 7) months[Number(x.finished.slice(5, 7)) - 1][x.type === "tv" ? "tv" : "movie"]++; else noMonth++; });
+    const mMax = Math.max(1, ...months.map(m => m.movie + m.tv));
+    // more numbers
+    const hb = (rows, max, fmt = n => n) => `<div class="hbars">${rows.map(([k, n, sub]) => `<div class="hb"><span class="k">${esc(String(k))}</span><span class="tr"><span style="width:${(n / max) * 100}%"></span></span><span class="n">${fmt(n)}${sub ? `<small> ${esc(sub)}</small>` : ""}</span></div>`).join("")}</div>`;
+    const vsI = rated.filter(x => x.imdb).map(x => [x, Number(x.rating) * 2 - Number(x.imdb)]);
+    const vsAvg = vsI.length ? vsI.reduce((s, [, d]) => s + d, 0) / vsI.length : 0;
+    const loveMore = vsI.slice().sort((a, b) => b[1] - a[1]).filter(([, d]) => d >= 1).slice(0, 4), loveLess = vsI.slice().sort((a, b) => a[1] - b[1]).filter(([, d]) => d <= -1).slice(0, 4);
+    const byYr = {}; watched.forEach(x => { const y = (x.finished || "").slice(0, 4); if (y) byYr[y] = (byYr[y] || 0) + 1; });
+    const yrs = Object.entries(byYr).sort((a, b) => b[0] - a[0]).slice(0, 8), yrMax = Math.max(1, ...yrs.map(y => y[1]));
+    const cty = {}; watched.forEach(x => { const c = x.country || ""; if (c) cty[c] = (cty[c] || 0) + 1; });
+    const ctop = Object.entries(cty).sort((a, b) => b[1] - a[1]).slice(0, 8), cMax = ctop[0]?.[1] || 1;
+    const fW = watched.filter(x => x.type !== "tv" && num(x.runtime) > 0), fMins = fW.reduce((s, x) => s + num(x.runtime), 0);
+    const longest = fW.slice().sort((a, b) => num(b.runtime) - num(a.runtime))[0], shortest = fW.slice().sort((a, b) => num(a.runtime) - num(b.runtime))[0];
+    const yrsSeen = watched.map(x => Number(x.year)).filter(Boolean).sort((a, b) => a - b), median = yrsSeen.length ? yrsSeen[Math.floor(yrsSeen.length / 2)] : 0;
+    const oldest = watched.filter(x => x.year).sort((a, b) => a.year - b.year)[0], newest = watched.filter(x => x.year).sort((a, b) => b.year - a.year)[0];
+    const tvL = ALL.filter(x => x.type === "tv");
+    const tvSt = [["Watching", tvL.filter(x => x.status === "watching" && !x.paused).length], ["On a break", tvL.filter(x => x.status === "watching" && x.paused).length], ["Finished", tvL.filter(x => x.status === "watched").length], ["Watchlist", tvL.filter(x => x.status === "want").length], ["Dropped", tvL.filter(x => x.status === "dropped").length]].filter(r => r[1]);
+    const bigShows = tvL.map(x => [x, epsWatched(x)]).filter(r => r[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 8), bigMax = bigShows[0]?.[1] || 1;
+    const epM = Array(12).fill(0); tvL.forEach(x => (x.log || []).forEach(l => { if (String(l.d).startsWith(String(yr))) epM[Number(l.d.slice(5, 7)) - 1] += num(l.n); }));
+    const epMax = Math.max(1, ...epM), epYear = epM.reduce((s, n) => s + n, 0);
+    const libSt = [["Seen", L.filter(x => x.status === "watched").length], ["Watching", L.filter(x => x.status === "watching").length], ["Want to watch", L.filter(x => x.status === "want").length], ["Dropped", L.filter(x => x.status === "dropped").length]].filter(r => r[1]), libMax = Math.max(1, ...libSt.map(r => r[1]));
     const top = rated.slice().sort((a, b) => b.rating - a.rating || (b.finished || "").localeCompare(a.finished || "")).slice(0, 10);
     const people = {}; L.filter(x => x.status !== "dropped" && x.creator).forEach(x => x.creator.split(", ").forEach(p => { people[p] = (people[p] || 0) + 1; }));
     const ptop = Object.entries(people).filter(p => p[1] > 1).sort((a, b) => b[1] - a[1]).slice(0, 6);
@@ -2117,19 +2140,22 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const dist = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map(r => [r, rated.filter(x => Number(x.rating) === r).length]), rmax = Math.max(1, ...dist.map(d => d[1]));
     const byG = {}; rated.forEach(x => (x.genres || []).forEach(g => { (byG[g] = byG[g] || []).push(Number(x.rating)); }));
     const gbest = Object.entries(byG).filter(([, a]) => a.length >= 2).map(([g, a]) => [g, a.reduce((s, x) => s + x, 0) / a.length, a.length]).sort((a, b) => b[1] - a[1]).slice(0, 6);
-    v.innerHTML = `<div class="sechead" style="margin-bottom:14px"><h2>Box office</h2><span class="serif">Your viewing, by the numbers</span></div>
+    v.innerHTML = `<div class="sechead" style="margin-bottom:10px"><h2>Box office</h2><span class="serif">Your viewing, by the numbers</span></div>
+      <div class="seg" role="tablist" style="margin-bottom:14px">${[["all", "Everything"], ["movie", "🎬 Films"], ["tv", "📺 TV shows"]].map(([k, t]) => `<button type="button" data-stt="${k}" aria-pressed="${stT === k}">${t}</button>`).join("")}</div>
       <div class="kpis">
-        <div class="kpi"><span class="v">${films}</span><span class="s">films seen</span></div>
-        <div class="kpi"><span class="v">${shows}</span><span class="s">series finished</span></div>
-        <div class="kpi"><span class="v">${eps.toLocaleString()}</span><span class="s">episodes logged</span></div>
+        ${stT !== "tv" ? `<div class="kpi"><span class="v">${films}</span><span class="s">films seen</span></div>` : ""}
+        ${stT !== "movie" ? `<div class="kpi"><span class="v">${shows}</span><span class="s">series finished</span></div>
+        <div class="kpi"><span class="v">${eps.toLocaleString()}</span><span class="s">episodes logged</span></div>` : ""}
+        ${stT === "movie" && fW.length ? `<div class="kpi"><span class="v">${Math.round(fMins / fW.length)} min</span><span class="s">average film length</span></div>` : ""}
+        <div class="kpi"><span class="v">${thisYear.length}</span><span class="s">seen in ${yr}</span></div>
         <div class="kpi"><span class="v">${fmtH(hours)}</span><span class="s">in front of the screen</span></div>
         <div class="kpi"><span class="v">${avg ? avg.toFixed(1) + "★" : "–"}</span><span class="s">your average rating</span></div>
         <div class="kpi"><span class="v">${fmtH(left)}</span><span class="s">to clear the watchlist</span></div>
       </div>
       ${funHTML(L)}
       <div class="panels">
-        <div class="panel wide"><div class="sechead"><h3>Ticket stubs, ${yr}</h3><span class="mono">${thisYear.length} seen</span></div>${thisYear.length ? `<div class="stubs">${thisYear.slice().reverse().slice(0, 40).map(x => `<button class="tstub" type="button" data-open="${esc(x.id)}" style="--r:${(hashNum(x.id, 5) - 2) * .6}deg">${posterHTML(x)}<span style="min-width:0"><small><span>ADMIT ONE</span><span>${esc(fmtDate(x.finished).replace(/ \d{4}$/, ""))}</span></small><b>${esc(x.title)}</b><small><span>${x.type === "tv" ? "Series" : "Film"}</span><span class="st">${x.rating ? starTxt(x.rating) : ""}</span></small></span></button>`).join("")}</div>` : `<span class="muted">Everything you finish this year gets a stub here.</span>`}</div>
-        <div class="panel"><h3>Finished in ${yr}</h3><div class="months">${months.map((m, i) => `<div class="mo" title="${MONTHS[i]}: ${m.movie} films, ${m.tv} series"><span class="n">${m.movie + m.tv || ""}</span><div class="c">${'<i class="movie"></i>'.repeat(Math.min(m.movie, 12))}${'<i class="tv"></i>'.repeat(Math.min(m.tv, 12))}</div><span class="m">${MONTHS[i]}</span></div>`).join("")}</div><div class="legend"><span><i style="background:var(--gold)"></i>Films</span><span><i style="background:var(--blue)"></i>Series</span></div></div>
+        <div class="panel wide"><div class="sechead"><h3>Ticket stubs, ${yr}</h3><span class="mono">${thisYear.length} seen</span></div>${thisYear.length ? `<div class="stubs">${thisYear.slice().reverse().slice(0, 40).map(x => `<button class="tstub" type="button" data-open="${esc(x.id)}" style="--r:${(hashNum(x.id, 5) - 2) * .6}deg">${posterHTML(x)}<span style="min-width:0"><small><span>ADMIT ONE</span><span>${x.finished.length >= 7 ? esc(fmtDate(x.finished).replace(/ \d{4}$/, "")) : ""}</span></small><b>${esc(x.title)}</b><small><span>${x.type === "tv" ? "Series" : "Film"}</span><span class="st">${x.rating ? starTxt(x.rating) : ""}</span></small></span></button>`).join("")}</div>` : `<span class="muted">Everything you finish this year gets a stub here.</span>`}</div>
+        <div class="panel"><h3>Finished in ${yr}</h3><div class="months">${months.map((m, i) => `<div class="mo" title="${MONTHS[i]}: ${m.movie} films, ${m.tv} series"><span class="n">${m.movie + m.tv || ""}</span><div class="c">${'<i class="movie"></i>'.repeat(Math.min(m.movie, 12))}${'<i class="tv"></i>'.repeat(Math.min(m.tv, 12))}</div><span class="m">${MONTHS[i]}</span></div>`).join("")}</div>${noMonth ? `<p class="note" style="margin:6px 0 0">+ ${noMonth} seen in ${yr} without a month set. Pick the date in a title's window to place it here.</p>` : ""}<div class="legend"><span><i style="background:var(--gold)"></i>Films</span><span><i style="background:var(--blue)"></i>Series</span></div></div>
         <div class="panel"><h3>Your genres</h3>${gtop.length ? `<div class="hbars">${gtop.map(([g, n]) => `<div class="hb"><span class="k">${esc(g)}</span><span class="tr"><span style="width:${(n / gmax * 100).toFixed(1)}%"></span></span><span class="v">${n}</span></div>`).join("")}</div>` : `<span class="muted">Genres show up once titles have them.</span>`}</div>
         <div class="panel"><h3>Your top ten</h3>${top.length ? `<ol class="toplist">${top.map(x => `<li><button type="button" data-open="${esc(x.id)}">${esc(x.title)}</button><span class="stars">${stars(x.rating)}</span></li>`).join("")}</ol>` : `<span class="muted">Rate what you watch and your favourites collect here.</span>`}</div>
         ${rated.length ? `<div class="panel"><h3>How you rate</h3><div class="dist">${dist.map(([r, n]) => `<div class="db" title="${r} stars: ${n}"><span class="n">${n || ""}</span><i style="height:${(n / rmax * 100).toFixed(0)}%"></i><span class="m">${r % 1 ? "½" : r + "★"}</span></div>`).join("")}</div></div>` : ""}
@@ -2137,6 +2163,15 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
         ${gbest.length ? `<div class="panel"><h3>Genres you rate highest</h3><ol class="toplist">${gbest.map(([g, a, n]) => `<li><span>${esc(g)}</span><span class="muted">${a.toFixed(1)}★ · ${n}</span></li>`).join("")}</ol></div>` : ""}
         ${atop.length ? `<div class="panel"><h3>Actors you keep seeing</h3><ol class="toplist">${atop.map(([p, n]) => `<li><span>${esc(p)}</span><span class="muted">${n} titles</span></li>`).join("")}</ol></div>` : ""}
         ${ptop.length ? `<div class="panel"><h3>Directors and creators you return to</h3><ol class="toplist">${ptop.map(([p, n]) => `<li><span>${esc(p)}</span><span class="muted">${n} titles</span></li>`).join("")}</ol></div>` : ""}
+        ${stT !== "movie" && epYear ? `<div class="panel"><h3>Episodes in ${yr}</h3><div class="dist eph">${epM.map((n, i) => `<div class="db" title="${MONTHS[i]}: ${n} episodes"><span class="n">${n || ""}</span><i style="height:${(n / epMax * 100).toFixed(0)}%"></i><span class="m">${MONTHS[i].slice(0, 3)}</span></div>`).join("")}</div><p class="note" style="margin:6px 0 0">${epYear} episodes ticked off this year</p></div>` : ""}
+        ${stT !== "movie" && bigShows.length ? `<div class="panel"><h3>Shows you've sunk the most into</h3>${hb(bigShows.map(([x, n]) => [x.title, n]), bigMax, n => n + " eps")}</div>` : ""}
+        ${stT !== "movie" && tvSt.length ? `<div class="panel"><h3>Your shows</h3>${hb(tvSt, Math.max(...tvSt.map(r => r[1])))}</div>` : ""}
+        ${stT !== "tv" && fW.length ? `<div class="panel"><h3>Film lengths</h3><ol class="toplist"><li><span>Average</span><span class="muted">${Math.round(fMins / fW.length)} min</span></li><li><span>All films together</span><span class="muted">${fmtH(fMins / 60)}</span></li>${longest ? `<li><button type="button" data-open="${esc(longest.id)}">Longest: ${esc(longest.title)}</button><span class="muted">${fmtRun(longest.runtime)}</span></li>` : ""}${shortest && shortest !== longest ? `<li><button type="button" data-open="${esc(shortest.id)}">Shortest: ${esc(shortest.title)}</button><span class="muted">${fmtRun(shortest.runtime)}</span></li>` : ""}</ol></div>` : ""}
+        ${vsI.length >= 3 ? `<div class="panel"><h3>You vs IMDb</h3><p class="note" style="margin:0 0 8px">On average you rate <b>${Math.abs(vsAvg).toFixed(1)} points ${vsAvg >= 0 ? "higher" : "lower"}</b> than IMDb (out of 10), across ${vsI.length} titles.</p>${loveMore.length ? `<span class="lbl">You liked more</span><ol class="toplist">${loveMore.map(([x, d]) => `<li><button type="button" data-open="${esc(x.id)}">${esc(x.title)}</button><span class="muted">you ${(x.rating * 2).toFixed(0)} · IMDb ${Number(x.imdb).toFixed(1)}</span></li>`).join("")}</ol>` : ""}${loveLess.length ? `<span class="lbl" style="margin-top:8px">You liked less</span><ol class="toplist">${loveLess.map(([x, d]) => `<li><button type="button" data-open="${esc(x.id)}">${esc(x.title)}</button><span class="muted">you ${(x.rating * 2).toFixed(0)} · IMDb ${Number(x.imdb).toFixed(1)}</span></li>`).join("")}</ol>` : ""}</div>` : ""}
+        ${yrs.length ? `<div class="panel"><h3>Seen per year</h3>${hb(yrs, yrMax)}<p class="note" style="margin:6px 0 0">${watched.filter(x => !x.finished).length} seen titles have no date</p></div>` : ""}
+        ${ctop.length ? `<div class="panel"><h3>Where it's from</h3>${hb(ctop, cMax)}</div>` : ""}
+        ${yrsSeen.length ? `<div class="panel"><h3>Release years</h3><ol class="toplist">${oldest ? `<li><button type="button" data-open="${esc(oldest.id)}">Oldest: ${esc(oldest.title)}</button><span class="muted">${oldest.year}</span></li>` : ""}${newest ? `<li><button type="button" data-open="${esc(newest.id)}">Newest: ${esc(newest.title)}</button><span class="muted">${newest.year}</span></li>` : ""}<li><span>Typical release year</span><span class="muted">${median}</span></li><li><span>From before 1980</span><span class="muted">${yrsSeen.filter(y => y < 1980).length}</span></li><li><span>From the last 5 years</span><span class="muted">${yrsSeen.filter(y => y > yr - 5).length}</span></li></ol></div>` : ""}
+        ${libSt.length ? `<div class="panel"><h3>Your library</h3>${hb(libSt, libMax)}</div>` : ""}
       </div>`;
   }
 
@@ -3928,6 +3963,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.ftab) { fv.tab = D.ftab; return renderFriend(); }
     if (D.fitem) { const x = friendItem(D.fitem, D.k); if (!x) return; const r = fromShelf(x), have = findSame(r); return have ? openCard(have) : openCard({ ...r, status: "want" }, { isNew: true, hint: `${soc.friends.find(f => f.user_id === D.fitem)?.name || "Your friend"} ${verb(x)} it` }); }
     if (D.fadd) { const x = friendItem(D.fadd, D.k); if (!x) return; addFrom(fromShelf(x), D.st, {}, D.st === "watched"); return view === "friend" ? renderFriend() : renderFriends(); }
+    if (D.stt) { stT = D.stt; lsSet("front-row-stt", stT); return renderStats(); }
     if (D.snrate !== undefined) { sn.rf = sn.rf === "unrated" ? "" : "unrated"; return renderSeen(); }
     if (D.recs !== undefined) { if (POOL && quickRecs(String(Date.now()))) { toast("Fresh picks"); return; } return buildRecs(); }
     if (D.recdeep !== undefined) return buildRecs();
