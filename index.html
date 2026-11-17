@@ -3753,9 +3753,11 @@ alter publication supabase_realtime add table public.${TABLE};`;
   }
 
   // keep each sideways row scrolled where it was when the page redraws
-  function rowKeys(){ const m = new Map(); document.querySelectorAll(".row").forEach(r => { const box = r.closest("[id]"), all = box ? [...box.querySelectorAll(".row")] : []; m.set((box?.id || "") + ":" + all.indexOf(r), r); }); return m; }
+  // every sideways-scrolling strip (poster rows, list pickers, filter chips, season tabs) keeps its place when the page redraws
+  const HSCROLL = ".row, .blkeys, .chips, .stabs, .tgtabs, .seenfilters, .bigtabs";
+  function rowKeys(){ const m = new Map(); document.querySelectorAll(HSCROLL).forEach(r => { const box = r.closest("[id]"), cls = r.className.split(" ")[0], all = box ? [...box.querySelectorAll("." + cls)] : []; m.set((box?.id || "") + ":" + cls + ":" + all.indexOf(r), r); }); return m; }
   function keepRows(fn){ return function(...a){ const before = []; rowKeys().forEach((r, k) => { if (r.scrollLeft) before.push([k, r.scrollLeft]); }); const out = fn.apply(this, a); if (before.length) { const now = rowKeys(); before.forEach(([k, x]) => { const r = now.get(k); if (r) r.scrollLeft = x; }); } return out; }; }
-  renderHome = keepRows(renderHome); render = keepRows(render); renderResults = keepRows(renderResults); renderSeen = keepRows(renderSeen); renderDiscover = keepRows(renderDiscover); renderLibrary = keepRows(renderLibrary); rerenderCard = keepRows(rerenderCard);
+  renderHome = keepRows(renderHome); render = keepRows(render); renderResults = keepRows(renderResults); renderSeen = keepRows(renderSeen); renderDiscover = keepRows(renderDiscover); renderLibrary = keepRows(renderLibrary); rerenderCard = keepRows(rerenderCard); renderTvGuide = keepRows(renderTvGuide); renderStats = keepRows(renderStats);
 
   // ================= events =================
   $("#search-form").addEventListener("submit", e => { e.preventDefault(); clearTimeout(typeTimer); runSearch($("#q").value); $("#q").blur(); });
