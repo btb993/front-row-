@@ -776,6 +776,32 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* v2.2: ready-made lists, import, friends */
+.tgtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tgtile{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;color:var(--ink);font:inherit;cursor:pointer;min-height:92px}
+.tgtile:hover{border-color:var(--gold)}
+.tgtile.hot{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.tgtile .tgk{font-weight:700;font-size:15px}
+.tgtile>b{font-family:var(--f-display,inherit);font-size:30px;line-height:1;color:var(--gold)}
+.tgtile>.muted,.tgtile>.tgminis{grid-column:1/-1;font-size:13px}
+.tgminis{display:flex;gap:5px}
+.tgmini{width:34px;flex:none}.tgmini .poster{border-radius:5px;--fs:6px}
+.tgtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px}
+.tgtabs button{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.tgtabs button small{margin-left:6px;opacity:.65;font-size:12px}
+.tgtabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.tggrid .cw1{flex:none;width:auto}
+.tglist{display:grid;gap:8px}
+.tgep{display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.tgep .poster,.tgshow .poster{border-radius:6px;--fs:7px}
+.tgep .tgb,.tgshow .tgb{display:grid;gap:2px;min-width:0}
+.tgep .tgb span{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tgd{font-weight:700;font-size:14px;text-align:right;display:grid}
+.tgd small{font-weight:400;color:var(--muted);font-size:11.5px}
+.tgh{margin:16px 0 8px;font-size:22px}
+.tgshow{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.tgsl{display:grid;gap:3px;margin-top:6px;font-size:13.5px}
+@media (max-width:600px){.tgtiles{grid-template-columns:1fr 1fr;gap:7px}.tgtile{min-height:0;padding:9px 11px;gap:2px 8px}.tgtile .tgk{font-size:12.5px;line-height:1.2}.tgtile>b{font-size:22px}.tgtile>.tgminis{display:none}.tgtile>.muted{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tggrid{grid-template-columns:1fr}.tgep{grid-template-columns:38px minmax(0,1fr) auto;gap:10px}.tgep .btn{grid-column:2/-1;justify-self:start}}
 .seenhead{margin-bottom:8px;align-items:baseline;flex-wrap:wrap;gap:4px 14px}
 .seenline{font-size:14px;color:var(--muted)}
 .seenacts{display:flex;gap:6px;flex-wrap:wrap}
@@ -892,6 +918,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   <main id="view-seen" hidden></main>
   <main id="view-discover" hidden></main>
   <main id="view-blitz" hidden></main>
+  <main id="view-tv" hidden></main>
   <main id="view-friends" hidden></main>
   <main id="view-friend" hidden></main>
   <main id="view-lists" hidden></main>
@@ -1530,7 +1557,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       renderResults();
     }
   }
-  const resultAt = key => { const [src, i] = String(key).split(":"); return (src === "w" ? res.works : src === "m" ? moreList : src === "x" ? recShown() : src === "a" ? adder?.web : src === "t" ? disc.trend : src === "u" ? disc.up : src === "d" ? disc.list : res.items)?.[Number(i)]; };
+  const resultAt = key => { const [src, i] = String(key).split(":"); return (src === "w" ? res.works : src === "m" ? moreList : src === "x" ? recShown() : src === "a" ? adder?.web : src === "t" ? disc.trend : src === "u" ? disc.up : src === "d" ? disc.list : src === "c" ? cin.list : res.items)?.[Number(i)]; };
   function addResult(r, st, extra = {}){
     if (!r) return;
     const have = findSame(r); if (have) { toast(`${r.title} is already in your library`); return; }
@@ -2368,9 +2395,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const eps = L.reduce((s, x) => s + (x.type === "tv" ? epsWatched(x) : 0), 0);
     const ready = L.filter(x => (x.status === "want" || x.status === "watching") && onMine(x)).sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0) || (b.imdb || 0) - (a.imdb || 0)).slice(0, 18);
     v.innerHTML = `
-      ${newEpsHTML()}
-      <section class="hsec"><div class="sechead"><h2>Continue watching</h2><span class="qa" style="margin:0"><button class="btn small gold" type="button" data-stopnew>+ A show I'm in the middle of</button>${watching.length > 3 ? `<button class="linkbtn" type="button" data-seeall="watching">All ${watching.length} →</button>` : ""}</span></div>${watching.length ? `<div class="row cwrow">${watching.map(cwCard).join("")}</div>` : `<p class="note">Nothing on the go. Add a show you're part-way through and pick the last episode you saw.</p>`}</section>
-      ${paused.length ? `<section class="hsec"><div class="sechead"><h2>On a break</h2><span class="serif">Pick up where you left off, whenever</span></div><div class="row cwrow">${paused.map(it => cwCard(it, true)).join("")}</div></section>` : ""}
+      ${(!cin.list && !cin.busy && navigator.onLine ? (setTimeout(loadCinema, 1500), "") : "")}${homeTvHTML()}
       ${homeFriendsHTML()}
       <section class="hsec"><button class="tcta" type="button" data-go="tonight"><span class="admit2">ADMIT ONE</span><span><b>What's playing tonight?</b><span>Pick by mood, time and rating from your watchlist</span></span><span class="go">→</span></button></section>
       ${ready.length ? `<section class="hsec"><div class="sechead"><h2>Ready to stream</h2><span class="serif">On your services right now</span></div>${homeRow(ready)}</section>` : ""}
@@ -2601,21 +2626,25 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   async function checkNewEpisodes(){
     if (newEps.busy || !navigator.onLine) return; newEps.busy = true;
     const today = todayISO(), from = new Date(Date.now() - 14 * 864e5).toISOString().slice(0, 10), to = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
-    const shows = items().filter(x => x.type === "tv" && (x.status === "watching" || (x.status === "watched" && x.showStatus !== "Ended"))).slice(0, 25);
-    const list = [], soon = [];
+    const upTo = new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10);
+    const rank = x => x.status === "watching" ? 0 : x.status === "watched" ? 1 : 2;
+    const shows = items().filter(x => x.type === "tv" && x.showStatus !== "Ended" && (x.status === "watching" || x.status === "watched" || x.status === "want")).sort((a, b) => rank(a) - rank(b)).slice(0, 60);
+    const list = [], soon = [], up = [];
     for (const s of shows) {
       try {
         if (!s.tvmaze) { const t = await tvInfo(s); const cur = items().find(x => x.id === s.id); if (cur && t) upsert(applyTv(cur, t)); }
         const it = items().find(x => x.id === s.id); const eps = await showEps(it); if (!eps) continue;
         const seen = seenKeys(it, eps);
-        eps.filter(([k, air]) => air && air >= from && air <= today && !seen.has(k)).forEach(([k, air, name]) => list.push({ it, k, air, name }));
+        if (it.status !== "want") eps.filter(([k, air]) => air && air >= from && air <= today && !seen.has(k)).forEach(([k, air, name]) => list.push({ it, k, air, name }));
+        eps.filter(([, air]) => air && air > today && air <= upTo).slice(0, 12).forEach(([k, air, name]) => up.push({ it, k, air, name }));
         eps.filter(([, air]) => air && air > today && air <= to).forEach(([k, air, name]) => soon.push({ it, k, air, name }));
       } catch {}
     }
     list.sort((a, b) => b.air.localeCompare(a.air)); soon.sort((a, b) => a.air.localeCompare(b.air));
-    newEps = { list, soon, busy: false, at: Date.now() };
+    up.sort((a, b) => a.air.localeCompare(b.air) || a.it.title.localeCompare(b.it.title));
+    newEps = { list, soon, up, busy: false, at: Date.now() };
     notifyNew(list);
-    if (view === "home") renderHome();
+    if (view === "home") renderHome(); else if (view === "tv") renderTvGuide();
     const dot = $(".nav [data-go='home']"); if (dot) dot.classList.toggle("hasnew", list.length > 0);
   }
   const epLabel = k => { const [s, e] = k.split("-"); return `S${s} E${e}`; };
@@ -2626,13 +2655,83 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       ${newEps.list.length ? `<div class="row nerow">${newEps.list.slice(0, 20).map(n => `<div class="ne">${posterHTML(n.it, { tag: "button", attrs: `type="button" data-open="${esc(n.it.id)}"` })}<div><b>${esc(n.it.title)}</b><span class="nek">${epLabel(n.k)}${n.name ? ` · ${esc(n.name)}` : ""}</span><span class="muted">Out ${esc(dayName(n.air))}</span><button class="btn small good" type="button" data-newep="${esc(n.it.id)}" data-k="${esc(n.k)}">✓ Watched</button></div></div>`).join("")}</div>` : ""}
       ${newEps.soon.length ? `<div class="soon"><span class="lbl">This week</span>${newEps.soon.slice(0, 8).map(n => `<button type="button" data-open="${esc(n.it.id)}"><b>${esc(DAYNAMES[new Date(n.air + "T00:00:00").getDay()].slice(0, 3))}</b> ${esc(n.it.title)} · ${epLabel(n.k)}</button>`).join("")}</div>` : ""}</section>`;
   }
+  // ================= in cinemas now (Wikidata: films released in the last ~7 weeks, best known first) =================
+  let cin = { list: null, busy: false };
+  async function loadCinema(){
+    const hit = cacheGet("cin", 864e5); if (hit) { cin.list = hit; return; }
+    if (cin.busy) return; cin.busy = true;
+    try {
+      const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+      const rows = await sparql(`SELECT ?item ?links (MAX(?d) AS ?date) WHERE {
+        ?item wdt:P31 wd:Q11424; wikibase:sitelinks ?links. FILTER(?links >= 10)
+        ?item wdt:P577 ?d. FILTER(?d >= "${day(-50)}T00:00:00Z"^^xsd:dateTime && ?d <= "${day(0)}T23:59:59Z"^^xsd:dateTime)
+        FILTER NOT EXISTS { ?item wdt:P577 ?old. FILTER(?old < "${day(-300)}T00:00:00Z"^^xsd:dateTime) }
+      } GROUP BY ?item ?links ORDER BY DESC(?links) LIMIT 48`);
+      const extra = {}; rows.forEach(b => { extra[qidOf(b)] = { release: String(b.date?.value || "").slice(0, 10) }; });
+      cin.list = await buildFromQids(rows.map(qidOf), null, extra); cacheSet("cin", cin.list);
+    } catch { cin.list = cin.list || []; }
+    cin.busy = false; if (view === "tv") renderTvGuide(); else if (view === "home") renderHome();
+  }
+
+  // ================= TV guide: continue watching, new episodes, coming up, on a break =================
+  let tg = { tab: "next", up: "date" };
+  function tvGroups(){
+    const L = items(), by = (a, b) => (b.updatedAt || 0) - (a.updatedAt || 0);
+    return { watching: L.filter(x => x.status === "watching" && !x.paused).sort(by), paused: L.filter(x => x.status === "watching" && x.paused).sort(by) };
+  }
+  const shortDay = iso => { if (iso < todayISO()) { const t = dayName(iso); return t[0].toUpperCase() + t.slice(1); } const d = Math.round((new Date(iso + "T00:00:00") - new Date(todayISO() + "T00:00:00")) / 864e5); return d === 0 ? "Today" : d === 1 ? "Tomorrow" : d < 7 ? DAYNAMES[new Date(iso + "T00:00:00").getDay()] : fmtDate(iso); };
+  const myFilmsUp = () => items().filter(x => x.type !== "tv" && x.status !== "dropped" && x.status !== "watched" && x.release && x.release > todayISO()).sort((a, b) => a.release.localeCompare(b.release));
+  function homeTvHTML(){
+    const { watching, paused } = tvGroups(), nNew = newEps.list.length, up = newEps.up || [], fu = myFilmsUp();
+    const minis = arr => `<span class="tgminis">${arr.slice(0, 4).map(it => `<span class="tgmini">${posterHTML(it)}</span>`).join("")}</span>`;
+    const nextUp = up[0];
+    return `<section class="hsec"><div class="sechead"><h2>What's on</h2><button class="btn small gold" type="button" data-stopnew>+ A show I'm in the middle of</button></div>
+      <div class="tgtiles">
+        <button class="tgtile" type="button" data-tvg="next"><span class="tgk">▶ Continue watching</span><b>${watching.length}</b>${watching.length ? minis(watching) : `<span class="muted">Nothing on the go</span>`}</button>
+        <button class="tgtile${nNew ? " hot" : ""}" type="button" data-tvg="new"><span class="tgk">🆕 New episodes</span><b>${nNew}</b>${nNew ? minis([...new Map(newEps.list.map(n => [n.it.id, n.it])).values()]) : `<span class="muted">${newEps.busy ? "Checking…" : "All caught up"}</span>`}</button>
+        <button class="tgtile" type="button" data-tvg="up"><span class="tgk">📅 Coming up</span><b>${up.length}</b>${nextUp ? `<span class="muted">Next: ${esc(nextUp.it.title)} · ${esc(shortDay(nextUp.air))}</span>` : `<span class="muted">${newEps.busy ? "Checking…" : "No dates announced"}</span>`}</button>
+        <button class="tgtile" type="button" data-tvg="films"><span class="tgk">🎬 My upcoming films</span><b>${fu.length}</b>${fu[0] ? `<span class="muted">Next: ${esc(fu[0].title)} · ${esc(shortDay(fu[0].release))}</span>` : `<span class="muted">None on your list yet</span>`}</button>
+        <button class="tgtile" type="button" data-tvg="cinema"><span class="tgk">🍿 In cinemas now</span><b>${cin.list ? cin.list.length : "…"}</b>${cin.list?.length ? minis(cin.list) : `<span class="muted">${cin.busy || !cin.list ? "Checking…" : "Couldn't load"}</span>`}</button>
+        ${paused.length ? `<button class="tgtile" type="button" data-tvg="break"><span class="tgk">⏸ On a break</span><b>${paused.length}</b>${minis(paused)}</button>` : ""}
+      </div></section>`;
+  }
+  function renderTvGuide(){
+    const v = $("#view-tv"), { watching, paused } = tvGroups(), up = newEps.up || [], fu = myFilmsUp();
+    if (!cin.list && !cin.busy) loadCinema();
+    const tabs = [["next", "▶ Continue watching", watching.length], ["new", "🆕 New episodes", newEps.list.length], ["up", "📅 TV coming up", up.length], ["films", "🎬 My upcoming films", fu.length], ["cinema", "🍿 In cinemas now", cin.list ? cin.list.length : "…"], ["break", "⏸ On a break", paused.length]];
+    let body = "";
+    const epRow = (n, act) => `<div class="tgep">${posterHTML(n.it, { tag: "button", attrs: `type="button" data-open="${esc(n.it.id)}"` })}<div class="tgb"><b>${esc(n.it.title)}</b><span><span class="mono">${epLabel(n.k)}</span>${n.name ? ` · ${esc(n.name)}` : ""}</span></div><span class="tgd">${esc(shortDay(n.air))}${shortDay(n.air) !== fmtDate(n.air) ? `<small>${esc(fmtDate(n.air))}</small>` : ""}</span>${act || ""}</div>`;
+    if (tg.tab === "next") body = watching.length ? `<div class="tggrid">${watching.map(it => cwCard(it)).join("")}</div>` : `<div class="empty"><h3>Nothing on the go</h3><button class="btn gold" type="button" data-stopnew>+ A show I'm in the middle of</button></div>`;
+    else if (tg.tab === "break") body = paused.length ? `<div class="tggrid">${paused.map(it => cwCard(it, true)).join("")}</div>` : `<p class="status">No shows on a break. Press ⏸ on one you're watching to park it here.</p>`;
+    else if (tg.tab === "new") body = newEps.list.length ? `<div class="tglist">${newEps.list.map(n => epRow(n, `<button class="btn small good" type="button" data-newep="${esc(n.it.id)}" data-k="${esc(n.k)}">✓ Watched</button>`)).join("")}</div>` : `<p class="status">${newEps.busy ? `<span class="dots">Checking your shows</span>` : "All caught up. New episodes from the last two weeks show up here."}</p>`;
+    else if (tg.tab === "films") body = fu.length ? `<div class="tglist">${fu.map(it => `<div class="tgep">${posterHTML(it, { tag: "button", attrs: `type="button" data-open="${esc(it.id)}"` })}<div class="tgb"><b>${esc(it.title)}</b><span>${esc([it.creator, (it.genres || []).slice(0, 2).join(", ")].filter(Boolean).join(" · "))}</span></div><span class="tgd">${esc(shortDay(it.release))}${shortDay(it.release) !== fmtDate(it.release) ? `<small>${esc(fmtDate(it.release))}</small>` : ""}</span></div>`).join("")}</div>`
+      : `<p class="status">No unreleased films on your watchlist. Find some under Discover → Coming soon, or <button class="linkbtn" type="button" data-go="discover">open Discover</button>.</p>`;
+    else if (tg.tab === "cinema") body = cin.list?.length ? `<p class="note" style="margin-top:0">Films released in the last seven weeks, best known first. What's actually showing depends on your local cinema.</p><div class="rgrid">${cin.list.map((r, i) => rcHTML(r, i, "c")).join("")}</div>`
+      : `<p class="status">${cin.busy || !cin.list ? `<span class="dots">Finding what's in cinemas</span>` : `Couldn't load that right now. <button class="linkbtn" type="button" data-cinretry>Try again</button>`}</p>`;
+    else if (tg.tab === "up") {
+      if (!up.length) body = `<p class="status">${newEps.busy ? `<span class="dots">Checking your shows</span>` : "No upcoming episode dates announced for your shows yet."}</p>`;
+      else if (tg.up === "show") {
+        const byShow = new Map(); up.forEach(n => { if (!byShow.has(n.it.id)) byShow.set(n.it.id, []); byShow.get(n.it.id).push(n); });
+        body = [...byShow.values()].map(ns => { const it = ns[0].it; return `<div class="tgshow">${posterHTML(it, { tag: "button", attrs: `type="button" data-open="${esc(it.id)}"` })}<div class="tgb"><b>${esc(it.title)}</b><span class="muted">${ns.length} episode${ns.length > 1 ? "s" : ""} announced · next ${esc(shortDay(ns[0].air))}</span>
+          <div class="tgsl">${ns.map(n => `<span><span class="mono">${epLabel(n.k)}</span> ${n.name ? esc(n.name) + " · " : ""}<b>${esc(fmtDate(n.air))}</b></span>`).join("")}</div></div></div>`; }).join("");
+      } else {
+        const groups = {}; up.forEach(n => { const d = Math.round((new Date(n.air + "T00:00:00") - new Date(todayISO() + "T00:00:00")) / 864e5); const g = d <= 0 ? "Today" : d === 1 ? "Tomorrow" : d < 7 ? "This week" : d < 31 ? "This month" : "Later"; (groups[g] = groups[g] || []).push(n); });
+        body = ["Today", "Tomorrow", "This week", "This month", "Later"].filter(g => groups[g]).map(g => `<h3 class="tgh">${g}</h3><div class="tglist">${groups[g].map(n => epRow(n)).join("")}</div>`).join("");
+      }
+      body = `<div class="seg" role="group" style="margin-bottom:12px"><button type="button" data-tgup="date" aria-pressed="${tg.up === "date"}">By date</button><button type="button" data-tgup="show" aria-pressed="${tg.up === "show"}">By show</button></div>` + body;
+    }
+    v.innerHTML = `<button class="back" type="button" data-go="home">← Home</button>
+      <div class="sechead" style="margin-bottom:12px"><h2>What's on</h2><button class="btn small gold" type="button" data-stopnew>+ A show I'm in the middle of</button></div>
+      <div class="tgtabs">${tabs.map(([k, t, n]) => `<button type="button" data-tvg="${k}" aria-pressed="${tg.tab === k}">${t}<small>${n}</small></button>`).join("")}</div>
+      ${body}`;
+  }
   function markNewEp(id, k){
     const it = items().find(x => x.id === id); if (!it) return;
     const st = epStore[it.tvmaze]?.eps || [], seen = seenKeys(it, st); seen.add(k);
     const order = st.filter(([kk]) => seen.has(kk)), last = order[order.length - 1]?.[0] || k, [s, e] = last.split("-").map(Number);
     const d = todayISO(), log = (it.log || []).map(l => ({ ...l })), same = log.find(l => l.d === d); if (same) same.n += 1; else log.push({ d, n: 1 });
     upsert({ ...it, paused: false, epsSeen: [...seen], watchedEps: seen.size, season: s, episode: e, log, status: it.status === "want" ? "watching" : it.status }, `${it.title}: ${epLabel(k)} watched`, true);
-    newEps.list = newEps.list.filter(n => !(n.it.id === id && n.k === k)); renderHome();
+    newEps.list = newEps.list.filter(n => !(n.it.id === id && n.k === k)); if (view === "tv") renderTvGuide(); else renderHome();
   }
   async function notifyNew(list){
     if (!lsGet("front-row-notify", false) || !("Notification" in window) || Notification.permission !== "granted") return;
@@ -3598,19 +3697,19 @@ alter publication supabase_realtime add table public.${TABLE};`;
     view = v;
     document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     closePop(); if (v === "discover") openDiscover();
-    document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v === "blitz" ? "seen" : v === "friend" ? "friends" : v)) b.setAttribute("aria-current", "page"); });
+    document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v === "blitz" ? "seen" : v === "friend" ? "friends" : v === "tv" ? "home" : v)) b.setAttribute("aria-current", "page"); });
     $("#marquee").classList.toggle("slim", v !== "home"); setTimeout(layBulbs, 0);
     if (v === "home") openHome();
     if (v === "blitz" && !bz.list && !bz.busy) loadBlitz();
     if (v === "friends") loadSocial(); if (v === "blitz" && !LISTS) loadPool();
-    ["home","library","seen","discover","blitz","friends","friend","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
+    ["home","tv","library","seen","discover","blitz","friends","friend","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
     const hv = v === "list" ? "list-" + curList : v;
     if (location.hash.slice(1) !== hv) history.replaceState(null, "", v === "home" ? location.pathname + location.search : "#" + hv);
     render();
   }
   function render(){
     renderMarquee(); $("#now").hidden = true;
-    if (view === "home") renderHome(); else if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else if (view === "friends") renderFriends(); else if (view === "friend") renderFriend(); else if (view === "blitz") renderBlitz(); else renderStats();
+    if (view === "home") renderHome(); else if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else if (view === "friends") renderFriends(); else if (view === "friend") renderFriend(); else if (view === "blitz") renderBlitz(); else if (view === "tv") renderTvGuide(); else renderStats();
     if (res.state === "done") renderResults();
     if (pop) renderPop();
   }
@@ -3635,7 +3734,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("#install-btn").hidden = false; });
   $("#install-btn").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; $("#install-btn").hidden = true; });
   addEventListener("appinstalled", () => { $("#install-btn").hidden = true; toast("Front Row is installed"); });
-  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["home","library","seen","discover","blitz","friends","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
+  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["home","tv","library","seen","discover","blitz","friends","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
   addEventListener("hashchange", routeHash);
   addEventListener("scroll", () => { if (pop && !$("#pop-root .sheet")) closePop(); }, { passive: true });
   addEventListener("resize", () => closePop());
@@ -3746,6 +3845,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.open) { const it = items().find(x => x.id === D.open); if (it) { closeModal(); openCard(it); } return; }
     if (D.ep) return plusEp(D.ep, t);
     if (D.stopnew !== undefined) return openStop(null);
+    if (D.tvg) { tg.tab = D.tvg; if (view !== "tv") { go("tv"); scrollTo({ top: 0 }); } else renderTvGuide(); if (!newEps.at && !newEps.busy) checkNewEpisodes(); return; }
+    if (D.tgup) { tg.up = D.tgup; return renderTvGuide(); }
+    if (D.cinretry !== undefined) { cacheSet("cin", null); cin.list = null; loadCinema(); return renderTvGuide(); }
     if (D.stop) { const it = items().find(x => x.id === D.stop); return it && openStop(it); }
     if (D.pause) { const it = items().find(x => x.id === D.pause); return it && upsert({ ...it, paused: true }, `${it.title}: on a break. Find it under "On a break" on Home.`, true); }
     if (D.resume) { const it = items().find(x => x.id === D.resume); return it && upsert({ ...it, paused: false, updatedAt: Date.now() }, `${it.title}: back to watching`, true); }
