@@ -776,6 +776,26 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* v2.2: ready-made lists, import, friends */
+.seenhead{margin-bottom:8px;align-items:baseline;flex-wrap:wrap;gap:4px 14px}
+.seenline{font-size:14px;color:var(--muted)}
+.seenacts{display:flex;gap:6px;flex-wrap:wrap}
+.seenbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seenbar .seg small{opacity:.6;font-size:11px}
+.seenbar .filterq{flex:1;min-width:180px;margin:0}
+.seenfilters{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.seenfilters .sel{flex:none;font-size:13px;padding-top:6px;padding-bottom:6px}
+@media (max-width:600px){
+  #view-seen .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 8px}
+  #view-seen .grid .t{font-size:13px}
+  #view-seen .yhead h3{font-size:26px}
+  #view-seen .grid .crate{display:flex;align-items:center;justify-content:space-between;gap:2px}
+  #view-seen .grid .rs{width:18px;height:18px;font-size:16px;padding:0}
+  #view-seen .grid .rs i::before{width:18px;height:18px}
+  #view-seen .grid .rnum{display:none}
+  #view-seen .grid .fav{font-size:16px;padding:0 2px}
+  #view-seen .grid .f{font-size:11px}
+  .seenbar .seg{width:100%}.seenbar .seg button{flex:1}
+}
 .stpres{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
 .stpr{display:flex;gap:10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;color:var(--ink);font:inherit;cursor:pointer}
 .stpr .poster{width:46px;flex:none;border-radius:6px}
@@ -921,7 +941,17 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   const items = () => lib.items, lists = () => lib.lists;
   if (!lib.posterFix) { lib.items = lib.items.map(x => x.poster ? x : { ...x, lookedUp: false }); lib.posterFix = 1; }
   if (!lib.undated) { const now = Date.now(); lib.items = lib.items.map(x => x.status === "watched" && x.finished && x.finished === x.added && !x.dateSet ? { ...x, finished: "", updatedAt: now } : x); lib.undated = 1; try { localStorage.setItem("front-row-library", JSON.stringify(lib)); } catch {} }
-  function saveLocal(){ if (!lsSet(LS, lib)) toast("This browser's storage is full. Remove a few uploaded poster images."); }
+  function autoDate(){
+    const yNow = new Date().getFullYear(), today = todayISO(); let n = 0;
+    lib.items = lib.items.map(x => {
+      const y = Number(x.year);
+      if (x.status !== "watched" || x.finished || x.autoDated || !y || y < 2026 || y > yNow) return x;
+      const added = String(x.added || ""), d = added.slice(0, 4) >= String(y) && added <= today ? added : today;
+      n++; return { ...x, finished: d, dateSet: true, autoDated: true, updatedAt: Date.now() };
+    });
+    return n;
+  }
+  function saveLocal(){ autoDate(); if (!lsSet(LS, lib)) toast("This browser's storage is full. Remove a few uploaded poster images."); }
   function commit(){ saveLocal(); render(); sync.schedule(); try { publishShelf(); } catch {} }
   function upsert(it, msg, undo){
     it.updatedAt = Date.now();
@@ -1874,22 +1904,16 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       const groups = {}; L.forEach(x => { const y = (x.finished || "").slice(0, 4) || "Date not set"; (groups[y] = groups[y] || []).push(x); });
       grid = Object.keys(groups).sort((a, b) => a === "Date not set" ? 1 : b === "Date not set" ? -1 : b.localeCompare(a)).map(y => `<div class="yhead"><h3>${esc(y)}</h3><span class="mono">${groups[y].length} seen</span></div><div class="grid">${groups[y].map(it => cardW(it, { rate: true })).join("")}</div>`).join("");
     } else if (L.length) grid = `<div class="grid">${L.map(it => cardW(it, { rate: true })).join("")}</div>`;
-    v.innerHTML = `<div class="sechead" style="margin-bottom:14px"><h2>Seen it</h2><span class="serif">Your collection of everything watched</span></div>
-      ${all.length ? `<div class="kpis">
-        <div class="kpi"><span class="v">${films}</span><span class="s">films</span></div><div class="kpi"><span class="v">${shows}</span><span class="s">series</span></div>
-        <div class="kpi"><span class="v">${fmtH(hours)}</span><span class="s">watched</span></div><div class="kpi"><span class="v">${avg ? avg.toFixed(1) + "★" : "–"}</span><span class="s">average rating</span></div>
-        <div class="kpi"><span class="v">${favs}</span><span class="s">favourites ♥</span></div></div>` : ""}
-      <div class="qa" style="margin-top:14px"><button class="btn gold" type="button" data-seenmode>+ Add something you've already seen</button><button class="btn" type="button" data-go="blitz">⚡ Seen-it blitz</button><button class="btn" type="button" data-import>Import or paste a list</button><button class="btn ghost" type="button" data-go="stats">All statistics →</button></div>
-      ${unrated.length ? `<div class="panel" style="margin-top:18px"><div class="sechead"><h3>How was it?</h3><span class="muted" style="font-size:14px">${all.filter(x => !x.rating).length} not rated yet · tap a star, the left half gives a half star</span></div><div class="row">${unrated.map(it => `<div class="rc">${posterHTML(it, { tag: "button", attrs: `type="button" class="pb" data-open="${esc(it.id)}"` })}<span class="t">${esc(it.title)}</span>${rateHTML(it)}</div>`).join("")}</div></div>` : ""}
-      ${recsHTML()}
-      <div style="margin-top:22px">${all.length ? `<div class="sechead"><h3 style="font-size:28px">The collection</h3><span class="mono">${L.length} of ${all.length}</span></div>
-        <div class="bigtabs" role="tablist" style="margin-top:10px">${[["movie", "🎬 Movies"], ["tv", "📺 TV shows"], ["all", "Both"]].map(([k, t]) => `<button type="button" role="tab" data-snt="${k}" aria-selected="${sn.type === k}">${t}<span class="n">${all.filter(x => k === "all" || (x.type || "movie") === k).length}</span></button>`).join("")}</div>
-        <div class="ctrl" style="margin-top:10px"><span></span>
-          <div class="tools" style="margin:0"><select class="sel" id="sn-rf" aria-label="Rating">${[["", "Any rating"], ["fav", "Favourites ♥"], ["5", "5 stars"], ["4", "4 stars and up"], ["3", "3 stars and up"], ["unrated", "Not rated"]].map(([k, t]) => `<option value="${k}" ${sn.rf === k ? "selected" : ""}>${t}</option>`).join("")}</select>
+    const nUnrated = all.filter(x => !x.rating).length;
+    v.innerHTML = `<div class="sechead seenhead"><h2>Seen it</h2>${all.length ? `<span class="seenline">${films} films · ${shows} series · ${fmtH(hours)}${avg ? ` · ${avg.toFixed(1)}★ average` : ""}${favs ? ` · ${favs} ♥` : ""} <button class="linkbtn" type="button" data-go="stats">Stats →</button></span>` : ""}</div>
+      <div class="seenacts"><button class="btn small gold" type="button" data-seenmode>+ Add seen</button><button class="btn small" type="button" data-go="blitz">⚡ Blitz</button><button class="btn small" type="button" data-import>Import</button>${nUnrated ? `<button class="btn small ghost" type="button" data-snrate aria-pressed="${sn.rf === "unrated"}">☆ ${nUnrated} to rate</button>` : ""}</div>
+      <div style="margin-top:12px">${all.length ? `
+        <div class="seenbar"><div class="seg" role="tablist">${[["movie", "Movies"], ["tv", "TV shows"], ["all", "Both"]].map(([k, t]) => `<button type="button" role="tab" data-snt="${k}" aria-pressed="${sn.type === k}">${t} <small>${all.filter(x => k === "all" || (x.type || "movie") === k).length}</small></button>`).join("")}</div>
+          <input class="filterq" id="sn-q" type="search" placeholder="Filter by title or person" value="${esc(sn.q)}"></div>
+        <div class="seenfilters"><select class="sel" id="sn-rf" aria-label="Rating">${[["", "Any rating"], ["fav", "Favourites ♥"], ["5", "5 stars"], ["4", "4 stars and up"], ["3", "3 stars and up"], ["unrated", "Not rated"]].map(([k, t]) => `<option value="${k}" ${sn.rf === k ? "selected" : ""}>${t}</option>`).join("")}</select>
           ${genres.length ? `<select class="sel" id="sn-genre" aria-label="Genre"><option value="">All genres</option>${genres.map(g => `<option ${sn.genre === g ? "selected" : ""}>${esc(g)}</option>`).join("")}</select>` : ""}
           ${minSel("sn-min", sn.min)}
-          <select class="sel" id="sn-sort" aria-label="Sort">${[["finished", "When I watched it"], ["rating", "My rating"], ["imdb", "IMDb rating"], ["year", "Release year"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${sn.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select></div></div>
-        <input class="filterq" id="sn-q" type="search" placeholder="Filter by title or person" value="${esc(sn.q)}" style="margin-top:10px;width:100%">
+          <select class="sel" id="sn-sort" aria-label="Sort">${[["finished", "When I watched it"], ["rating", "My rating"], ["imdb", "IMDb rating"], ["year", "Release year"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${sn.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select>${L.length !== all.length ? `<span class="mono" style="font-size:12px;align-self:center;white-space:nowrap">${L.length} of ${all.length}</span>` : ""}</div>
         ${grid || `<div class="empty"><h3>No matches</h3><span class="serif">Try a different filter.</span></div>`}`
       : `<div class="empty"><h3>Nothing seen yet</h3><span class="serif">Add the films and series you've already watched, rate them, and recommendations follow.</span><button class="btn gold" type="button" data-seenmode>+ Add something you've seen</button></div>`}</div>`;
   }
@@ -3800,6 +3824,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.ftab) { fv.tab = D.ftab; return renderFriend(); }
     if (D.fitem) { const x = friendItem(D.fitem, D.k); if (!x) return; const r = fromShelf(x), have = findSame(r); return have ? openCard(have) : openCard({ ...r, status: "want" }, { isNew: true, hint: `${soc.friends.find(f => f.user_id === D.fitem)?.name || "Your friend"} ${verb(x)} it` }); }
     if (D.fadd) { const x = friendItem(D.fadd, D.k); if (!x) return; addFrom(fromShelf(x), D.st, {}, D.st === "watched"); return view === "friend" ? renderFriend() : renderFriends(); }
+    if (D.snrate !== undefined) { sn.rf = sn.rf === "unrated" ? "" : "unrated"; return renderSeen(); }
     if (D.recs !== undefined) { if (POOL && quickRecs(String(Date.now()))) { toast("Fresh picks"); return; } return buildRecs(); }
     if (D.recdeep !== undefined) return buildRecs();
     if (D.nope) { lib.notForMe = [...new Set([...(lib.notForMe || []), D.nope])]; commit(); toast("Got it, not for you"); return; }
