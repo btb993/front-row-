@@ -2433,7 +2433,9 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       <div class="eplist">${list.map(e => { const on = seen.has(e.k), fut = !e.air || e.air > today; return `<div class="eprow${on ? " on" : ""}${fut ? " fut" : ""}"><button type="button" class="epck" data-epk="${e.k}" aria-pressed="${on}" aria-label="Season ${e.s} episode ${e.n}${on ? ", watched" : ""}" ${fut ? "disabled" : ""}>${on ? "✓" : ""}</button><span class="epn">E${e.n}</span><span class="ept">${esc(e.name)}</span><span class="epd">${fut ? (e.air ? `Airs ${esc(fmtDate(e.air))}` : "Not aired yet") : esc(fmtDate(e.air))}</span>${!fut && !on ? `<button type="button" class="epupto" data-epupto="${e.k}" title="Mark every episode up to this one">up to here</button>` : ""}</div>`; }).join("")}</div>
       <div class="chips">${aired.length && nSeen < aired.length ? `<button class="btn small gold" type="button" data-epseason="${cur}" data-on="1">✓ Mark season ${cur} watched</button>` : ""}${nSeen ? `<button class="btn small ghost" type="button" data-epseason="${cur}" data-on="0">Unmark season ${cur}</button>` : ""}</div></div>`;
   }
-  function paintEps(){ const el = $("#eps"); if (el) el.outerHTML = epsHTML(); }
+  // keep the season tabs where they were scrolled to, and bring the chosen season into view
+  function keepTabs(fn){ const sl = $(".stabs")?.scrollLeft || 0; fn(); const t = $(".stabs"); if (t) { t.scrollLeft = sl; const a = t.querySelector('[aria-pressed="true"]'); if (a && (a.offsetLeft < t.scrollLeft || a.offsetLeft + a.offsetWidth > t.scrollLeft + t.clientWidth)) t.scrollLeft = a.offsetLeft - t.clientWidth / 2 + a.offsetWidth / 2; } }
+  function paintEps(){ keepTabs(() => { const el = $("#eps"); if (el) el.outerHTML = epsHTML(); }); }
   function applyEps(set){
     if (!draft || !draftEps) return;
     readFields();
@@ -3365,7 +3367,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     if ($("#f-finished")) d.finished = g("#f-finished") || g("#f-fyear") || "";
     if ($("#f-rew")) d.rewatches = num(g("#f-rew"));
   }
-  function rerenderCard(){ const open = $("details.more")?.open, st = $(".modal")?.scrollTop || 0; renderCard(open); const m = $(".modal"); if (m) m.scrollTop = st; }
+  function rerenderCard(){ const open = $("details.more")?.open, st = $(".modal")?.scrollTop || 0; keepTabs(() => renderCard(open)); const m = $(".modal"); if (m) m.scrollTop = st; }
   function saveDraft(){
     readFields(); const d = draft;
     if (!d.title) { toast("Give it a title first."); const det = $("details.more"); if (det) det.open = true; $("#f-title")?.focus(); return; }
@@ -3862,7 +3864,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.eps) { epSeason = Number(D.eps); return paintEps(); }
     if (D.epk && draftEps) { const set = new Set(draft.epsSeen || []); set.has(D.epk) ? set.delete(D.epk) : set.add(D.epk); return applyEps(set); }
     if (D.epupto && draftEps) { const set = new Set(draft.epsSeen || []), today = todayISO(); for (const e of draftEps.eps) { if (e.air && e.air <= today) set.add(e.k); if (e.k === D.epupto) break; } return applyEps(set); }
-    if (D.epseason && draftEps) { const set = new Set(draft.epsSeen || []), s0 = Number(D.epseason), today = todayISO(); draftEps.eps.filter(e => e.s === s0 && (D.on === "0" || (e.air && e.air <= today))).forEach(e => D.on === "1" ? set.add(e.k) : set.delete(e.k)); return applyEps(set); }
+    if (D.epseason && draftEps) { const set = new Set(draft.epsSeen || []), s0 = Number(D.epseason), today = todayISO(); draftEps.eps.filter(e => e.s === s0 && (D.on === "0" || (e.air && e.air <= today))).forEach(e => D.on === "1" ? set.add(e.k) : set.delete(e.k));
+      if (D.on === "1") { const next = [...new Set(draftEps.eps.map(e => e.s))].find(s => s > s0 && draftEps.eps.some(e => e.s === s && e.air && e.air <= today)); if (next) epSeason = next; }
+      return applyEps(set); }
     if (D.ffav !== undefined) { readFields(); draft.fav = !draft.fav; return rerenderCard(); }
     if (D.flist) { readFields(); const i = draft.lists.indexOf(D.flist); draft.listAdded = { ...(draft.listAdded || {}) }; if (i >= 0) { draft.lists.splice(i, 1); delete draft.listAdded[D.flist]; } else { draft.lists.push(D.flist); draft.listAdded[D.flist] = Date.now(); } return rerenderCard(); }
   });
