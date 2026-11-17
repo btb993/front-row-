@@ -103,6 +103,8 @@ for (let i = 0; i < qids.length; i += 50) {
     const { type, n } = pool.get(q), tv = type === "tv", imdb = strs(e, "P345").find(x => /^tt\d+$/.test(x)) || "";
     const ys = tv ? (years(e, "P580").length ? years(e, "P580") : years(e, "P577")) : years(e, "P577"), ends = years(e, "P582");
     let cr = ids(e, tv ? "P170" : "P57"); if (!cr.length) cr = ids(e, tv ? "P57" : "P170");
+    if (ids(e, "P31").some(c => c === "Q5" || c === "Q16334295" || c === "Q43229")) continue;   // people, groups, organisations (from award lists)
+    if (!ys.length && !imdb) continue;
     const t = label(e) || e.sitelinks?.enwiki?.title || ""; if (!t) continue;
     raw[q] = { g: ids(e, "P136").slice(0, 6), cr: cr.slice(0, 2), co: ids(e, "P495").slice(0, 1) };
     [...raw[q].g, ...raw[q].cr, ...raw[q].co].forEach(x => refs.add(x));

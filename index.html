@@ -2686,7 +2686,9 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   function loadPool(){
     if (poolP) return poolP;
     poolP = Promise.all([fetch("data/pool.json").then(r => r.ok ? r.json() : null), fetch("data/lists.json").then(r => r.ok ? r.json() : null)])
-      .then(([p, l]) => { if (p?.items && l?.lists) { POOL = p.items; LISTS = l.lists; } return !!POOL; }).catch(() => false)
+      .then(([p, l]) => { if (p?.items && l?.lists) {
+        for (const [q, x] of Object.entries(p.items)) if (!x.y && !x.i) delete p.items[q];   // people that slipped in through award lists
+        POOL = p.items; LISTS = l.lists.map(x => ({ ...x, ids: x.ids.filter(q => POOL[q]) })).filter(x => x.ids.length >= 5); } return !!POOL; }).catch(() => false)
       .then(ok => { if (ok) { if (view === "discover") renderDiscover(); if (view === "blitz") { if (!bz.list) loadBlitz(); else renderBlitz(); } if (!recState.busy && recState.fromPool !== true) quickRecs(); } return ok; });
     return poolP;
   }
@@ -2908,8 +2910,9 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   const isMissing = e => ["42P01", "PGRST205", "PGRST202"].includes(e?.code) || /does not exist|schema cache/i.test(e?.message || "");
   async function loadSocial(force){
     if (!C() || !U()) { soc.state = "signedout"; if (view === "friends") renderFriends(); return; }
-    if (soc.state === "loading" || (!force && Date.now() - soc.at < 60000 && soc.state === "ready")) return;
-    soc.state = "loading"; if (view === "friends") renderFriends();
+    if ((soc.state === "loading" && Date.now() - (soc.loadAt || 0) < 15000) || (!force && Date.now() - soc.at < 60000 && soc.state === "ready")) return;
+    soc.state = "loading"; soc.loadAt = Date.now(); if (view === "friends") renderFriends();
+    const slow = setTimeout(() => { if (soc.state === "loading" && Date.now() - soc.loadAt > 14000) { soc.state = "error"; soc.err = "Couldn't reach your account just now."; if (view === "friends") renderFriends(); } }, 15000);
     try {
       const uid = U().id;
       const { data: me, error: e1 } = await C().from("sp_profiles").select("user_id, handle, name").eq("user_id", uid).maybeSingle();
@@ -2932,7 +2935,8 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       const dot = $(".nav [data-go='friends']"); if (dot) dot.classList.toggle("hasnew", soc.incoming.length > 0);
       publishShelf();
     } catch (e) { soc.state = isMissing(e) ? "setup" : "error"; soc.err = e?.message || "Something went wrong."; }
-    if (view === "friends" || view === "friend") render(); else if (view === "home") renderHome();
+    clearTimeout(slow);
+    if (view === "friends") renderFriends(); else if (view === "friend") renderFriend(); else if (view === "home") renderHome();
   }
   async function autoProfile(){
     const u = U(), md = u.user_metadata || {}, mail = String(u.email || "").split("@")[0];
@@ -3481,7 +3485,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   }
   function render(){
     renderMarquee(); $("#now").hidden = true;
-    if (view === "home") renderHome(); else if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else renderStats();
+    if (view === "home") renderHome(); else if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else if (view === "friends") renderFriends(); else if (view === "friend") renderFriend(); else if (view === "blitz") renderBlitz(); else renderStats();
     if (res.state === "done") renderResults();
     if (pop) renderPop();
   }
