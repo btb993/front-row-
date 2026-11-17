@@ -579,6 +579,23 @@ details.more .inner{display:flex;flex-direction:column;gap:12px;padding-bottom:1
 .rc .acts{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .rc .acts .have{grid-column:1/-1}
 .btn.seenb{border-color:var(--gold);color:var(--gold);background:transparent}
+@media (max-width:600px){
+  .rgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 9px}
+  .rgrid .rc{gap:4px}
+  .rgrid .rc .poster{--fs:11px}
+  .rgrid .rc .t{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .rgrid .rc .f{font-size:11px;gap:0 5px}
+  .rgrid .rc .sc.rt,.rgrid .rc .sc.mc,.rgrid .rc .sc small{display:none}
+  .rgrid .rc .sc{font-size:10.5px;padding:1px 4px}
+  .rgrid .rc .acts{grid-template-columns:1fr 1fr;gap:5px}
+  .rgrid .rc .acts .btn{font-size:17px!important;line-height:1;padding:6px 0!important;min-height:0!important;height:32px}
+  .rgrid .rc .acts .bt{display:none}
+  .rgrid .rc .have{font-size:10px;padding:3px 2px}
+  .rgrid .rc .because,.rgrid .rc .why{font-size:11px}
+  .rcp .cbtn{width:26px;height:26px;top:4px;right:4px}
+  .panel{padding-left:12px;padding-right:12px}
+  .results{padding:12px}
+}
 .btn.seenb:hover{background:var(--gold-soft)}
 .hsec{margin-top:6px}
 .hsec+.hsec{margin-top:16px}
@@ -1421,7 +1438,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     return `<div class="rc"><div class="rcp"><button class="pb" type="button" data-preview="${src}:${i}" aria-label="More about ${esc(r.title)}">${posterHTML(r, { eager: i < 10, extra: r.type === "tv" ? `<span class="tvmark">TV</span>` : "" })}</button><button class="cbtn" type="button" data-listpop="${src}:${i}" aria-label="Status and lists for ${esc(r.title)}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7M18 15v6M15 18h6"/></svg></button>${src === "x" ? `<button class="cbtn nope" type="button" data-nope="${esc(r.wikidata)}" aria-label="Not for me" title="Not for me">✕</button>` : ""}</div>
       <span class="t">${esc(r.title)}</span><span class="f">${f.map(esc).map(x => `<span>${x}</span>`).join("")}</span>${scoresHTML(r)}
       ${have && have.status === "watched" ? rateHTML(have) : ""}
-      <div class="acts">${have ? `<button class="have" type="button" data-open="${esc(have.id)}">✓ ${esc(STATUS[have.status])}</button>` : `<button class="btn small ${addMode === "watched" ? "" : "primary"}" type="button" data-add="${src}:${i}" data-st="want" title="Add to watchlist">+ Watchlist</button><button class="btn small ${addMode === "watched" ? "gold" : "seenb"}" type="button" data-add="${src}:${i}" data-st="watched" data-quiet="1" title="Already seen it">✓ Seen</button>`}</div></div>`;
+      <div class="acts">${have ? `<button class="have" type="button" data-open="${esc(have.id)}">✓ ${esc(STATUS[have.status])}</button>` : `<button class="btn small ${addMode === "watched" ? "" : "primary"}" type="button" data-add="${src}:${i}" data-st="want" title="Add to watchlist" aria-label="Add to watchlist">+<span class="bt"> Watchlist</span></button><button class="btn small ${addMode === "watched" ? "gold" : "seenb"}" type="button" data-add="${src}:${i}" data-st="watched" data-quiet="1" title="Already seen it" aria-label="Seen it">✓<span class="bt"> Seen</span></button>`}</div></div>`;
   }
   function renderResults(){
     const el = $("#results");
