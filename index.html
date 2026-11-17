@@ -759,6 +759,22 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* v2.2: ready-made lists, import, friends */
+.stpres{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.stpr{display:flex;gap:10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;color:var(--ink);font:inherit;cursor:pointer}
+.stpr .poster{width:46px;flex:none;border-radius:6px}
+.stpr>span{display:grid;gap:2px;min-width:0}
+.stpr:hover{border-color:var(--gold)}
+.chip small{opacity:.7;font-size:11px;margin-left:3px}
+.stpeps{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;max-height:46vh;overflow:auto;padding:2px}
+.stpe{display:flex;gap:10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.stpe b{min-width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--bg2);font-size:13px;flex:none}
+.stpe span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.stpe small{opacity:.6;font-size:11px}
+.stpe.on{border-color:color-mix(in srgb,var(--good,#3c9) 60%,transparent);background:color-mix(in srgb,var(--good,#3c9) 14%,var(--panel))}
+.stpe.on b{background:var(--good);color:#fff}
+.stpe.last{outline:2px solid var(--gold);outline-offset:1px}
+.stpe:disabled{opacity:.45;cursor:default}
+.stpmode{margin-top:4px}
 .blsearch{display:flex;gap:10px;align-items:center}
 .blsearch input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:11px 16px;font:inherit;font-size:15px;background:var(--bg2);color:var(--ink)}
 .blkeys{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin}
@@ -1378,7 +1394,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const it = items().find(x => x.id === id); if (!it) return;
     const d = todayISO(), log = (it.log || []).map(l => ({ ...l })), same = log.find(l => l.d === d);
     if (same) same.n += 1; else log.push({ d, n: 1 });
-    const out = { ...it, episode: num(it.episode) + 1, season: num(it.season) || 1, watchedEps: epsWatched(it) + 1, log, started: it.started || d };
+    const out = { ...it, paused: false, episode: num(it.episode) + 1, season: num(it.season) || 1, watchedEps: epsWatched(it) + 1, log, started: it.started || d };
     if (Array.isArray(it.epsSeen)) out.epsSeen = [...new Set([...it.epsSeen, `${out.season}-${out.episode}`])];
     if (btn && !reduceMotion) { const r = btn.getBoundingClientRect(), f = document.createElement("div"); f.className = "plus"; f.textContent = `E${out.episode}`; f.style.left = (r.left + r.width / 2 - 12) + "px"; f.style.top = (r.top - 6) + "px"; document.body.append(f); setTimeout(() => f.remove(), 900); }
     upsert(out, `${it.title}: S${out.season} E${out.episode} watched`, true);
@@ -1758,6 +1774,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       <div class="poph"><b>${esc(t.title)}</b><button class="xs" type="button" data-popclose aria-label="Close">×</button></div>
       <div><span class="lbl">${it ? "Status" : "Add as"}</span><div class="popst">${[["want", "Want to watch"], ["watching", "Watching"], ["watched", "Seen it"]].map(([k, l]) => `<button type="button" data-popst="${k}" aria-pressed="${it?.status === k}">${l}</button>`).join("")}</div></div>
       ${it?.status === "watched" ? `<div class="prate"><span class="lbl">Your rating</span>${rateHTML(it)}</div>` : ""}
+      ${t.type === "tv" ? `<button class="prow" type="button" data-popstop><span class="sw">📍</span><span class="pn">${it?.status === "watching" ? `Where I stopped${it.episode ? ` (S${num(it.season) || 1} E${num(it.episode)})` : ""}` : "I've started this: pick where I stopped"}</span><span class="ck">›</span></button>${it?.status === "watching" ? `<button class="prow" type="button" data-poppause aria-pressed="${!!it.paused}"><span class="sw">⏸</span><span class="pn">On a break, continue later</span><span class="ck">${it.paused ? "✓" : ""}</span></button>` : ""}` : ""}
       <button class="prow" type="button" data-poppri aria-pressed="${!!it?.priority}"><span class="sw star">★</span><span class="pn">Must see</span><span class="ck">${it?.priority ? "✓" : ""}</span></button>
       <div><span class="lbl">Lists</span><div class="plist">${lists().map(l => { const on = (it?.lists || []).includes(l.id); return `<button class="prow" type="button" data-poplist="${esc(l.id)}" aria-pressed="${on}"><span class="sw lban ls ls-${styleOf(l)}"></span><span class="pn">${l.emoji ? esc(l.emoji) + " " : ""}${esc(l.name)}</span><span class="ck">${on ? "✓" : ""}</span></button>`; }).join("")}</div>
         <form class="popnew" id="popnew"><input placeholder="New list…" maxlength="60" aria-label="New list name"><button class="btn small" type="submit">Create</button></form></div>
@@ -1770,7 +1787,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     }
   }
   function withStatus(it, st){
-    const o = { ...it, status: st }, d = todayISO();
+    const o = { ...it, status: st }, d = todayISO(); if (st !== "watching") o.paused = false;
     if (st === "watching") { o.started = o.started || d; if (o.type === "tv" && !o.season) { o.season = 1; o.episode = 0; } }
     return o;
   }
@@ -2283,14 +2300,14 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
 
   // ================= home =================
   const LS_TYPE = "front-row-type";
-  function cwCard(it){
+  function cwCard(it, onBreak){
     const tv = it.type === "tv", s = num(it.season) || 1, e = num(it.episode), pr = tv ? tvProgress(it) : 0;
     const nextAir = tv && it.nextSeason && it.nextSeason > todayISO() ? `New season ${untilTxt(it.nextSeason).toLowerCase()}` : "";
     return `<div class="cw1">${posterHTML(it, { tag: "button", attrs: `type="button" data-open="${esc(it.id)}" aria-label="Open ${esc(it.title)}"` })}
       <div class="cwb"><button class="cwt" type="button" data-open="${esc(it.id)}">${esc(it.title)}</button>
         <span class="cwe">${tv ? `<b>S${s} · E${e}</b> ${e ? "watched" : "not started"}` : esc([it.year, fmtRun(it.runtime)].filter(Boolean).join(" · "))}</span>
         ${tv && pr ? `<span class="sbar"><span style="width:${pr}%"></span></span>` : ""}${nextAir ? `<span class="cwn">${esc(nextAir)}</span>` : ""}
-        <span class="cwa">${tv ? `<button class="btn small primary" type="button" data-ep="${esc(it.id)}">+1 episode</button><button class="btn small icon" type="button" data-open="${esc(it.id)}" title="Episodes" aria-label="Episode list">☰</button>` : ""}<button class="btn small good" type="button" data-done="${esc(it.id)}" title="Finished" aria-label="Finished">✓</button></span></div></div>`;
+        <span class="cwa">${onBreak ? `<button class="btn small primary" type="button" data-resume="${esc(it.id)}">▶ Resume</button>${tv ? `<button class="btn small icon" type="button" data-stop="${esc(it.id)}" title="Where I stopped" aria-label="Where I stopped">📍</button>` : ""}` : `${tv ? `<button class="btn small primary" type="button" data-ep="${esc(it.id)}">+1 episode</button><button class="btn small icon" type="button" data-stop="${esc(it.id)}" title="Where I stopped" aria-label="Where I stopped">📍</button><button class="btn small icon" type="button" data-pause="${esc(it.id)}" title="Take a break" aria-label="Take a break">⏸</button>` : ""}<button class="btn small good" type="button" data-done="${esc(it.id)}" title="Finished" aria-label="Finished">✓</button>`}</span></div></div>`;
   }
   function homeRow(list){ return `<div class="row">${list.map(it => cardW(it, { quick: true })).join("")}</div>`; }
   function renderHome(){
@@ -2303,7 +2320,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       return;
     }
     const by = (a, b) => (b.updatedAt || 0) - (a.updatedAt || 0);
-    const watching = L.filter(x => x.status === "watching").sort(by);
+    const watching = L.filter(x => x.status === "watching" && !x.paused).sort(by), paused = L.filter(x => x.status === "watching" && x.paused).sort(by);
     const pick = t => L.filter(x => x.status === "want" && (x.type || "movie") === t).sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0) || (b.added || "").localeCompare(a.added || "")).slice(0, 18);
     const nextM = pick("movie"), nextT = pick("tv"), mine = mineUpcoming().slice(0, 14);
     const yr = new Date().getFullYear(), seenYr = L.filter(x => x.status === "watched" && String(x.finished || "").startsWith(String(yr))).length;
@@ -2311,7 +2328,8 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const ready = L.filter(x => (x.status === "want" || x.status === "watching") && onMine(x)).sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0) || (b.imdb || 0) - (a.imdb || 0)).slice(0, 18);
     v.innerHTML = `
       ${newEpsHTML()}
-      ${watching.length ? `<section class="hsec"><div class="sechead"><h2>Continue watching</h2>${watching.length > 3 ? `<button class="linkbtn" type="button" data-seeall="watching">All ${watching.length} →</button>` : ""}</div><div class="row cwrow">${watching.map(cwCard).join("")}</div></section>` : ""}
+      <section class="hsec"><div class="sechead"><h2>Continue watching</h2><span class="qa" style="margin:0"><button class="btn small gold" type="button" data-stopnew>+ A show I'm in the middle of</button>${watching.length > 3 ? `<button class="linkbtn" type="button" data-seeall="watching">All ${watching.length} →</button>` : ""}</span></div>${watching.length ? `<div class="row cwrow">${watching.map(cwCard).join("")}</div>` : `<p class="note">Nothing on the go. Add a show you're part-way through and pick the last episode you saw.</p>`}</section>
+      ${paused.length ? `<section class="hsec"><div class="sechead"><h2>On a break</h2><span class="serif">Pick up where you left off, whenever</span></div><div class="row cwrow">${paused.map(it => cwCard(it, true)).join("")}</div></section>` : ""}
       ${homeFriendsHTML()}
       <section class="hsec"><button class="tcta" type="button" data-go="tonight"><span class="admit2">ADMIT ONE</span><span><b>What's playing tonight?</b><span>Pick by mood, time and rating from your watchlist</span></span><span class="go">→</span></button></section>
       ${ready.length ? `<section class="hsec"><div class="sechead"><h2>Ready to stream</h2><span class="serif">On your services right now</span></div>${homeRow(ready)}</section>` : ""}
@@ -2570,7 +2588,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const st = epStore[it.tvmaze]?.eps || [], seen = seenKeys(it, st); seen.add(k);
     const order = st.filter(([kk]) => seen.has(kk)), last = order[order.length - 1]?.[0] || k, [s, e] = last.split("-").map(Number);
     const d = todayISO(), log = (it.log || []).map(l => ({ ...l })), same = log.find(l => l.d === d); if (same) same.n += 1; else log.push({ d, n: 1 });
-    upsert({ ...it, epsSeen: [...seen], watchedEps: seen.size, season: s, episode: e, log, status: it.status === "want" ? "watching" : it.status }, `${it.title}: ${epLabel(k)} watched`, true);
+    upsert({ ...it, paused: false, epsSeen: [...seen], watchedEps: seen.size, season: s, episode: e, log, status: it.status === "want" ? "watching" : it.status }, `${it.title}: ${epLabel(k)} watched`, true);
     newEps.list = newEps.list.filter(n => !(n.it.id === id && n.k === k)); renderHome();
   }
   async function notifyNew(list){
@@ -3050,6 +3068,70 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     return `<section class="hsec"><div class="sechead"><h2>Friends are watching</h2><button class="linkbtn" type="button" data-go="friends">Friends →</button></div><div class="row">${w.slice(0, 12).map(e => tile(e, x => x.ty === "t" && x.s ? `· S${x.s} E${x.e}` : "· now")).join("")}${recent.map(e => tile(e, x => `loved it ${starTxt(x.r)}`)).join("")}</div></section>`;
   }
 
+  // ================= "where I stopped": pick the last episode you watched, optionally on a break =================
+  let stp = null;
+  function openStop(target){
+    closePop();
+    stp = { it: target || null, q: "", res: [], searching: false, eps: null, loading: false, season: 1, last: null, paused: target ? !!target.paused : false, s: "", e: "" };
+    if (stp.it) { stp.season = num(stp.it.season) || 1; stp.last = stp.it.episode ? `${stp.season}-${num(stp.it.episode)}` : null; loadStopEps(); }
+    renderStop(); document.addEventListener("keydown", escClose);
+    if (!stp.it) setTimeout(() => $("#stp-q")?.focus(), 50);
+  }
+  async function loadStopEps(){
+    stp.loading = true; renderStop();
+    try { const x = await tvEpisodes(stp.it); stp.eps = x?.eps?.length ? x.eps : []; if (x?.id && !stp.it.tvmaze) stp.it = { ...stp.it, tvmaze: x.id }; } catch { stp.eps = []; }
+    stp.loading = false;
+    if (stp.eps.length && !stp.it.episode) { const ss = [...new Set(stp.eps.map(e => e.s))]; stp.season = ss[0]; }
+    if (stp) renderStop();
+  }
+  function renderStop(){
+    if (!stp) return;
+    const it = stp.it, today = todayISO();
+    let body;
+    if (!it) {
+      body = `<form class="ppq" id="stp-form"><input id="stp-q" value="${esc(stp.q)}" placeholder="Which show? Type its name" autocomplete="off"><button class="btn primary" type="submit">Find</button></form>
+        ${stp.searching ? `<p class="status"><span class="dots">Looking</span></p>` : stp.res.length ? `<div class="stpres">${stp.res.slice(0, 12).map((r, i) => `<button type="button" class="stpr" data-stppick="${i}">${posterHTML(r)}<span><b>${esc(r.title)}</b><span class="muted">${esc([r.year, r.seasons ? r.seasons + " seasons" : ""].filter(Boolean).join(" · "))}</span></span></button>`).join("")}</div>` : stp.q ? `<p class="note">No shows found. Try another spelling.</p>` : `<p class="note">Search for a show you've started, then tap the last episode you watched.</p>`}`;
+    } else if (stp.loading) body = `<p class="status"><span class="dots">Getting the episodes</span></p>`;
+    else if (stp.eps?.length) {
+      const seasons = [...new Set(stp.eps.map(e => e.s))], lastK = stp.last, [ls, le] = lastK ? lastK.split("-").map(Number) : [0, 0];
+      const inS = stp.eps.filter(e => e.s === stp.season);
+      const before = e => ls && (e.s < ls || (e.s === ls && e.n <= le));
+      body = `<p class="note" style="margin:0">Tap the <b>last episode you watched</b>. Everything before it gets ticked off.</p>
+        <div class="chips stps">${seasons.map(s => { const all = stp.eps.filter(e => e.s === s), done = all.filter(before).length; return `<button class="chip" type="button" data-stps="${s}" aria-pressed="${stp.season === s}">Season ${s}${done ? ` <small>${done === all.length ? "✓" : done + "/" + all.length}</small>` : ""}</button>`; }).join("")}</div>
+        <div class="stpeps">${inS.map(e => `<button type="button" class="stpe${before(e) ? " on" : ""}${e.k === lastK ? " last" : ""}" data-stpe="${e.k}" ${e.air && e.air > today ? "disabled" : ""}><b>${e.n}</b><span>${esc(e.name || "Episode " + e.n)}</span>${e.air && e.air > today ? `<small>${esc(dayName(e.air))}</small>` : ""}</button>`).join("")}</div>
+        <div class="qa" style="margin:0"><button class="btn small" type="button" data-stpwhole="${stp.season}">I finished season ${stp.season}</button>${lastK ? `<button class="linkbtn" type="button" data-stpclear>Start from scratch</button>` : ""}</div>`;
+    } else {
+      body = `<p class="note" style="margin:0">Couldn't get the episode list for this one. Type where you stopped:</p>
+        <div class="ppq"><label>Season <input id="stp-s" type="number" min="1" max="60" value="${esc(stp.s || num(it.season) || 1)}" style="width:80px"></label><label>Last episode watched <input id="stp-e" type="number" min="0" max="999" value="${esc(stp.e || num(it.episode) || "")}" style="width:90px"></label></div>`;
+    }
+    $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal" role="dialog" aria-modal="true" aria-label="Where did you stop?">
+      <button class="x" type="button" id="x-btn" aria-label="Close">×</button>
+      <div class="mbody"><div class="sechead" style="padding-right:40px"><h3 style="font-size:30px">${it ? esc(it.title) : "Add a show you're in the middle of"}</h3><span class="serif">${it ? "Where did you stop?" : ""}</span></div>
+        ${body}
+        ${it ? `<div class="seg stpmode" role="group"><button type="button" data-stpmode="0" aria-pressed="${!stp.paused}">▶ Watching it now</button><button type="button" data-stpmode="1" aria-pressed="${stp.paused}">⏸ On a break, continue later</button></div>
+        <div class="qa" style="margin:0"><button class="btn gold" type="button" data-stpsave>${stp.last || (stp.eps && !stp.eps.length) ? "Save" : "Save (not started yet)"}</button>${!stp.it.id ? `<button class="linkbtn" type="button" data-stpback>Pick another show</button>` : ""}</div>` : ""}
+      </div></div></div>`;
+  }
+  async function stopSearch(q){
+    stp.q = q; stp.searching = true; renderStop();
+    try { const out = await searchAll(q); stp.res = out.items.filter(x => x.type === "tv"); } catch { stp.res = []; }
+    if (!stp.res.length && POOL) stp.res = poolSearch(q, "tv").slice(0, 12);
+    stp.searching = false; renderStop();
+  }
+  function saveStop(){
+    const it = stp.it; let s, e, seen = null;
+    if (stp.eps?.length) {
+      if (stp.last) { [s, e] = stp.last.split("-").map(Number); seen = stp.eps.filter(x => x.s < s || (x.s === s && x.n <= e)).map(x => x.k); }
+      else { s = stp.eps[0].s; e = 0; seen = []; }
+    } else { s = Math.max(1, Number($("#stp-s")?.value) || 1); e = Math.max(0, Number($("#stp-e")?.value) || 0); }
+    const have = it.id ? items().find(x => x.id === it.id) : findSame(it);
+    const base = have || addFrom(it, "watching", {}, true);
+    const out = { ...withStatus({ ...base, tvmaze: base.tvmaze || it.tvmaze }, "watching"), season: s, episode: e, paused: stp.paused, updatedAt: Date.now() };
+    if (seen) { out.epsSeen = seen; out.watchedEps = seen.length; } else { delete out.epsSeen; out.watchedEps = null; }
+    upsert(out, `${out.title}: ${e ? `stopped at S${s} E${e}` : "not started yet"}${stp.paused ? " · on a break" : ""}`, true);
+    closeModal(); stp = null;
+  }
+
   // ================= poster picker: alternatives from IMDb, TVmaze, every Wikipedia, Wikidata and Commons =================
   let pp = null;
   const LANG_ORDER = ["en","hu","de","fr","es","it","pt","nl","pl","sv","da","no","fi","cs","ro","ru","uk","ja","ko","zh","tr","he"];
@@ -3167,7 +3249,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     }).catch(() => {});
     if (moreFor) worksOf(moreFor, ctl.signal).then(w => { if (!draft || ctl.signal.aborted) return; moreList = w.filter(x => x.wikidata !== draft.wikidata).slice(0, 14); const el = $("#more-row"); if (el) el.outerHTML = moreHTML(); rateList(moreList, ctl.signal).then(ch => { if (ch && draft) { const e2 = $("#more-row"); if (e2) e2.outerHTML = moreHTML(); } }).catch(() => {}); }).catch(() => { moreList = []; const el = $("#more-row"); if (el) el.outerHTML = moreHTML(); });
   }
-  function closeModal(){ if (pp) { pp.ctl.abort(); pp = null; } const wasAdder = adder, wasLe = le; $("#modal-root").innerHTML = ""; draft = null; adder = null; le = null; adderCtl?.abort(); closePop(); if (wasAdder && view === "list") renderListPage(); if (wasAdder && view === "lists") renderLists(); moreCtl?.abort(); document.removeEventListener("keydown", escClose); document.body.style.overflow = ""; }
+  function closeModal(){ stp = null; if (pp) { pp.ctl.abort(); pp = null; } const wasAdder = adder, wasLe = le; $("#modal-root").innerHTML = ""; draft = null; adder = null; le = null; adderCtl?.abort(); closePop(); if (wasAdder && view === "list") renderListPage(); if (wasAdder && view === "lists") renderLists(); moreCtl?.abort(); document.removeEventListener("keydown", escClose); document.body.style.overflow = ""; }
   function escClose(e){ if (e.key === "Escape") { if (pop) return closePop(); if (pp) return closePicker(); closeModal(); } }
   function moreHTML(){
     if (!moreFor) return "";
@@ -3558,6 +3640,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   document.addEventListener("submit", e => {
     const f = e.target;
     if (f.id === "le-form") { e.preventDefault(); saveListEditor(); }
+    if (f.id === "stp-form") { e.preventDefault(); const q = $("#stp-q").value.trim(); if (q) stopSearch(q); return; }
     if (f.id === "soc-prof") { e.preventDefault(); const h = $("#soc-handle").value.trim().toLowerCase().replace(/^@/, ""), n = $("#soc-name").value.trim();
       if (!/^[a-z0-9_]{3,20}$/.test(h)) { soc.hint = "Handles are 3–20 letters, numbers or _."; return renderFriends(); }
       C().from("sp_profiles").insert({ user_id: U().id, handle: h, name: n }).then(({ error }) => { if (error) { soc.hint = /duplicate|unique/i.test(error.message) ? "That handle is taken. Try another." : error.message; renderFriends(); } else { soc.hint = ""; toast(`You're @${h}`); loadSocial(true); } }); }
@@ -3578,6 +3661,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (pop && !t.closest("#pop-root") && !D.listpop) closePop();
     if (D.popclose !== undefined) return closePop();
     if (D.listpop) { if (pop && pop.key === D.listpop) return closePop(); return openPop(t, D.listpop); }
+    if (D.popst === "watching") { const { it, r } = popTarget(pop.key); if ((it || r)?.type === "tv" && it?.status !== "watching") return openStop(it || r); }
+    if (D.popstop !== undefined) { const { it, r } = popTarget(pop.key); return openStop(it || r); }
+    if (D.poppause !== undefined) { const { it } = popTarget(pop.key); if (it) upsert({ ...it, paused: !it.paused }, it.paused ? `${it.title}: back to watching` : `${it.title}: on a break`, true); return renderPop(); }
     if (D.popst) { const { it, r } = popTarget(pop.key); if (it) upsert(withStatus(it, D.popst), `${it.title}: ${STATUS[D.popst]}`, true); else if (r) addFrom(r, D.popst, {}, true); renderResults(); return renderPop(); }
     if (D.poppri !== undefined) { const it = ensureIt(pop.key); if (it) upsert({ ...it, priority: !it.priority }, it.priority ? "No longer a must see" : `${it.title} is a must see`); return renderPop(); }
     if (D.poplist) { const it = ensureIt(pop.key); const l = listById(D.poplist); if (it && l) { const on = (it.lists || []).includes(l.id); upsert(setMember(it, l.id, !on), on ? `Removed from ${l.name}` : `Added to ${l.name}`); } renderResults(); return renderPop(); }
@@ -3616,6 +3702,18 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.add) { const r = resultAt(D.add); if (t.closest(".modal")) { closeModal(); } if (D.quiet && r && !findSame(r)) { const it = addFrom(r, D.st, {}, true); renderResults(); return; } return addResult(r, D.st); }
     if (D.open) { const it = items().find(x => x.id === D.open); if (it) { closeModal(); openCard(it); } return; }
     if (D.ep) return plusEp(D.ep, t);
+    if (D.stopnew !== undefined) return openStop(null);
+    if (D.stop) { const it = items().find(x => x.id === D.stop); return it && openStop(it); }
+    if (D.pause) { const it = items().find(x => x.id === D.pause); return it && upsert({ ...it, paused: true }, `${it.title}: on a break. Find it under "On a break" on Home.`, true); }
+    if (D.resume) { const it = items().find(x => x.id === D.resume); return it && upsert({ ...it, paused: false, updatedAt: Date.now() }, `${it.title}: back to watching`, true); }
+    if (D.stppick !== undefined && stp) { stp.it = stp.res[Number(D.stppick)]; const have = findSame(stp.it); if (have) { stp.it = have; stp.season = num(have.season) || 1; stp.last = have.episode ? `${stp.season}-${num(have.episode)}` : null; stp.paused = !!have.paused; } return loadStopEps(); }
+    if (D.stpback !== undefined && stp) { stp.it = null; stp.eps = null; stp.last = null; return renderStop(); }
+    if (D.stps && stp) { stp.season = Number(D.stps); return renderStop(); }
+    if (D.stpe && stp) { stp.last = stp.last === D.stpe ? null : D.stpe; stp.season = Number(D.stpe.split("-")[0]); return renderStop(); }
+    if (D.stpwhole && stp) { const s0 = Number(D.stpwhole), today = todayISO(), inS = stp.eps.filter(e => e.s === s0 && (!e.air || e.air <= today)); if (inS.length) stp.last = inS[inS.length - 1].k; const next = stp.eps.find(e => e.s > s0); if (next) stp.season = next.s; return renderStop(); }
+    if (D.stpclear !== undefined && stp) { stp.last = null; return renderStop(); }
+    if (D.stpmode && stp) { stp.paused = D.stpmode === "1"; return renderStop(); }
+    if (D.stpsave !== undefined && stp) { if (!stp.eps) { stp.s = $("#stp-s")?.value; stp.e = $("#stp-e")?.value; } return saveStop(); }
     if (D.season) return nextSeason(D.season);
     if (D.done) return markDone(D.done);
     if (D.startwatch) {
