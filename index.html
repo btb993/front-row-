@@ -1589,6 +1589,33 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     return `<div class="gstrip" role="group" aria-label="Genre"><button type="button" class="gchip" ${attr}="" aria-pressed="${!cur}">All genres</button>${rows.map(([k, n]) => `<button type="button" class="gchip" ${attr}="${esc(k)}" aria-pressed="${cur === k}">${esc(gName(k))}<small>${n}</small></button>`).join("")}</div>`;
   }
   let libG = "";
+  const tkey = t => String(t || "").replace(/^(the|a|an) /i, "");
+  const rt = x => x.type === "tv" ? itemHours(x) * 60 || num(x.episodes) * num(x.epLength) : num(x.runtime);
+  const SORTBY = {
+    added: (a, b) => (b.added || "").localeCompare(a.added || "") || (b.updatedAt || 0) - (a.updatedAt || 0),
+    finished: (a, b) => (b.finished || "").localeCompare(a.finished || ""),
+    year: (a, b) => (b.year || 0) - (a.year || 0) || a.title.localeCompare(b.title),
+    yearOld: (a, b) => (a.year || 9999) - (b.year || 9999) || a.title.localeCompare(b.title),
+    imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0),
+    votes: (a, b) => (b.imdbVotes || 0) - (a.imdbVotes || 0),
+    rating: (a, b) => (b.rating || 0) - (a.rating || 0) || (b.finished || "").localeCompare(a.finished || ""),
+    title: (a, b) => tkey(a.title).localeCompare(tkey(b.title)),
+    long: (a, b) => (rt(b) || 0) - (rt(a) || 0),
+    genre: (a, b) => gName((a.genres || [])[0] || "~").localeCompare(gName((b.genres || [])[0] || "~")) || a.title.localeCompare(b.title),
+    director: (a, b) => (a.creator || "~").localeCompare(b.creator || "~") || (a.year || 0) - (b.year || 0)
+  };
+  const SORT_LABELS = { added: "Recently added", finished: "When I watched it", priority: "Must-see first", short: "Shortest first", long: "Longest first", year: "Release year, newest", yearOld: "Release year, oldest", imdb: "IMDb rating", votes: "Most popular", rating: "My rating", title: "Title A–Z", genre: "Genre", director: "Director / creator" };
+  // headings for sorts where a heading helps
+  function groupedGrid(list, sort, card){
+    const key = { year: x => x.year ? `${Math.floor(x.year / 10) * 10}s` : "Year unknown", yearOld: x => x.year ? `${Math.floor(x.year / 10) * 10}s` : "Year unknown",
+      genre: x => (x.genres || []).length ? gName(x.genres[0]) : "No genre", director: x => (x.creator || "").split(", ")[0] || "Unknown",
+      title: x => { const c = (x.title || "?").replace(/^(the|a|an) /i, "")[0]?.toUpperCase() || "#"; return /[A-Z]/.test(c) ? c : "#"; },
+      rating: x => x.rating ? `${starTxt(x.rating)}` : "Not rated", imdb: x => x.imdb ? `IMDb ${Math.floor(x.imdb)}+` : "No IMDb rating" }[sort];
+    if (!key || list.length < 8) return `<div class="grid">${list.map(card).join("")}</div>`;
+    const groups = new Map(); list.forEach(x => { const k = key(x); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(x); });
+    if (sort === "director" && groups.size > 40) return `<div class="grid">${list.map(card).join("")}</div>`;
+    return [...groups].map(([k, xs]) => `<div class="yhead"><h3>${esc(k)}</h3><span class="mono">${xs.length}</span></div><div class="grid">${xs.map(card).join("")}</div>`).join("");
+  }
   // when Wikidata has no genres, read them from the first line of the Wikipedia summary ("…is a 2026 legal thriller family drama film…")
   const GENRE_WORDS = ["black comedy", "romantic comedy", "science fiction", "sci-fi", "coming-of-age", "legal thriller", "psychological thriller", "political thriller", "crime thriller", "erotic thriller", "action comedy", "comedy drama", "comedy-drama", "dark comedy", "teen comedy", "period drama", "historical drama", "family drama", "legal drama", "war drama", "sports drama", "romantic drama", "biographical", "documentary", "animated", "superhero", "thriller", "drama", "comedy", "horror", "romance", "romantic", "crime", "mystery", "fantasy", "adventure", "action", "musical", "western", "war", "satirical", "satire", "heist", "spy", "disaster", "slasher", "zombie", "monster", "mockumentary", "anthology", "sitcom", "procedural", "historical", "family", "noir", "neo-noir", "psychological", "survival", "sports", "teen", "dystopian", "martial arts", "supernatural", "queer", "LGBTQ"];
   function genresFromText(t){
@@ -1613,12 +1640,11 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     if (libG) list = list.filter(x => hasGenre(x, libG));
     if (libSvc) list = list.filter(onMine);
     if (libQ) { const q = norm(libQ); list = list.filter(x => norm([x.title, x.creator, (x.cast || []).join(" "), (x.genres || []).join(" ")].join(" ")).includes(q)); }
-    const by = {
+    const by = { ...SORTBY,
       added: (a, b) => (b.added || "").localeCompare(a.added || "") || (b.updatedAt || 0) - (a.updatedAt || 0),
-      title: (a, b) => a.title.localeCompare(b.title),
+      title: (a, b) => tkey(a.title).localeCompare(tkey(b.title)),
       rating: (a, b) => (b.rating || 0) - (a.rating || 0),
       imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0),
-      year: (a, b) => (b.year || 0) - (a.year || 0),
       short: (a, b) => (remainingHours(a) || 999) - (remainingHours(b) || 999),
       finished: (a, b) => (b.finished || "").localeCompare(a.finished || ""),
       priority: (a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0) || (b.added || "").localeCompare(a.added || "")
@@ -1644,12 +1670,12 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
         ${lists().length ? `<select class="sel" id="listsel" aria-label="List"><option value="">All lists</option>${lists().map(l => `<option value="${esc(l.id)}" ${l.id === listF ? "selected" : ""}>${esc(l.name)}</option>`).join("")}</select>` : ""}
         ${prefs().services.length ? `<button class="chip" type="button" data-lsvc aria-pressed="${libSvc}">On my services</button>` : ""}
         ${minSel("libmin", libMin)}
-        <select class="sel" id="sort" aria-label="Sort">${[["added","Recently added"],["priority","Must-see first"],["short","Shortest first"],["imdb","IMDb rating"],["rating","Your rating"],["finished","Recently watched"],["year","Newest release"],["title","Title"]].map(([k, l]) => `<option value="${k}" ${sortBy === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+        <select class="sel" id="sort" aria-label="Sort">${["added", "priority", "year", "yearOld", "imdb", "votes", "short", "long", "title", "genre", "director", "rating", "finished"].map(k => [k, SORT_LABELS[k]]).map(([k, l]) => `<option value="${k}" ${sortBy === k ? "selected" : ""}>${l}</option>`).join("")}</select>
       </div>
       ${L ? `<div class="banner"><span class="mono">List</span><b>${esc(L.name)}</b><span class="muted">Titles you add from search go on this list too.</span><button class="linkbtn" type="button" data-openlist="${esc(L.id)}" style="margin-left:auto">Open the list page</button><button class="linkbtn" type="button" data-unlist>Show everything</button></div>` : ""}
       ${missing ? `<div class="fillbar"><span>${missing} title${missing === 1 ? " has" : "s have"} no poster yet.</span><button class="btn small gold" type="button" id="fill-btn" ${filling ? "disabled" : ""}>${filling ? `<span class="dots">Finding posters</span>` : "Find posters and details"}</button></div>` : ""}
       ${genreStrip(base.filter(x => statusF === "all" || x.status === statusF), libG, "data-libg")}
-      ${list.length ? `<div class="grid">${list.map(it => cardW(it, { quick: statusF !== "dropped" })).join("")}</div>` : emptyHTML()}
+      ${list.length ? groupedGrid(list, sortBy, it => cardW(it, { quick: statusF !== "dropped" })) : emptyHTML()}
       ${homeTeaser()}`;
   }
   function cardHTML(it, opt = {}){
@@ -1752,7 +1778,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const hrs = left.reduce((s, x) => s + remainingHours(x), 0);
     if (lpStatus === "left" && !left.length && mem.length) lpStatus = "all";
     let shown = (lpStatus === "left" ? left : lpStatus === "seen" ? seen : mem).filter(x => passMin(x, lpMin));
-    const by = { listed: (a, b) => (b.listAdded?.[l.id] || 0) - (a.listAdded?.[l.id] || 0), title: (a, b) => a.title.localeCompare(b.title), imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0), short: (a, b) => (remainingHours(a) || 999) - (remainingHours(b) || 999), rating: (a, b) => (b.rating || 0) - (a.rating || 0), year: (a, b) => (b.year || 0) - (a.year || 0) };
+    const by = { listed: (a, b) => (b.listAdded?.[l.id] || 0) - (a.listAdded?.[l.id] || 0), title: (a, b) => tkey(a.title).localeCompare(tkey(b.title)), imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0), short: (a, b) => (remainingHours(a) || 999) - (remainingHours(b) || 999), rating: (a, b) => (b.rating || 0) - (a.rating || 0), year: (a, b) => (b.year || 0) - (a.year || 0) };
     shown = shown.slice().sort(by[lpSort] || by.listed);
     v.innerHTML = `<button class="back" type="button" data-go="lists">← All lists</button>
       <section class="lhero lban ls ls-${st}">
@@ -1951,8 +1977,8 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     if (sn.min) L = L.filter(x => passMin(x, sn.min));
     if (sn.rf === "fav") L = L.filter(x => x.fav); else if (sn.rf === "unrated") L = L.filter(x => !x.rating); else if (sn.rf) L = L.filter(x => (x.rating || 0) >= Number(sn.rf));
     if (sn.q) { const q = norm(sn.q); L = L.filter(x => norm([x.title, x.creator, (x.cast || []).join(" ")].join(" ")).includes(q)); }
-    const by = { finished: (a, b) => (b.finished || "").localeCompare(a.finished || ""), rating: (a, b) => (b.rating || 0) - (a.rating || 0) || (b.finished || "").localeCompare(a.finished || ""), title: (a, b) => a.title.localeCompare(b.title), year: (a, b) => (b.year || 0) - (a.year || 0), imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0) };
-    return L.sort(by[sn.sort] || by.finished);
+    const by = { finished: (a, b) => (b.finished || "").localeCompare(a.finished || ""), rating: (a, b) => (b.rating || 0) - (a.rating || 0) || (b.finished || "").localeCompare(a.finished || ""), title: (a, b) => tkey(a.title).localeCompare(tkey(b.title)), year: (a, b) => (b.year || 0) - (a.year || 0), imdb: (a, b) => (b.imdb || 0) - (a.imdb || 0) };
+    return L.sort({ ...SORTBY, ...by }[sn.sort] || by.finished);
   }
   function renderSeen(){
     const v = $("#view-seen"), all = items().filter(x => x.status === "watched");
@@ -1966,7 +1992,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     if (L.length && sn.sort === "finished") {
       const groups = {}; L.forEach(x => { const y = (x.finished || "").slice(0, 4) || "Date not set"; (groups[y] = groups[y] || []).push(x); });
       grid = Object.keys(groups).sort((a, b) => a === "Date not set" ? 1 : b === "Date not set" ? -1 : b.localeCompare(a)).map(y => `<div class="yhead"><h3>${esc(y)}</h3><span class="mono">${groups[y].length} seen</span></div><div class="grid">${groups[y].map(it => cardW(it, { rate: true })).join("")}</div>`).join("");
-    } else if (L.length) grid = `<div class="grid">${L.map(it => cardW(it, { rate: true })).join("")}</div>`;
+    } else if (L.length) grid = groupedGrid(L, sn.sort, it => cardW(it, { rate: true }));
     const nUnrated = all.filter(x => !x.rating).length;
     v.innerHTML = `<div class="sechead seenhead"><h2>Seen it</h2>${all.length ? `<span class="seenline">${films} films · ${shows} series · ${fmtH(hours)}${avg ? ` · ${avg.toFixed(1)}★ average` : ""}${favs ? ` · ${favs} ♥` : ""} <button class="linkbtn" type="button" data-go="stats">Stats →</button></span>` : ""}</div>
       <div class="seenacts"><button class="btn small gold" type="button" data-seenmode>+ Add seen</button><button class="btn small" type="button" data-go="blitz">⚡ Blitz</button><button class="btn small" type="button" data-import>Import</button>${nUnrated ? `<button class="btn small ghost" type="button" data-snrate aria-pressed="${sn.rf === "unrated"}">☆ ${nUnrated} to rate</button>` : ""}</div>
@@ -1977,7 +2003,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
         <div class="seenfilters"><select class="sel" id="sn-rf" aria-label="Rating">${[["", "Any rating"], ["fav", "Favourites ♥"], ["5", "5 stars"], ["4", "4 stars and up"], ["3", "3 stars and up"], ["unrated", "Not rated"]].map(([k, t]) => `<option value="${k}" ${sn.rf === k ? "selected" : ""}>${t}</option>`).join("")}</select>
 
           ${minSel("sn-min", sn.min)}
-          <select class="sel" id="sn-sort" aria-label="Sort">${[["finished", "When I watched it"], ["rating", "My rating"], ["imdb", "IMDb rating"], ["year", "Release year"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${sn.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select>${L.length !== all.length ? `<span class="mono" style="font-size:12px;align-self:center;white-space:nowrap">${L.length} of ${all.length}</span>` : ""}</div>
+          <select class="sel" id="sn-sort" aria-label="Sort">${["finished", "year", "yearOld", "rating", "imdb", "votes", "title", "genre", "director", "long", "added"].map(k => [k, SORT_LABELS[k]]).map(([k, t]) => `<option value="${k}" ${sn.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select>${L.length !== all.length ? `<span class="mono" style="font-size:12px;align-self:center;white-space:nowrap">${L.length} of ${all.length}</span>` : ""}</div>
         ${grid || `<div class="empty"><h3>No matches</h3><span class="serif">Try a different filter.</span></div>`}`
       : `<div class="empty"><h3>Nothing seen yet</h3><span class="serif">Add the films and series you've already watched, rate them, and recommendations follow.</span><button class="btn gold" type="button" data-seenmode>+ Add something you've seen</button></div>`}</div>`;
   }
