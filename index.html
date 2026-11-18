@@ -1589,6 +1589,21 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     return `<div class="gstrip" role="group" aria-label="Genre"><button type="button" class="gchip" ${attr}="" aria-pressed="${!cur}">All genres</button>${rows.map(([k, n]) => `<button type="button" class="gchip" ${attr}="${esc(k)}" aria-pressed="${cur === k}">${esc(gName(k))}<small>${n}</small></button>`).join("")}</div>`;
   }
   let libG = "";
+  // when Wikidata has no genres, read them from the first line of the Wikipedia summary ("…is a 2026 legal thriller family drama film…")
+  const GENRE_WORDS = ["black comedy", "romantic comedy", "science fiction", "sci-fi", "coming-of-age", "legal thriller", "psychological thriller", "political thriller", "crime thriller", "erotic thriller", "action comedy", "comedy drama", "comedy-drama", "dark comedy", "teen comedy", "period drama", "historical drama", "family drama", "legal drama", "war drama", "sports drama", "romantic drama", "biographical", "documentary", "animated", "superhero", "thriller", "drama", "comedy", "horror", "romance", "romantic", "crime", "mystery", "fantasy", "adventure", "action", "musical", "western", "war", "satirical", "satire", "heist", "spy", "disaster", "slasher", "zombie", "monster", "mockumentary", "anthology", "sitcom", "procedural", "historical", "family", "noir", "neo-noir", "psychological", "survival", "sports", "teen", "dystopian", "martial arts", "supernatural", "queer", "LGBTQ"];
+  function genresFromText(t){
+    const m = String(t || "").match(/\b(?:is|was) an? (?:upcoming )?(?:\d{4} )?([^.;]{3,140}?) (?:film|movie|television series|TV series|series|miniseries|sitcom|drama series|streaming series)\b/i);
+    if (!m) return [];
+    let rest = " " + m[1].toLowerCase().replace(/[,]/g, " ") + " ", out = [];
+    for (const w of GENRE_WORDS) { const k = " " + w.toLowerCase() + " "; if (rest.includes(k)) { out.push(w === "romantic" ? "romance" : w === "satirical" ? "satire" : w); rest = rest.replace(k, " "); } }
+    return out.slice(0, 4).map(g => g.charAt(0).toUpperCase() + g.slice(1));
+  }
+  function fillGenres(d){
+    if ((d.genres || []).length) return false;
+    const g = genresFromText(d.plot || d.blurb); if (!g.length) return false;
+    d.genres = g; const cur = d.id && items().find(x => x.id === d.id); if (cur && !(cur.genres || []).length) { cur.genres = g; saveLocal(); }
+    return true;
+  }
   function libFiltered(){
     let list = items().slice();
     if (statusF !== "all") list = list.filter(x => x.status === statusF);
@@ -3439,7 +3454,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     renderCard(opt.editOpen);
     document.addEventListener("keydown", escClose);
     const ctl = new AbortController(); moreCtl = ctl;
-    if (!draft.plot && draft.wiki) plotOf(draft.wiki, ctl.signal).then(p => { if (draft && p && !ctl.signal.aborted) { draft.plot = p; const el = $("#plot"); if (el) el.textContent = p; const cur = items().find(x => x.id === draft.id); if (cur && !cur.plot) { cur.plot = p; saveLocal(); } } }).catch(() => {});
+    if (!draft.plot && draft.wiki) plotOf(draft.wiki, ctl.signal).then(p => { if (draft && p && !ctl.signal.aborted) { draft.plot = p; const el = $("#plot"); if (el) el.textContent = p; if (fillGenres(draft)) rerenderCard(); const cur = items().find(x => x.id === draft.id); if (cur && !cur.plot) { cur.plot = p; saveLocal(); } } }).catch(() => {});
     if (draft.imdbId && (!rcache[draft.imdbId] || Date.now() - rcache[draft.imdbId].at > 3 * 864e5)) imdbRatings([draft.imdbId], ctl.signal).then(m => { const c = m[draft?.imdbId]; if (!draft || !c?.r) return; if (c.r === draft.imdb && c.v === draft.imdbVotes) return; readFields(); Object.assign(draft, withRating(draft, c)); const cur = items().find(x => x.id === draft.id); if (cur) upsert(withRating(cur, c)); rerenderCard(); }).catch(() => {});
     if (helperVer >= 2 && draft.title && (!draft.offersAt || draft.jwCountry !== prefs().country || Date.now() - draft.offersAt > 3 * 864e5)) fetchOffers(draft, ctl.signal).then(o => { if (!draft || ctl.signal.aborted) return; Object.assign(draft, o); const cur = items().find(x => x.id === draft.id); if (cur) { lib.items = lib.items.map(x => x.id === cur.id ? { ...x, ...o } : x); saveLocal(); } const el = $("#wtw"); if (el) el.outerHTML = offersHTML(draft); }).catch(() => { if (draft) { draft.offersAt = Date.now(); draft.offers = draft.offers || []; const el = $("#wtw"); if (el) el.outerHTML = offersHTML(draft); } });
     if (draft.type === "tv") tvEpisodes(draft, ctl.signal).then(r => { if (!draft || ctl.signal.aborted) return; draftEps = r || { eps: [] }; if (r?.eps?.length) { seedEpsSeen(draft, r.eps); if (r.id && !draft.tvmaze) draft.tvmaze = r.id; } rerenderCard(); }).catch(() => { if (draft) { draftEps = { eps: [] }; paintEps(); } });
@@ -3464,6 +3479,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     if (d.imdbId) links.push(`<a href="https://www.imdb.com/title/${esc(d.imdbId)}/" target="_blank" rel="noopener">IMDb ↗</a>`);
     if (d.wiki) links.push(`<a href="https://en.wikipedia.org/wiki/${encodeURIComponent(d.wiki.replace(/ /g, "_"))}" target="_blank" rel="noopener">Wikipedia ↗</a>`);
     if (d.title) links.unshift(`<button type="button" class="tbtn" data-trailer>▶ Trailer</button>`);
+    fillGenres(d);
     const facts = [tv ? "Series" : "Film", yearText(d), ...factsOf(d), d.network, d.country, tv && d.showStatus === "Running" && d.nextSeason ? `New season ${fmtDate(d.nextSeason)}` : tv && d.showStatus === "Ended" ? "Ended" : ""].filter(Boolean);
     const editing = draftNew && !d.wikidata;
     $("#modal-root").innerHTML = `<div class="scrim" data-scrim><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(d.title || "New title")}">
