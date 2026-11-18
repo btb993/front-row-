@@ -776,6 +776,35 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* v2.2: ready-made lists, import, friends */
+.wrapcta{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:center;width:100%;text-align:left;margin:0 0 14px;padding:16px 18px;border-radius:18px;border:1px solid var(--gold);background:radial-gradient(120% 140% at 0% 0%,rgba(232,183,74,.28),transparent 60%),linear-gradient(135deg,#2a0d14,#14070b);color:#f6ead2;font:inherit;cursor:pointer;box-shadow:0 0 30px rgba(232,183,74,.15)}
+.wrapcta>span{grid-row:span 2;font-size:34px}
+.wrapcta b{font-family:var(--f-display,inherit);font-size:26px;letter-spacing:.02em}
+.wrapcta em{font-style:normal;opacity:.8;font-size:14px}
+.wrapx{position:relative;min-height:calc(100vh - 170px);border-radius:24px;padding:18px 20px 16px;display:flex;flex-direction:column;gap:14px;background:radial-gradient(90% 70% at 50% 0%,rgba(232,183,74,.18),transparent 60%),radial-gradient(80% 60% at 100% 100%,rgba(225,29,72,.25),transparent 60%),#12060a;color:#f6ead2;overflow:hidden;user-select:none;cursor:pointer}
+.wbars{display:flex;gap:4px}.wbars i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.18)}.wbars i.done{background:#e8b74a}.wbars i.now{background:linear-gradient(90deg,#e8b74a,rgba(255,255,255,.3))}
+.wtop-ui{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wslide{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px;animation:wIn .45s ease both;max-width:760px;margin:0 auto;width:100%}
+@keyframes wIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.wslide h1{font-family:var(--f-display,inherit);font-size:clamp(48px,9vw,96px);line-height:.95;margin:0;color:#fff;text-shadow:0 0 24px rgba(232,183,74,.45)}
+.wslide h2{font-family:var(--f-display,inherit);font-size:clamp(38px,7vw,72px);line-height:1;margin:0;color:#e8b74a}
+.wk{font-family:var(--f-mono,monospace);letter-spacing:.2em;text-transform:uppercase;font-size:12px;color:#e8b74a}
+.ws{font-size:18px;opacity:.9;margin:0;max-width:520px}
+.wbigs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;width:100%;max-width:520px}
+.wbig{display:grid;gap:2px}.wbig b{font-family:var(--f-display,inherit);font-size:clamp(40px,8vw,72px);line-height:1;color:#fff}.wbig span{opacity:.8}
+.wwall{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;width:100%;max-width:560px}.wwall .poster{border-radius:6px;--fs:6px}
+.wmonths{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;height:180px;width:100%;max-width:520px;align-items:end}
+.wmonths span{display:grid;grid-template-rows:1fr auto;height:100%;align-items:end;gap:4px}.wmonths i{display:block;background:rgba(255,255,255,.25);border-radius:4px 4px 0 0}.wmonths .on i{background:#e8b74a;box-shadow:0 0 18px rgba(232,183,74,.6)}.wmonths small{opacity:.7;font-size:11px}
+.wlist{list-style:none;margin:0;padding:0;display:grid;gap:8px;width:100%;max-width:420px;text-align:left}.wlist li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;font-size:18px}.wlist b{color:#e8b74a;font-family:var(--f-display,inherit);font-size:24px}.wlist em{font-style:normal;opacity:.7}
+.wfeat{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center;text-align:left;max-width:520px}.wfeat .poster{border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.wtop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;width:100%;align-items:end}.wtop>div{display:grid;gap:4px;font-size:13px;text-align:left}.wtop .first{transform:scale(1.08);transform-origin:bottom}.wtop .poster{border-radius:8px}.wtop span{color:#e8b74a}
+.wodd{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;width:100%;text-align:left}.wodd>div{display:grid;grid-template-columns:auto 1fr;gap:0 10px;background:rgba(255,255,255,.06);border-radius:14px;padding:12px}.wodd span{grid-row:span 2;font-size:26px}.wodd em{font-style:normal;opacity:.8;font-size:14px}
+.wpers{font-size:90px;line-height:1}
+.wcard{width:100%;max-width:440px;border-radius:20px;padding:20px;background:linear-gradient(160deg,#3a0f18,#1a0a0e);border:1px solid rgba(232,183,74,.5);box-shadow:0 20px 60px rgba(0,0,0,.5);display:grid;gap:12px;text-align:left}
+.wcard h3{font-family:var(--f-display,inherit);font-size:30px;margin:0;color:#e8b74a}.wcn{display:flex;flex-wrap:wrap;gap:6px 16px}.wcn b{font-size:22px;color:#fff}.wcard p{margin:0;font-size:14px;opacity:.9}.wcard .wwall{grid-template-columns:repeat(4,1fr)}.wbrand{font-family:var(--f-display,inherit);letter-spacing:.2em;color:#e11d48;font-size:14px;text-align:right}
+.wnav{display:flex;justify-content:space-between;align-items:center}
+body[data-view="wrap"] #marquee,body[data-view="wrap"] footer{display:none}
+@media (max-width:600px){.wrapx{min-height:calc(100vh - 230px);padding:14px 12px}.wtop{grid-template-columns:repeat(3,minmax(0,1fr))}.wtop>div:nth-child(n+4){display:none}.wfeat{grid-template-columns:96px 1fr}.wwall{grid-template-columns:repeat(4,minmax(0,1fr))}.wwall span:nth-child(n+13){display:none}.ws{font-size:16px}}
+
 .rel{margin-top:8px;font-size:14px;opacity:.9;line-height:1.5}
 .gstrip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 2px;padding-bottom:2px}
 .gchip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
@@ -930,6 +959,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   <main id="view-discover" hidden></main>
   <main id="view-blitz" hidden></main>
   <main id="view-tv" hidden></main>
+  <main id="view-wrap" hidden></main>
   <main id="view-friends" hidden></main>
   <main id="view-friend" hidden></main>
   <main id="view-lists" hidden></main>
@@ -2225,6 +2255,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const byG = {}; rated.forEach(x => (x.genres || []).forEach(g => { (byG[g] = byG[g] || []).push(Number(x.rating)); }));
     const gbest = Object.entries(byG).filter(([, a]) => a.length >= 2).map(([g, a]) => [g, a.reduce((s, x) => s + x, 0) / a.length, a.length]).sort((a, b) => b[1] - a[1]).slice(0, 6);
     v.innerHTML = `<div class="sechead" style="margin-bottom:10px"><h2>Box office</h2><span class="serif">Your viewing, by the numbers</span></div>
+      ${wrapYears().length ? `<button class="wrapcta" type="button" data-wrap="${wrapYears()[0]}"><span>🎬</span><b>Your ${wrapYears()[0]} wrap-up</b><em>Your year at the movies, slide by slide →</em></button>` : ""}
       <div class="seg" role="tablist" style="margin-bottom:14px">${[["all", "Everything"], ["movie", "🎬 Films"], ["tv", "📺 TV shows"]].map(([k, t]) => `<button type="button" data-stt="${k}" aria-pressed="${stT === k}">${t}</button>`).join("")}</div>
       <div class="kpis">
         ${stT !== "tv" ? `<div class="kpi"><span class="v">${films}</span><span class="s">films seen</span></div>` : ""}
@@ -2515,6 +2546,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     const ready = L.filter(x => (x.status === "want" || x.status === "watching") && onMine(x)).sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0) || (b.imdb || 0) - (a.imdb || 0)).slice(0, 18);
     v.innerHTML = `
       ${(!cin.list && !cin.busy && navigator.onLine ? (setTimeout(loadCinema, 1500), "") : "")}${homeTvHTML()}
+      ${(() => { const m = new Date().getMonth(), y = m === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear(); return (m >= 10 || m === 0) && wrapYears().includes(y) ? `<section class="hsec"><button class="wrapcta" type="button" data-wrap="${y}"><span>🎬</span><b>Your ${y} wrap-up is ready</b><em>Your year at the movies, slide by slide →</em></button></section>` : ""; })()}
       ${homeFriendsHTML()}
       <section class="hsec"><button class="tcta" type="button" data-go="tonight"><span class="admit2">ADMIT ONE</span><span><b>What's playing tonight?</b><span>Pick by mood, time and rating from your watchlist</span></span><span class="go">→</span></button></section>
       ${ready.length ? `<section class="hsec"><div class="sechead"><h2>Ready to stream</h2><span class="serif">On your services right now</span></div>${homeRow(ready)}</section>` : ""}
@@ -2793,6 +2825,78 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       cin.list = list.slice(); cacheSet("cin2", cin.list);
     } catch { cin.list = cin.list || []; }
     cin.busy = false; if (view === "tv") renderTvGuide(); else if (view === "home") renderHome();
+  }
+
+  // ================= yearly wrap-up: a slide-by-slide story of one year =================
+  let wr = { year: 0, i: 0 };
+  function wrapYears(){
+    const ys = new Set();
+    items().forEach(x => { if (x.status === "watched" && /^\d{4}/.test(x.finished || "")) ys.add(+x.finished.slice(0, 4)); (x.log || []).forEach(l => ys.add(+String(l.d).slice(0, 4))); });
+    return [...ys].filter(Boolean).sort((a, b) => b - a);
+  }
+  function wrapData(Y){
+    const L = items(), y = String(Y);
+    const seen = L.filter(x => x.status === "watched" && String(x.finished || "").startsWith(y));
+    const films = seen.filter(x => x.type !== "tv"), showsDone = seen.filter(x => x.type === "tv");
+    const epsBy = L.filter(x => x.type === "tv").map(x => [x, (x.log || []).filter(l => String(l.d).startsWith(y)).reduce((s, l) => s + num(l.n), 0)]).filter(r => r[1] > 0).sort((a, b) => b[1] - a[1]);
+    const eps = epsBy.reduce((s, r) => s + r[1], 0);
+    const epMin = (x, n) => n * (num(x.epLength) || 40);
+    const minutes = films.reduce((s, x) => s + (num(x.runtime) || 110), 0) + epsBy.reduce((s, [x, n]) => s + epMin(x, n), 0) + showsDone.filter(x => !epsBy.some(r => r[0].id === x.id)).reduce((s, x) => s + num(x.episodes || 8) * (num(x.epLength) || 40), 0);
+    const months = Array(12).fill(0); seen.forEach(x => { if (x.finished.length >= 7) months[+x.finished.slice(5, 7) - 1]++; });
+    L.forEach(x => (x.log || []).forEach(l => { if (String(l.d).startsWith(y)) months[+l.d.slice(5, 7) - 1] += num(l.n) / 4; }));
+    const bestM = months.some(Boolean) ? months.indexOf(Math.max(...months)) : -1;
+    const pool = [...seen, ...epsBy.map(r => r[0]).filter(x => !seen.includes(x))];
+    const gc = {}; pool.forEach(x => new Set((x.genres || []).map(gKey)).forEach(k => { if (k) gc[k] = (gc[k] || 0) + 1; }));
+    const genres = Object.entries(gc).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const top = seen.filter(x => x.rating).sort((a, b) => b.rating - a.rating || (b.fav ? 1 : 0) - (a.fav ? 1 : 0) || (b.imdb || 0) - (a.imdb || 0)).slice(0, 5);
+    const pc = {}; pool.forEach(x => String(x.creator || "").split(", ").filter(Boolean).forEach(p => { pc[p] = (pc[p] || 0) + 1; }));
+    const ac = {}; pool.forEach(x => (x.cast || []).slice(0, 4).forEach(p => { ac[p] = (ac[p] || 0) + 1; }));
+    const person = Object.entries(pc).sort((a, b) => b[1] - a[1])[0], actor = Object.entries(ac).sort((a, b) => b[1] - a[1])[0];
+    const dated = seen.filter(x => x.finished.length >= 7).sort((a, b) => a.finished.localeCompare(b.finished));
+    const newOnes = seen.filter(x => +x.year === +Y).length, oldest = seen.filter(x => x.year).sort((a, b) => a.year - b.year)[0];
+    const longest = films.filter(x => num(x.runtime)).sort((a, b) => num(b.runtime) - num(a.runtime))[0];
+    const rated = seen.filter(x => x.rating), avg = rated.length ? rated.reduce((s, x) => s + Number(x.rating), 0) / rated.length : 0;
+    const vs = seen.filter(x => x.rating && x.imdb).map(x => [x, x.rating * 2 - x.imdb]).sort((a, b) => b[1] - a[1]);
+    const added = L.filter(x => String(x.added || "").startsWith(y)).length;
+    const p = persona(pool.map(x => ({ ...x, status: "watched" })));
+    return { Y, seen, films, showsDone, epsBy, eps, minutes, months, bestM, genres, top, person, actor, first: dated[0], last: dated[dated.length - 1], newOnes, oldest, longest, avg, rated, hot: vs[0], cold: vs[vs.length - 1], added, persona: p, pool };
+  }
+  function wrapSlides(d){
+    const S = [], h = Math.round(d.minutes / 60), big = (n, l) => `<div class="wbig"><b>${n}</b><span>${l}</span></div>`;
+    const pw = (list, n = 12) => `<div class="wwall">${list.slice(0, n).map(x => `<span>${posterHTML(x)}</span>`).join("")}</div>`;
+    S.push(`<span class="wk">Front Row presents</span><h1>Your ${d.Y}<br>at the movies</h1><p class="ws">${d.seen.length + d.epsBy.length} titles, ${h.toLocaleString()} hours in the dark.</p>${pw(d.pool, 18)}`);
+    S.push(`<span class="wk">The numbers</span><div class="wbigs">${big(d.films.length, d.films.length === 1 ? "film" : "films")}${big(d.eps.toLocaleString(), "episodes")}${big(d.showsDone.length, d.showsDone.length === 1 ? "series finished" : "series finished")}${big(h.toLocaleString(), "hours")}</div><p class="ws">That's ${(d.minutes / 1440).toFixed(1)} full days${h >= 3 ? `, or ${Math.round(d.minutes / 142)} trips to the cinema` : ""}.</p>`);
+    if (d.bestM >= 0) { const mx = Math.max(...d.months, 1); S.push(`<span class="wk">Your busiest month</span><h2>${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.bestM]}</h2><div class="wmonths">${d.months.map((m, i) => `<span class="${i === d.bestM ? "on" : ""}"><i style="height:${Math.max(3, m / mx * 100)}%"></i><small>${MONTHS[i].slice(0, 1)}</small></span>`).join("")}</div>`); }
+    if (d.genres.length) S.push(`<span class="wk">What you kept coming back to</span><h2>${esc(gName(d.genres[0][0]))}</h2><ol class="wlist">${d.genres.map(([k, n], i) => `<li><b>${i + 1}</b><span>${esc(gName(k))}</span><em>${n}</em></li>`).join("")}</ol>`);
+    if (d.epsBy.length) { const [x, n] = d.epsBy[0]; S.push(`<span class="wk">Your show of the year</span><div class="wfeat">${posterHTML(x)}<div><h2>${esc(x.title)}</h2><p class="ws">${n} episodes, about ${Math.round(n * (num(x.epLength) || 40) / 60)} hours.</p></div></div>${d.epsBy.length > 1 ? `<ol class="wlist">${d.epsBy.slice(1, 5).map(([s, m], i) => `<li><b>${i + 2}</b><span>${esc(s.title)}</span><em>${m} eps</em></li>`).join("")}</ol>` : ""}`); }
+    if (d.top.length) S.push(`<span class="wk">Your top ${d.top.length === 1 ? "pick" : d.top.length}</span><div class="wtop">${d.top.map((x, i) => `<div class="${i ? "" : "first"}">${posterHTML(x)}<b>${i + 1}. ${esc(x.title)}</b><span>${starTxt(x.rating)}${x.fav ? " ♥" : ""}</span></div>`).join("")}</div>`);
+    if (d.person || d.actor) S.push(`<span class="wk">The people of your year</span>${d.person && d.person[1] > 1 ? `<div class="wbig"><b>${esc(d.person[0])}</b><span>${d.person[1]} titles directed or created</span></div>` : ""}${d.actor && d.actor[1] > 1 ? `<div class="wbig"><b>${esc(d.actor[0])}</b><span>turned up in ${d.actor[1]} of them</span></div>` : ""}`);
+    const odd = [];
+    if (d.first) odd.push(["🎬", "First of the year", `${d.first.title}, ${fmtDate(d.first.finished)}`]);
+    if (d.last && d.last !== d.first) odd.push(["🏁", "Most recent", `${d.last.title}, ${fmtDate(d.last.finished)}`]);
+    if (d.longest) odd.push(["⏳", "Longest sit", `${d.longest.title} (${fmtRun(d.longest.runtime)})`]);
+    if (d.oldest) odd.push(["🎞️", "Oldest", `${d.oldest.title} from ${d.oldest.year}`]);
+    if (d.newOnes) odd.push(["✨", `Brand new in ${d.Y}`, `${d.newOnes} title${d.newOnes > 1 ? "s" : ""} the same year they came out`]);
+    if (d.hot && d.hot[1] >= 1) odd.push(["🔥", "You loved it more than IMDb", `${d.hot[0].title}: you ${d.hot[0].rating * 2}/10, IMDb ${Number(d.hot[0].imdb).toFixed(1)}`]);
+    if (d.cold && d.cold[1] <= -1) odd.push(["🧊", "Not for you", `${d.cold[0].title}: you ${d.cold[0].rating * 2}/10, IMDb ${Number(d.cold[0].imdb).toFixed(1)}`]);
+    if (d.added) odd.push(["📝", "Added to your lists", `${d.added} titles`]);
+    if (odd.length) S.push(`<span class="wk">Odds and ends</span><div class="wodd">${odd.slice(0, 6).map(([e, t, s]) => `<div><span>${e}</span><b>${esc(t)}</b><em>${esc(s)}</em></div>`).join("")}</div>`);
+    if (d.persona) S.push(`<span class="wk">This year you were</span><div class="wpers">${d.persona[0]}</div><h2>${esc(d.persona[1])}</h2><p class="ws">${esc(d.persona[2])}</p>`);
+    S.push(`<span class="wk">That's a wrap</span><div class="wcard"><h3>My ${d.Y} at the movies</h3><div class="wcn"><span><b>${d.films.length}</b> films</span><span><b>${d.eps}</b> episodes</span><span><b>${h}</b> hours</span>${d.avg ? `<span><b>${d.avg.toFixed(1)}★</b> average</span>` : ""}</div>${d.genres[0] ? `<p>Top genre: <b>${esc(gName(d.genres[0][0]))}</b>${d.epsBy[0] ? ` · Show of the year: <b>${esc(d.epsBy[0][0].title)}</b>` : ""}${d.top[0] ? ` · Favourite: <b>${esc(d.top[0].title)}</b>` : ""}</p>` : ""}${pw(d.top.length >= 4 ? d.top.concat(d.seen) : d.pool, 8)}<span class="wbrand">FRONT ROW</span></div><div class="qa" style="justify-content:center"><button class="btn gold" type="button" data-wshare>Share my year</button><button class="btn" type="button" data-wi="0">Watch again</button></div>`);
+    return S;
+  }
+  function renderWrap(){
+    const v = $("#view-wrap"), ys = wrapYears();
+    if (!wr.year) wr.year = ys[0] || new Date().getFullYear();
+    const d = wrapData(wr.year);
+    if (!d.seen.length && !d.eps) { v.innerHTML = `<button class="back" type="button" data-go="stats">← Stats</button><div class="empty"><h3>Nothing dated in ${wr.year} yet</h3><span class="serif">Give your seen titles a date (Seen → 📅 Date by release date, or pick dates yourself), then come back.</span></div>`; return; }
+    const S = wrapSlides(d); wr.i = Math.min(wr.i, S.length - 1);
+    v.innerHTML = `<div class="wrapx" data-wtap>
+      <div class="wbars">${S.map((_, i) => `<i class="${i < wr.i ? "done" : i === wr.i ? "now" : ""}"></i>`).join("")}</div>
+      <div class="wtop-ui"><button class="back" type="button" data-go="stats" style="margin:0">← Stats</button>${ys.length > 1 ? `<select class="sel" id="wr-year" aria-label="Year">${ys.map(y => `<option ${y === wr.year ? "selected" : ""}>${y}</option>`).join("")}</select>` : ""}</div>
+      <div class="wslide" key="${wr.i}">${S[wr.i]}</div>
+      <div class="wnav"><button type="button" class="btn small ghost" data-wi="${wr.i - 1}" ${wr.i ? "" : "disabled"}>‹ Back</button><span class="mono">${wr.i + 1} / ${S.length}</span><button type="button" class="btn small gold" data-wi="${wr.i + 1}" ${wr.i < S.length - 1 ? "" : "disabled"}>Next ›</button></div>
+    </div>`;
   }
 
   // ================= TV guide: continue watching, new episodes, coming up, on a break =================
@@ -3823,19 +3927,20 @@ alter publication supabase_realtime add table public.${TABLE};`;
     view = v;
     document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     closePop(); if (v === "discover") openDiscover();
-    document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v === "blitz" ? "seen" : v === "friend" ? "friends" : v === "tv" ? "home" : v)) b.setAttribute("aria-current", "page"); });
+    document.querySelectorAll(".nav [data-go]").forEach(b => { if (b.dataset.go === (v === "list" ? "lists" : v === "blitz" ? "seen" : v === "friend" ? "friends" : v === "tv" ? "home" : v === "wrap" ? "stats" : v)) b.setAttribute("aria-current", "page"); });
     $("#marquee").classList.toggle("slim", v !== "home"); setTimeout(layBulbs, 0);
     if (v === "home") openHome();
     if (v === "blitz" && !bz.list && !bz.busy) loadBlitz();
     if (v === "friends") loadSocial(); if (v === "blitz" && !LISTS) loadPool();
-    ["home","tv","library","seen","discover","blitz","friends","friend","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
+    document.body.dataset.view = v;
+    ["home","tv","wrap","library","seen","discover","blitz","friends","friend","lists","list","tonight","stats"].forEach(k => $("#view-" + k).hidden = k !== v);
     const hv = v === "list" ? "list-" + curList : v;
     if (location.hash.slice(1) !== hv) history.replaceState(null, "", v === "home" ? location.pathname + location.search : "#" + hv);
     render();
   }
   function render(){
     renderMarquee(); $("#now").hidden = true;
-    if (view === "home") renderHome(); else if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else if (view === "friends") renderFriends(); else if (view === "friend") renderFriend(); else if (view === "blitz") renderBlitz(); else if (view === "tv") renderTvGuide(); else renderStats();
+    if (view === "home") renderHome(); else if (view === "library") renderLibrary(); else if (view === "seen") renderSeen(); else if (view === "discover") renderDiscover(); else if (view === "lists") renderLists(); else if (view === "list") renderListPage(); else if (view === "tonight") renderTonight(); else if (view === "friends") renderFriends(); else if (view === "friend") renderFriend(); else if (view === "blitz") renderBlitz(); else if (view === "tv") renderTvGuide(); else if (view === "wrap") renderWrap(); else renderStats();
     if (res.state === "done") renderResults();
     if (pop) renderPop();
   }
@@ -3862,7 +3967,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
   addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; $("#install-btn").hidden = false; });
   $("#install-btn").addEventListener("click", async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; $("#install-btn").hidden = true; });
   addEventListener("appinstalled", () => { $("#install-btn").hidden = true; toast("Front Row is installed"); });
-  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["home","tv","library","seen","discover","blitz","friends","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
+  function routeHash(){ const h = location.hash.slice(1); if (h.startsWith("list-") && listById(h.slice(5))) { if (view !== "list" || curList !== h.slice(5)) { curList = h.slice(5); go("list"); } return true; } if (["home","tv","wrap","library","seen","discover","blitz","friends","lists","tonight","stats"].includes(h)) { if (h !== view) go(h); return true; } return false; }
   addEventListener("hashchange", routeHash);
   addEventListener("scroll", () => { if (pop && !$("#pop-root .sheet")) closePop(); }, { passive: true });
   addEventListener("resize", () => closePop());
@@ -3901,6 +4006,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (t.id === "sn-genre") { sn.genre = t.value; renderSeen(); }
     if (t.id === "sn-sort") { sn.sort = t.value; renderSeen(); }
     if (t.id === "t-from") { tn.from = t.value; tn.pick = null; renderTonight(); }
+    if (t.id === "wr-year") { wr = { year: Number(t.value), i: 0 }; renderWrap(); }
     if (t.id === "bz-sel") { bz.set = t.value; bzSkipped.clear(); loadBlitz(); }
     if (t.id === "imp-dates" && imp) { imp.useDates = t.checked; }
     if (t.id === "imp-ptype" && imp) { imp.ptype = t.value; }
@@ -3923,6 +4029,12 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (f.id === "popnew") { e.preventDefault(); const name = f.querySelector("input").value.trim(); if (!name) return; if (lists().some(l => norm(l.name) === norm(name))) { toast(`You already have a list called ${name}`); return; } const l = newListObj(name); setLists([...lists(), l]); const it = ensureIt(pop.key); if (it) upsert(setMember(it, l.id, true), `Created ${l.name} and added ${it.title}`); renderPop(); }
     if (f.id === "cardnewlist") { e.preventDefault(); const name = f.querySelector("input").value.trim(); if (!name || !draft) return; readFields(); let l = lists().find(x => norm(x.name) === norm(name)); if (!l) { l = newListObj(name); setLists([...lists(), l], `Created ${l.name}`); } if (!draft.lists.includes(l.id)) draft.lists.push(l.id); draft.listAdded = { ...(draft.listAdded || {}), [l.id]: Date.now() }; rerenderCard(); }
   });
+  document.addEventListener("click", e => {
+    if (view !== "wrap" || e.target.closest("button,a,select")) return;
+    const w = e.target.closest("[data-wtap]"); if (!w) return;
+    const n = document.querySelectorAll(".wbars i").length; const r = w.getBoundingClientRect(); wr.i = Math.max(0, Math.min(n - 1, wr.i + (e.clientX < r.left + r.width * .3 ? -1 : 1))); renderWrap();
+  });
+  document.addEventListener("keydown", e => { if (view !== "wrap" || $("#modal-root").innerHTML) return; if (e.key === "ArrowRight" || e.key === "ArrowLeft") { const n = document.querySelectorAll(".wbars i").length; wr.i = Math.max(0, Math.min(n - 1, wr.i + (e.key === "ArrowRight" ? 1 : -1))); renderWrap(); } });
   document.addEventListener("click", async e => {
     const t = e.target.closest("button,a,[data-scrim],[data-popclose],#drop");
     if (!t) return;
@@ -3975,6 +4087,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.ep) return plusEp(D.ep, t);
     if (D.stopnew !== undefined) return openStop(null);
     if (D.tvg) { tg.tab = D.tvg; if (view !== "tv") { go("tv"); scrollTo({ top: 0 }); } else renderTvGuide(); if (!newEps.at && !newEps.busy) checkNewEpisodes(); return; }
+    if (D.wrap) { wr = { year: Number(D.wrap), i: 0 }; go("wrap"); scrollTo({ top: 0 }); return; }
+    if (D.wi !== undefined) { wr.i = Math.max(0, Number(D.wi)); return renderWrap(); }
+    if (D.wshare !== undefined) { const d = wrapData(wr.year); const txt = `My ${d.Y} at the movies 🎬\n${d.films.length} films · ${d.eps} episodes · ${Math.round(d.minutes / 60)} hours${d.genres[0] ? `\nTop genre: ${gName(d.genres[0][0])}` : ""}${d.epsBy[0] ? `\nShow of the year: ${d.epsBy[0][0].title}` : ""}${d.top.length ? `\nMy top ${Math.min(3, d.top.length)}: ${d.top.slice(0, 3).map(x => x.title).join(", ")}` : ""}${d.persona ? `\nI was: ${d.persona[1]} ${d.persona[0]}` : ""}\n— made with Front Row`; if (navigator.share) { try { await navigator.share({ text: txt }); } catch {} } else { try { await navigator.clipboard.writeText(txt); toast("Copied. Paste it anywhere."); } catch {} } return; }
     if (D.tgup) { tg.up = D.tgup; return renderTvGuide(); }
     if (D.cinretry !== undefined) { cacheSet("cin2", null); cin.list = null; loadCinema(); return renderTvGuide(); }
     if (D.stop) { const it = items().find(x => x.id === D.stop); return it && openStop(it); }
