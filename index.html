@@ -776,6 +776,14 @@ footer .row2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* v2.2: ready-made lists, import, friends */
+.gstrip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px 0 2px;padding-bottom:2px}
+.gchip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.gchip small{margin-left:5px;opacity:.6;font-size:11px}
+.gchip[aria-pressed="true"]{background:var(--gold);color:#1a1206;border-color:var(--gold)}
+.hgen{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.hgen .gchip{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:inherit;padding:4px 10px;font-size:12.5px}
+.hgen .gchip:hover{border-color:var(--gold)}
+.card .cg{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .dist.eph{grid-template-columns:repeat(12,minmax(0,1fr))}.dist.eph .db i{background:var(--blue)}
 .tgtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .tgtile{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;color:var(--ink);font:inherit;cursor:pointer;min-height:92px}
@@ -1572,12 +1580,22 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   // ================= library =================
   let libSvc = false;
   let view = "home", statusF = "want", typeF = lsGet("front-row-type", "all"), listF = "", sortBy = "added", libQ = "", libMin = "";
+  const gKey = g => String(g || "").toLowerCase().replace(/[-_]+/g, " ").replace(/\s+(film|films|movie|television series|tv series|series)$/, "").replace(/^science fiction$/, "sci fi").replace(/^sci fi$/, "sci fi").trim();
+  const gName = g => { const k = gKey(g); return k === "sci fi" ? "Sci-fi" : k === "lgbt" || k === "lgbtq" || k === "lgbtq+" || k === "lgbt related" ? "LGBTQ+" : k.charAt(0).toUpperCase() + k.slice(1); };
+  const hasGenre = (x, k) => (x.genres || []).some(g => gKey(g) === k);
+  function genreStrip(list, cur, attr){
+    const c = {}; list.forEach(x => new Set((x.genres || []).map(gKey)).forEach(k => { if (k) c[k] = (c[k] || 0) + 1; }));
+    const rows = Object.entries(c).sort((a, b) => b[1] - a[1]); if (rows.length < 2) return "";
+    return `<div class="gstrip" role="group" aria-label="Genre"><button type="button" class="gchip" ${attr}="" aria-pressed="${!cur}">All genres</button>${rows.map(([k, n]) => `<button type="button" class="gchip" ${attr}="${esc(k)}" aria-pressed="${cur === k}">${esc(gName(k))}<small>${n}</small></button>`).join("")}</div>`;
+  }
+  let libG = "";
   function libFiltered(){
     let list = items().slice();
     if (statusF !== "all") list = list.filter(x => x.status === statusF);
     if (typeF !== "all") list = list.filter(x => (x.type || "movie") === typeF);
     if (listF) list = list.filter(x => (x.lists || []).includes(listF));
     if (libMin) list = list.filter(x => passMin(x, libMin));
+    if (libG) list = list.filter(x => hasGenre(x, libG));
     if (libSvc) list = list.filter(onMine);
     if (libQ) { const q = norm(libQ); list = list.filter(x => norm([x.title, x.creator, (x.cast || []).join(" "), (x.genres || []).join(" ")].join(" ")).includes(q)); }
     const by = {
@@ -1615,6 +1633,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       </div>
       ${L ? `<div class="banner"><span class="mono">List</span><b>${esc(L.name)}</b><span class="muted">Titles you add from search go on this list too.</span><button class="linkbtn" type="button" data-openlist="${esc(L.id)}" style="margin-left:auto">Open the list page</button><button class="linkbtn" type="button" data-unlist>Show everything</button></div>` : ""}
       ${missing ? `<div class="fillbar"><span>${missing} title${missing === 1 ? " has" : "s have"} no poster yet.</span><button class="btn small gold" type="button" id="fill-btn" ${filling ? "disabled" : ""}>${filling ? `<span class="dots">Finding posters</span>` : "Find posters and details"}</button></div>` : ""}
+      ${genreStrip(base.filter(x => statusF === "all" || x.status === statusF), libG, "data-libg")}
       ${list.length ? `<div class="grid">${list.map(it => cardW(it, { quick: statusF !== "dropped" })).join("")}</div>` : emptyHTML()}
       ${homeTeaser()}`;
   }
@@ -1626,7 +1645,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
     if (it.status === "watched" && !opt.rate && !opt.quick) extra += `<span class="stub"><span>${it.finished ? esc(/^\d{4}$/.test(it.finished) ? it.finished : fmtDate(it.finished).replace(/ \d{4}$/, "")) : "Seen"}</span><span class="st">${starTxt(it.rating)}</span></span>`;
     const sub = it.type === "tv" ? (it.seasons ? `${it.seasons} season${it.seasons > 1 ? "s" : ""}` : "Series") : (fmtRun(it.runtime) || "Film");
     const right = it.status === "watching" && it.type === "tv" ? `<span class="mono" style="font-size:11px">S${num(it.season) || 1}·E${num(it.episode)}</span>` : it.imdb ? `<span class="sc imdb">${Number(it.imdb).toFixed(1)}</span>` : "";
-    return `<button class="card" type="button" data-open="${esc(it.id)}">${posterHTML(it, { extra })}<span class="ct">${esc(it.title)}${listDots(it)}</span><span class="cs"><span>${esc([it.year, sub].filter(Boolean).join(" · "))}</span>${right}</span>${it.status === "watching" && it.type === "tv" && tvProgress(it) ? `<span class="mini"><span style="width:${tvProgress(it)}%"></span></span>` : ""}${(view === "library" && statusF === "all") || (view === "list" && lpStatus === "all") ? `<span><span class="pill ${it.status}">${esc(STATUS[it.status])}</span></span>` : ""}</button>`;
+    return `<button class="card" type="button" data-open="${esc(it.id)}">${posterHTML(it, { extra })}<span class="ct">${esc(it.title)}${listDots(it)}</span><span class="cs"><span>${esc([it.year, sub].filter(Boolean).join(" · "))}</span>${right}</span>${(it.genres || []).length ? `<span class="cg">${esc([...new Set(it.genres.map(gName))].slice(0, 2).join(" · "))}</span>` : ""}${it.status === "watching" && it.type === "tv" && tvProgress(it) ? `<span class="mini"><span style="width:${tvProgress(it)}%"></span></span>` : ""}${(view === "library" && statusF === "all") || (view === "list" && lpStatus === "all") ? `<span><span class="pill ${it.status}">${esc(STATUS[it.status])}</span></span>` : ""}</button>`;
   }
   function emptyHTML(){
     if (!items().length) return `<div class="empty"><h3>The house lights are up</h3><span class="serif">Search above for anything you've been meaning to watch.</span><div class="chips">${SUGGEST.map(s => `<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
@@ -1913,7 +1932,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
   function seenFiltered(){
     let L = items().filter(x => x.status === "watched");
     if (sn.type !== "all") L = L.filter(x => (x.type || "movie") === sn.type);
-    if (sn.genre) L = L.filter(x => (x.genres || []).includes(sn.genre));
+    if (sn.genre) L = L.filter(x => hasGenre(x, sn.genre));
     if (sn.min) L = L.filter(x => passMin(x, sn.min));
     if (sn.rf === "fav") L = L.filter(x => x.fav); else if (sn.rf === "unrated") L = L.filter(x => !x.rating); else if (sn.rf) L = L.filter(x => (x.rating || 0) >= Number(sn.rf));
     if (sn.q) { const q = norm(sn.q); L = L.filter(x => norm([x.title, x.creator, (x.cast || []).join(" ")].join(" ")).includes(q)); }
@@ -1939,8 +1958,9 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
       <div style="margin-top:12px">${all.length ? `
         <div class="seenbar"><div class="seg" role="tablist">${[["movie", "Movies"], ["tv", "TV shows"], ["all", "Both"]].map(([k, t]) => `<button type="button" role="tab" data-snt="${k}" aria-pressed="${sn.type === k}">${t} <small>${all.filter(x => k === "all" || (x.type || "movie") === k).length}</small></button>`).join("")}</div>
           <input class="filterq" id="sn-q" type="search" placeholder="Filter by title or person" value="${esc(sn.q)}"></div>
+        ${genreStrip(all.filter(x => sn.type === "all" || (x.type || "movie") === sn.type), sn.genre, "data-sng")}
         <div class="seenfilters"><select class="sel" id="sn-rf" aria-label="Rating">${[["", "Any rating"], ["fav", "Favourites ♥"], ["5", "5 stars"], ["4", "4 stars and up"], ["3", "3 stars and up"], ["unrated", "Not rated"]].map(([k, t]) => `<option value="${k}" ${sn.rf === k ? "selected" : ""}>${t}</option>`).join("")}</select>
-          ${genres.length ? `<select class="sel" id="sn-genre" aria-label="Genre"><option value="">All genres</option>${genres.map(g => `<option ${sn.genre === g ? "selected" : ""}>${esc(g)}</option>`).join("")}</select>` : ""}
+
           ${minSel("sn-min", sn.min)}
           <select class="sel" id="sn-sort" aria-label="Sort">${[["finished", "When I watched it"], ["rating", "My rating"], ["imdb", "IMDb rating"], ["year", "Release year"], ["title", "Title"]].map(([k, t]) => `<option value="${k}" ${sn.sort === k ? "selected" : ""}>${t}</option>`).join("")}</select>${L.length !== all.length ? `<span class="mono" style="font-size:12px;align-self:center;white-space:nowrap">${L.length} of ${all.length}</span>` : ""}</div>
         ${grid || `<div class="empty"><h3>No matches</h3><span class="serif">Try a different filter.</span></div>`}`
@@ -3453,6 +3473,7 @@ textarea.bulk{width:100%;min-height:180px;border:1px solid var(--line);border-ra
           <span class="kind">${draftNew ? "Not in your library yet" : esc(STATUS[d.status] || "")}${d.priority ? " · Must see" : ""}</span>
           <h2>${esc(d.title || "New title")}</h2>
           <div class="facts">${facts.map(f => `<span>${esc(f)}</span>`).join("")}</div>
+          ${(d.genres || []).length ? `<div class="hgen">${[...new Set(d.genres.map(gKey))].filter(Boolean).map(k => `<button type="button" class="gchip" data-gopen="${d.status === "watched" ? "watched" : "lib"}|${esc(k)}" data-gtype="${tv ? "tv" : "movie"}" title="See all your ${esc(gName(k).toLowerCase())} titles">${esc(gName(k))}</button>`).join("")}</div>` : ""}
           <div style="margin-top:8px">${scoresHTML(d)}</div>
           ${d.creator || d.cast?.length ? `<div class="people">${d.creator ? `${tv ? "Created by" : "Directed by"} <b>${esc(d.creator)}</b>` : ""}${d.creator && d.cast?.length ? "<br>" : ""}${d.cast?.length ? `With <b>${esc(d.cast.join(", "))}</b>` : ""}</div>` : ""}
           ${links.length ? `<div class="links">${links.join("")}</div>` : ""}
@@ -3754,7 +3775,7 @@ alter publication supabase_realtime add table public.${TABLE};`;
 
   // keep each sideways row scrolled where it was when the page redraws
   // every sideways-scrolling strip (poster rows, list pickers, filter chips, season tabs) keeps its place when the page redraws
-  const HSCROLL = ".row, .blkeys, .chips, .stabs, .tgtabs, .seenfilters, .bigtabs";
+  const HSCROLL = ".row, .blkeys, .chips, .stabs, .tgtabs, .seenfilters, .bigtabs, .gstrip";
   function rowKeys(){ const m = new Map(); document.querySelectorAll(HSCROLL).forEach(r => { const box = r.closest("[id]"), cls = r.className.split(" ")[0], all = box ? [...box.querySelectorAll("." + cls)] : []; m.set((box?.id || "") + ":" + cls + ":" + all.indexOf(r), r); }); return m; }
   function keepRows(fn){ return function(...a){ const before = []; rowKeys().forEach((r, k) => { if (r.scrollLeft) before.push([k, r.scrollLeft]); }); const out = fn.apply(this, a); if (before.length) { const now = rowKeys(); before.forEach(([k, x]) => { const r = now.get(k); if (r) r.scrollLeft = x; }); } return out; }; }
   renderHome = keepRows(renderHome); render = keepRows(render); renderResults = keepRows(renderResults); renderSeen = keepRows(renderSeen); renderDiscover = keepRows(renderDiscover); renderLibrary = keepRows(renderLibrary); rerenderCard = keepRows(rerenderCard); renderTvGuide = keepRows(renderTvGuide); renderStats = keepRows(renderStats);
@@ -3969,6 +3990,9 @@ alter publication supabase_realtime add table public.${TABLE};`;
     if (D.fitem) { const x = friendItem(D.fitem, D.k); if (!x) return; const r = fromShelf(x), have = findSame(r); return have ? openCard(have) : openCard({ ...r, status: "want" }, { isNew: true, hint: `${soc.friends.find(f => f.user_id === D.fitem)?.name || "Your friend"} ${verb(x)} it` }); }
     if (D.fadd) { const x = friendItem(D.fadd, D.k); if (!x) return; addFrom(fromShelf(x), D.st, {}, D.st === "watched"); return view === "friend" ? renderFriend() : renderFriends(); }
     if (D.stt) { stT = D.stt; lsSet("front-row-stt", stT); return renderStats(); }
+    if (D.sng !== undefined) { sn.genre = D.sng; return renderSeen(); }
+    if (D.libg !== undefined) { libG = D.libg; return renderLibrary(); }
+    if (D.gopen) { closeModal(); const [st, k] = D.gopen.split("|"); if (st === "watched") { sn.genre = k; sn.type = D.gtype || "all"; go("seen"); } else { libG = k; go("library"); } scrollTo({ top: 0 }); toast(`Your ${gName(k).toLowerCase()} titles`); return; }
     if (D.snrate !== undefined) { sn.rf = sn.rf === "unrated" ? "" : "unrated"; return renderSeen(); }
     if (D.recs !== undefined) { if (POOL && quickRecs(String(Date.now()))) { toast("Fresh picks"); return; } return buildRecs(); }
     if (D.recdeep !== undefined) return buildRecs();
